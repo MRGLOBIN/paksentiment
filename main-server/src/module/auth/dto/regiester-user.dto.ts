@@ -1,3 +1,4 @@
+import { Match } from '@decorators/match.decorator';
 import {
   IsNotEmpty,
   IsString,
@@ -27,6 +28,7 @@ export class RegisterUserDTO {
   })
   password: string;
 
+  @Match('password', { message: 'Confirm Password must match password field' })
   @IsNotEmpty({ message: 'Confirm Password is required' })
   confirmPassword: string;
 }
