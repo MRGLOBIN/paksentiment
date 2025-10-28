@@ -4,10 +4,14 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background-color: #f5f5f5;
+  background-color: var(--background);
 
   & h1 {
-    font-size: 3rem;
-    color: #333;
+    font-size: var(--font-size-3xl);
+    color: var(--primary);
+  }
+  & p {
+    font-size: var(--font-size-lg);
+    color: var(--foreground);
   }
 }
