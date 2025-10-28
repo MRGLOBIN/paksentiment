@@ -6,7 +6,7 @@ import {
   MinLength,
 } from 'class-validator';
 
-export class LoginUserWithEmailAndPasswordDTO {
+export class LoginWithEmailAndPasswordDTO {
   @IsEmail()
   @IsEmpty()
   email: string;
