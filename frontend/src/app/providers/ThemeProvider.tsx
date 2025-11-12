@@ -1,139 +1,68 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode,
-} from "react";
+import { createContext, useContext, ReactNode, useMemo } from "react";
 import {
   ThemeProvider as MuiThemeProvider,
   createTheme,
   CssBaseline,
 } from "@mui/material";
 
-type ThemeMode = "light" | "dark";
-
-interface ThemeContextType {
-  mode: ThemeMode;
-  toggleTheme: () => void;
-}
+import { ThemeContextType } from "@/common/core/types/theme";
+import { useThemeMode } from "@/hooks/useThemeMode";
+import { DEFAULT_COLORS, CSS_VARIABLES } from "@/common/constants/theme";
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function useTheme() {
   const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error("useTheme must be used within ThemeProvider");
-  }
+  if (!context) throw new Error("useTheme must be used within ThemeProvider");
   return context;
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  // Initialize theme from localStorage or default to 'light'
-  const [mode, setMode] = useState<ThemeMode>("light");
-  const [mounted, setMounted] = useState(false);
+  const { mode, toggleTheme, mounted } = useThemeMode();
 
-  useEffect(() => {
-    setMounted(true);
-    // Get saved theme from localStorage
-    const savedTheme = localStorage.getItem("theme") as ThemeMode;
-    if (savedTheme) {
-      setMode(savedTheme);
-      document.documentElement.setAttribute("data-theme", savedTheme);
-    } else {
-      // Check system preference
-      const prefersDark = window.matchMedia(
-        "(prefers-color-scheme: dark)"
-      ).matches;
-      const initialMode = prefersDark ? "dark" : "light";
-      setMode(initialMode);
-      document.documentElement.setAttribute("data-theme", initialMode);
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    setMode((prevMode) => {
-      const newMode = prevMode === "light" ? "dark" : "light";
-      localStorage.setItem("theme", newMode);
-      document.documentElement.setAttribute("data-theme", newMode);
-      return newMode;
-    });
+  // Read CSS variables safely (only client-side)
+  const getCSSVar = (variable: string, fallback: string) => {
+    if (typeof window === "undefined") return fallback;
+    const value = getComputedStyle(document.documentElement)
+      .getPropertyValue(variable)
+      .trim();
+    return value || fallback;
   };
 
-  const theme = createTheme({
-    palette: {
-      mode,
-      ...(mode === "light"
-        ? {
-            // Light mode colors
-            primary: {
-              main:
-                getComputedStyle(document.documentElement)
-                  .getPropertyValue("--primary")
-                  .trim() || "#6aaf40",
-            },
-            background: {
-              default:
-                getComputedStyle(document.documentElement)
-                  .getPropertyValue("--background")
-                  .trim() || "#ffffff",
-              paper:
-                getComputedStyle(document.documentElement)
-                  .getPropertyValue("--card-bg")
-                  .trim() || "#f5f5f5",
-            },
-            text: {
-              primary:
-                getComputedStyle(document.documentElement)
-                  .getPropertyValue("--text-primary")
-                  .trim() || "#171717",
-              secondary:
-                getComputedStyle(document.documentElement)
-                  .getPropertyValue("--text-secondary")
-                  .trim() || "#666666",
-            },
-          }
-        : {
-            // Dark mode colors
-            primary: {
-              main:
-                getComputedStyle(document.documentElement)
-                  .getPropertyValue("--primary")
-                  .trim() || "#6aaf40",
-            },
-            background: {
-              default:
-                getComputedStyle(document.documentElement)
-                  .getPropertyValue("--background")
-                  .trim() || "#0a0a0a",
-              paper:
-                getComputedStyle(document.documentElement)
-                  .getPropertyValue("--card-bg")
-                  .trim() || "#1a1a1a",
-            },
-            text: {
-              primary:
-                getComputedStyle(document.documentElement)
-                  .getPropertyValue("--text-primary")
-                  .trim() || "#ededed",
-              secondary:
-                getComputedStyle(document.documentElement)
-                  .getPropertyValue("--text-secondary")
-                  .trim() || "#a0a0a0",
-            },
-          }),
-    },
-    typography: {
-      fontFamily: "Arial, Helvetica, sans-serif",
-    },
-  });
+  const theme = useMemo(
+    () =>
+      createTheme({
+        palette: {
+          mode,
+          primary: {
+            main: getCSSVar(CSS_VARIABLES.primary, DEFAULT_COLORS.primary),
+          },
+          background: {
+            default: getCSSVar(
+              CSS_VARIABLES.background,
+              DEFAULT_COLORS[mode].background
+            ),
+            paper: getCSSVar(CSS_VARIABLES.card, DEFAULT_COLORS[mode].paper),
+          },
+          text: {
+            primary: getCSSVar(
+              CSS_VARIABLES.textPrimary,
+              DEFAULT_COLORS[mode].textPrimary
+            ),
+            secondary: getCSSVar(
+              CSS_VARIABLES.textSecondary,
+              DEFAULT_COLORS[mode].textSecondary
+            ),
+          },
+        },
+        typography: { fontFamily: "Arial, Helvetica, sans-serif" },
+      }),
+    [mode]
+  );
 
-  // Prevent flash of wrong theme
-  if (!mounted) {
-    return null;
-  }
+  if (!mounted) return null; // Avoid flash of incorrect theme
 
   return (
     <ThemeContext.Provider value={{ mode, toggleTheme }}>

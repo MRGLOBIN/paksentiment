@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, FormEvent } from "react";
 import Link from "next/link";
 import {
   TextField,
@@ -13,95 +12,30 @@ import {
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import styles from "./login.module.scss";
-
-interface FormErrors {
-  email?: string;
-  password?: string;
-}
+import { useLogin } from "./useLogin";
 
 const LoginPage = () => {
   const theme = useTheme();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState<FormErrors>({});
-  const [loading, setLoading] = useState(false);
-  const [apiError, setApiError] = useState("");
-
-  const validateForm = (): boolean => {
-    const newErrors: FormErrors = {};
-
-    // Email validation
-    if (!email) {
-      newErrors.email = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = "Please enter a valid email";
-    }
-
-    // Password validation
-    if (!password) {
-      newErrors.password = "Password is required";
-    } else if (password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setApiError("");
-
-    if (!validateForm()) {
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      // TODO: Replace with your actual API endpoint
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.message || "Login failed");
-      }
-
-      const data = await response.json();
-      // TODO: Handle successful login (store token, redirect, etc.)
-      console.log("Login successful:", data);
-
-      // Example: Store token and redirect
-      // localStorage.setItem('token', data.token);
-      // router.push('/dashboard');
-    } catch (error) {
-      setApiError(
-        error instanceof Error
-          ? error.message
-          : "An error occurred during login"
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleTogglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
+  const {
+    email,
+    setEmail,
+    password,
+    setPassword,
+    showPassword,
+    handleTogglePasswordVisibility,
+    errors,
+    setErrors,
+    loading,
+    apiError,
+    handleSubmit,
+  } = useLogin();
 
   return (
     <div className={styles.container}>
       <div className={styles.card}>
         <div className={styles.header}>
-          <h1>Welcome Back</h1>
-          <p>Sign in to your account to continue</p>
+          <h1>Sign In</h1>
+          <p>Welcome Back to PakSentiment</p>
         </div>
 
         {apiError && (
@@ -163,9 +97,7 @@ const LoginPage = () => {
               mt: 1,
               py: 1.5,
               background: theme.palette.primary.main,
-              "&:hover": {
-                background: theme.palette.primary.dark,
-              },
+              "&:hover": { background: theme.palette.primary.dark },
             }}
           >
             {loading ? (
