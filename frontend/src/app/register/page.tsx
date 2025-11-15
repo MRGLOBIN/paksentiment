@@ -3,7 +3,7 @@
 import Link from "next/link";
 import styles from "./register.module.scss";
 import { RegisterForm } from "./RegisterForm";
-import { withAlerts } from "@/app/components/withAlerts";
+import { withAlerts } from "@/app/components/alerts/withAlerts";
 import { useRegister } from "./useRegister";
 
 const RegisterPageBase = () => {

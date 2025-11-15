@@ -1,37 +1,32 @@
 "use client";
 
 import { useState, FormEvent } from "react";
-
-interface FormErrors {
-  email?: string;
-  password?: string;
-}
+import { LoginFormErrors } from "./core/types";
+import { loginSchema } from "./core/schema";
 
 export const useLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState<FormErrors>({});
+  const [errors, setErrors] = useState<LoginFormErrors>({});
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState("");
 
   const validateForm = (): boolean => {
-    const newErrors: FormErrors = {};
+    const result = loginSchema.safeParse({ email, password });
 
-    if (!email) {
-      newErrors.email = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = "Please enter a valid email";
+    if (!result.success) {
+      const fieldErrors: LoginFormErrors = {};
+      result.error.issues.forEach((issue) => {
+        const field = issue.path[0] as keyof LoginFormErrors;
+        fieldErrors[field] = issue.message;
+      });
+      setErrors(fieldErrors);
+      return false;
     }
 
-    if (!password) {
-      newErrors.password = "Password is required";
-    } else if (password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setErrors({});
+    return true;
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -55,7 +50,7 @@ export const useLogin = () => {
 
       const data = await response.json();
       console.log("Login successful:", data);
-      // TODO: handle login success (redirect, store token, etc.)
+      // TODO: redirect or store token
     } catch (error) {
       setApiError(
         error instanceof Error
@@ -79,7 +74,6 @@ export const useLogin = () => {
     showPassword,
     handleTogglePasswordVisibility,
     errors,
-    setErrors,
     loading,
     apiError,
     handleSubmit,

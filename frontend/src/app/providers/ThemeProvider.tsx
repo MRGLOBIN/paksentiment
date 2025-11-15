@@ -1,35 +1,29 @@
 "use client";
 
-import { createContext, useContext, ReactNode, useMemo } from "react";
+import { ReactNode, useEffect, useMemo } from "react";
 import {
-  ThemeProvider as MuiThemeProvider,
   createTheme,
   CssBaseline,
+  ThemeProvider as MuiThemeProvider,
 } from "@mui/material";
-
-import { ThemeContextType } from "@/common/core/types/theme";
-import { useThemeMode } from "@/hooks/useThemeMode";
+import { getCSSVar } from "@/common/core/themeUtils";
 import { DEFAULT_COLORS, CSS_VARIABLES } from "@/common/constants/theme";
-
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+import { useThemeStore } from "@/store/useThemeStore";
 
 export function useTheme() {
-  const context = useContext(ThemeContext);
-  if (!context) throw new Error("useTheme must be used within ThemeProvider");
-  return context;
+  const mode = useThemeStore((s) => s.mode);
+  const toggleTheme = useThemeStore((s) => s.toggleTheme);
+  return { mode, toggleTheme };
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const { mode, toggleTheme, mounted } = useThemeMode();
+  const mode = useThemeStore((s) => s.mode);
+  const mounted = useThemeStore((s) => s.mounted);
+  const initializeTheme = useThemeStore((s) => s.initializeTheme);
 
-  // Read CSS variables safely (only client-side)
-  const getCSSVar = (variable: string, fallback: string) => {
-    if (typeof window === "undefined") return fallback;
-    const value = getComputedStyle(document.documentElement)
-      .getPropertyValue(variable)
-      .trim();
-    return value || fallback;
-  };
+  useEffect(() => {
+    initializeTheme();
+  }, [initializeTheme]);
 
   const theme = useMemo(
     () =>
@@ -62,14 +56,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     [mode]
   );
 
-  if (!mounted) return null; // Avoid flash of incorrect theme
+  if (!mounted) return null; // Prevent flash of incorrect theme
 
   return (
-    <ThemeContext.Provider value={{ mode, toggleTheme }}>
-      <MuiThemeProvider theme={theme}>
-        <CssBaseline />
-        {children}
-      </MuiThemeProvider>
-    </ThemeContext.Provider>
+    <MuiThemeProvider theme={theme}>
+      <CssBaseline />
+      {children}
+    </MuiThemeProvider>
   );
 }

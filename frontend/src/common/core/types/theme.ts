@@ -1,7 +1,8 @@
-// src/common/core/types/theme.ts
 export type ThemeMode = "light" | "dark";
 
-export interface ThemeContextType {
+export interface ThemeState {
   mode: ThemeMode;
+  mounted: boolean;
   toggleTheme: () => void;
+  initializeTheme: () => void;
 }
