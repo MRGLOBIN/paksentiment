@@ -1,0 +1,250 @@
+.resultsSection {
+  padding: 4rem 2rem;
+  background-color: var(--background);
+}
+
+.container {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.statsCard {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 6px var(--box-shadow);
+  border: 1px solid var(--border-color);
+}
+
+.statsTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.statLabel {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.statValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+
+  &.positive {
+    color: #10b981;
+  }
+
+  &.negative {
+    color: #ef4444;
+  }
+
+  &.neutral {
+    color: #6b7280;
+  }
+}
+
+.resultsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.resultCard {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px var(--box-shadow);
+  border: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px var(--box-shadow);
+    transform: translateY(-2px);
+  }
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.postInfo {
+  flex: 1;
+}
+
+.postTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.postMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+
+  span {
+    &:not(:last-child) {
+      &::after {
+        content: '';
+      }
+    }
+  }
+}
+
+.sentimentBadge {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  text-transform: capitalize;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &.positive {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  &.negative {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  &.neutral {
+    background: #e5e7eb;
+    color: #374151;
+  }
+}
+
+.confidence {
+  font-size: var(--font-size-xs);
+  opacity: 0.8;
+}
+
+.postText {
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.translation {
+  background: var(--background);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  border-left: 3px solid var(--primary);
+}
+
+.translationLabel {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.translationText {
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+.summary {
+  background: #eff6ff;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  border-left: 3px solid #3b82f6;
+
+  [data-theme='dark'] & {
+    background: rgba(59, 130, 246, 0.1);
+  }
+}
+
+.summaryLabel {
+  font-size: var(--font-size-xs);
+  color: #3b82f6;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.summaryText {
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  line-height: 1.6;
+  font-style: italic;
+}
+
+.viewLink {
+  display: inline-block;
+  color: var(--primary);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+  }
+}
+
+@media (max-width: 768px) {
+  .resultsSection {
+    padding: 2rem 1rem;
+  }
+
+  .cardHeader {
+    flex-direction: column;
+  }
+
+  .sentimentBadge {
+    align-self: flex-start;
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+}

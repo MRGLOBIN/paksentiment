@@ -1,29 +1,57 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# PakSentiment Main Server
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+The main backend server for PakSentiment - A comprehensive social media sentiment analysis platform focused on Pakistani social discourse.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Built with [Nest.js](https://nestjs.com/) - A progressive Node.js framework for building efficient and scalable server-side applications.
 
-## Description
+## Features
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **User Authentication**: Secure registration, login, and OAuth (Google) integration
+- **JWT Authorization**: Token-based authentication with bcrypt password hashing
+- **Data Aggregation**: Proxy layer to FastAPI gateway for social media data
+- **Dual Database**: PostgreSQL for users/config, MongoDB for posts/analytics
+- **TypeORM Integration**: Type-safe database operations with entities
+- **Validation Pipes**: Automatic request validation using class-validator
+- **Swagger Documentation**: Comprehensive API documentation with examples
+
+## API Documentation
+
+### Interactive Swagger UI
+
+Once the server is running, you can access the interactive API documentation at:
+
+**Swagger UI**: http://localhost:3000/api
+
+The Swagger UI provides:
+
+- Complete endpoint documentation with detailed descriptions
+- Request/response schemas with examples
+- Interactive testing interface (try endpoints directly)
+- Authentication testing with Bearer tokens
+- Organized by tags (Authentication, Reddit, Twitter, Health)
+
+### API Sections
+
+1. **Authentication** (`/auth`)
+   - User registration with email/password
+   - Login with credentials
+   - Google OAuth integration
+   - Password reset functionality
+
+2. **Reddit Data** (`/raw-data/reddit`)
+   - Fetch raw Reddit posts
+   - Full sentiment analysis pipeline
+
+3. **Twitter Data** (`/raw-data/twitter`)
+   - Fetch raw tweets
+   - Full sentiment analysis pipeline
+
+## Architecture
+
+```
+Frontend (Next.js) → Main Server (Nest.js) → FastAPI Gateway → Social Media APIs
+                                                             → AI Services (Gemini, Groq)
+```
 
 ## Project setup
 
@@ -42,21 +70,25 @@ This project uses both PostgreSQL (for relational data) and MongoDB (for documen
 2. **Create the database** using one of these methods:
 
    **Option A: Using the npm script (recommended)**
+
    ```bash
    $ yarn db:init
    ```
 
    **Option B: Using psql directly**
+
    ```bash
    $ psql -U postgres -c "CREATE DATABASE paksentiment;"
    ```
 
    **Option C: Using the SQL script**
+
    ```bash
    $ psql -U postgres -f scripts/init-database.sql
    ```
 
 3. **Configure environment variables** (optional, defaults shown):
+
    ```env
    POSTGRES_HOST=localhost
    POSTGRES_PORT=5432
@@ -78,6 +110,7 @@ This project uses both PostgreSQL (for relational data) and MongoDB (for documen
 1. **Ensure MongoDB is running locally** (default: `mongodb://localhost:27017`)
 
 2. **Configure environment variables** (optional, defaults shown):
+
    ```env
    MONGO_URI=mongodb://localhost:27017
    MONGO_DB=paksentiment
@@ -88,6 +121,89 @@ This project uses both PostgreSQL (for relational data) and MongoDB (for documen
    - `processed_posts` - Posts with sentiment analysis and translation
    - `analytics_cache` - Aggregated analytics data
    - `system_logs` - System event logs
+
+## Environment Variables
+
+Create a `.env` file in the root directory with the following variables:
+
+```env
+# Server
+PORT=3000
+NODE_ENV=development
+
+# PostgreSQL
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DB=paksentiment
+
+# MongoDB
+MONGO_URI=mongodb://localhost:27017
+MONGO_DB=paksentiment
+
+# JWT
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+
+# Google OAuth (optional)
+GOOGLE_CLIENT_ID=your-google-client-id
+
+# FastAPI Gateway
+FAST_API_BASE_URL=http://localhost:8000
+```
+
+## Using the API
+
+### Accessing Swagger Documentation
+
+1. Start the server: `yarn run start:dev`
+2. Open your browser to: http://localhost:3000/api
+3. Explore endpoints, schemas, and try requests directly
+
+### Authentication Flow
+
+1. **Register a new user**:
+
+   ```bash
+   POST http://localhost:3000/auth/register
+   Content-Type: application/json
+
+   {
+     "firstName": "John",
+     "lastName": "Doe",
+     "email": "john@example.com",
+     "password": "SecurePass123!",
+     "confirmPassword": "SecurePass123!"
+   }
+   ```
+
+2. **Get your access token** from the response:
+
+   ```json
+   {
+     "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+     "user": { ... }
+   }
+   ```
+
+3. **Use the token** in subsequent requests:
+   ```bash
+   Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+   ```
+
+### Example: Reddit Sentiment Analysis
+
+```bash
+GET http://localhost:3000/raw-data/reddit/sentiment?subreddit=pakistan&query=education&limit=10
+```
+
+Response includes:
+
+- Original Reddit posts
+- Language detection results
+- Translations (if needed)
+- Sentiment analysis (positive/negative/neutral)
+- AI-generated summaries
 
 ## Compile and run the project
 

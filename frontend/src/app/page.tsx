@@ -1,14 +1,15 @@
-import styles from "./page.module.scss";
-import ThemeToggle from "./components/ThemeToggle";
+import HeroSection from './components/HeroSection'
+import AnalysisInput from './components/AnalysisInput'
+import Navbar from './components/Navbar'
+import Footer from './components/Footer'
 
 export default function Home() {
   return (
     <>
-      <ThemeToggle />
-      <div className={styles.container}>
-        <h1>Welcome to PakSentiment Frontend</h1>
-        <p>Your go-to platform for sentiment analysis in Pakistan.</p>
-      </div>
+      <Navbar />
+      <HeroSection />
+      <AnalysisInput />
+      <Footer />
     </>
-  );
+  )
 }

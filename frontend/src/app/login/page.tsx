@@ -1,7 +1,8 @@
-"use client";
+'use client'
 
-import { useState, FormEvent } from "react";
-import Link from "next/link";
+import { useState, FormEvent } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import {
   TextField,
   Button,
@@ -10,91 +11,97 @@ import {
   Alert,
   CircularProgress,
   useTheme,
-} from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
-import styles from "./login.module.scss";
+} from '@mui/material'
+import { Visibility, VisibilityOff } from '@mui/icons-material'
+import Navbar from '../components/Navbar'
+import Footer from '../components/Footer'
+import styles from './login.module.scss'
 
 interface FormErrors {
-  email?: string;
-  password?: string;
+  email?: string
+  password?: string
 }
 
 const LoginPage = () => {
-  const theme = useTheme();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState<FormErrors>({});
-  const [loading, setLoading] = useState(false);
-  const [apiError, setApiError] = useState("");
+  const theme = useTheme()
+  const router = useRouter()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [errors, setErrors] = useState<FormErrors>({})
+  const [loading, setLoading] = useState(false)
+  const [apiError, setApiError] = useState('')
 
   const validateForm = (): boolean => {
-    const newErrors: FormErrors = {};
+    const newErrors: FormErrors = {}
 
     // Email validation
     if (!email) {
-      newErrors.email = "Email is required";
+      newErrors.email = 'Email is required'
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = "Please enter a valid email";
+      newErrors.email = 'Please enter a valid email'
     }
 
     // Password validation
     if (!password) {
-      newErrors.password = "Password is required";
-    } else if (password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
+      newErrors.password = 'Password is required'
+    } else if (password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters'
     }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setApiError("");
+    e.preventDefault()
+    setApiError('')
 
     if (!validateForm()) {
-      return;
+      return
     }
 
-    setLoading(true);
+    setLoading(true)
 
     try {
-      // TODO: Replace with your actual API endpoint
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const response = await fetch(
+        'http://localhost:3000/auth/login-with-email-password',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+        }
+      )
 
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.message || "Login failed");
+        const data = await response.json()
+        throw new Error(data.message || 'Login failed')
       }
 
-      const data = await response.json();
-      // TODO: Handle successful login (store token, redirect, etc.)
-      console.log("Login successful:", data);
+      const data = await response.json()
 
-      // Example: Store token and redirect
-      // localStorage.setItem('token', data.token);
-      // router.push('/dashboard');
+      // Store the access token
+      localStorage.setItem('accessToken', data.accessToken)
+      localStorage.setItem('user', JSON.stringify(data.user))
+
+      // Redirect to home page
+      router.push('/')
     } catch (error) {
       setApiError(
         error instanceof Error
           ? error.message
-          : "An error occurred during login"
-      );
+          : 'An error occurred during login'
+      )
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleTogglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
+    setShowPassword(!showPassword)
+  }
 
   return (
     <div className={styles.container}>
@@ -105,47 +112,46 @@ const LoginPage = () => {
         </div>
 
         {apiError && (
-          <Alert severity="error" sx={{ mb: 2 }}>
+          <Alert severity='error' sx={{ mb: 2 }}>
             {apiError}
           </Alert>
         )}
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <TextField
-            label="Email"
-            type="email"
+            label='Email'
+            type='email'
             value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              if (errors.email) setErrors({ ...errors, email: undefined });
+            onChange={e => {
+              setEmail(e.target.value)
+              if (errors.email) setErrors({ ...errors, email: undefined })
             }}
             error={!!errors.email}
             helperText={errors.email}
             fullWidth
-            autoComplete="email"
+            autoComplete='email'
             autoFocus
           />
 
           <TextField
-            label="Password"
-            type={showPassword ? "text" : "password"}
+            label='Password'
+            type={showPassword ? 'text' : 'password'}
             value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              if (errors.password)
-                setErrors({ ...errors, password: undefined });
+            onChange={e => {
+              setPassword(e.target.value)
+              if (errors.password) setErrors({ ...errors, password: undefined })
             }}
             error={!!errors.password}
             helperText={errors.password}
             fullWidth
-            autoComplete="current-password"
+            autoComplete='current-password'
             InputProps={{
               endAdornment: (
-                <InputAdornment position="end">
+                <InputAdornment position='end'>
                   <IconButton
                     onClick={handleTogglePasswordVisibility}
-                    edge="end"
-                    aria-label="toggle password visibility"
+                    edge='end'
+                    aria-label='toggle password visibility'
                   >
                     {showPassword ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
@@ -155,35 +161,43 @@ const LoginPage = () => {
           />
 
           <Button
-            type="submit"
-            variant="contained"
+            type='submit'
+            variant='contained'
             fullWidth
             disabled={loading}
             sx={{
               mt: 1,
               py: 1.5,
               background: theme.palette.primary.main,
-              "&:hover": {
+              '&:hover': {
                 background: theme.palette.primary.dark,
               },
             }}
           >
             {loading ? (
-              <CircularProgress size={24} color="inherit" />
+              <CircularProgress size={24} color='inherit' />
             ) : (
-              "Sign In"
+              'Sign In'
             )}
           </Button>
         </form>
 
         <div className={styles.footer}>
           <p>
-            Don&apos;t have an account? <Link href="/register">Sign up</Link>
+            Don&apos;t have an account? <Link href='/register'>Sign up</Link>
           </p>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default LoginPage;
+export default function LoginPageWithNav() {
+  return (
+    <>
+      <Navbar />
+      <LoginPage />
+      <Footer />
+    </>
+  )
+}
