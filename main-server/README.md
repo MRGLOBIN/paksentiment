@@ -31,6 +31,64 @@
 $ yarn install
 ```
 
+## Database Setup
+
+This project uses both PostgreSQL (for relational data) and MongoDB (for document storage).
+
+### PostgreSQL Setup
+
+1. **Ensure PostgreSQL is running locally** (default: `localhost:5432`)
+
+2. **Create the database** using one of these methods:
+
+   **Option A: Using the npm script (recommended)**
+   ```bash
+   $ yarn db:init
+   ```
+
+   **Option B: Using psql directly**
+   ```bash
+   $ psql -U postgres -c "CREATE DATABASE paksentiment;"
+   ```
+
+   **Option C: Using the SQL script**
+   ```bash
+   $ psql -U postgres -f scripts/init-database.sql
+   ```
+
+3. **Configure environment variables** (optional, defaults shown):
+   ```env
+   POSTGRES_HOST=localhost
+   POSTGRES_PORT=5432
+   POSTGRES_USER=postgres
+   POSTGRES_PASSWORD=postgres
+   POSTGRES_DB=paksentiment
+   ```
+
+4. **Tables will be created automatically** when you start the server (TypeORM `synchronize: true` is enabled in development).
+
+   Tables created:
+   - `users` - User accounts and authentication
+   - `user_preferences` - User settings and preferences
+   - `api_keys` - API keys for programmatic access
+   - `system_configs` - System-wide configuration
+
+### MongoDB Setup
+
+1. **Ensure MongoDB is running locally** (default: `mongodb://localhost:27017`)
+
+2. **Configure environment variables** (optional, defaults shown):
+   ```env
+   MONGO_URI=mongodb://localhost:27017
+   MONGO_DB=paksentiment
+   ```
+
+3. **Collections will be created automatically** when data is first stored:
+   - `raw_posts` - Original posts from Reddit/Twitter
+   - `processed_posts` - Posts with sentiment analysis and translation
+   - `analytics_cache` - Aggregated analytics data
+   - `system_logs` - System event logs
+
 ## Compile and run the project
 
 ```bash

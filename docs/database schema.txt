@@ -1,0 +1,80 @@
+5.2.2.1	1. RawPost Entity (in raw_posts)
+Description: Stores the original, immutable data as retrieved from the source API.
+Attribute	Type	Description
+_id	ObjectId	Unique identifier for the document.
+platform	String	Source platform (e.g., "twitter", "reddit").
+content	String	The raw text content of the post.
+author	String	The author's username or ID (non-personal).
+timestamp	Date	The original creation date/time of the post.
+metadata	Object	Any platform-specific metadata (e.g., likes, shares).
+fetched_at	Date	System timestamp when the post was ingested.
+5.2.2.2	ProcessedPost Entity (in processed_posts)
+Description: Stores the enriched and analyzed version of a post.
+Attribute	Type	Description
+_id	ObjectId	Unique identifier for the document.
+raw_post_id	ObjectId	A reference link to the original raw_posts entry.
+clean_text	String	Normalized and cleaned text (e.g., links, stop words removed).
+translated_text	String	Urdu translation of the text, if applicable.
+language	String	Detected language code (e.g., "en", "ur", "ps").
+sentiment	String	Classified sentiment label ("positive", "negative", "neutral").
+confidence	Number	The model's confidence score (0.0 to 1.0) for the label.
+keywords	[String]	An array of extracted keywords or n-grams.
+processed_at	Date	System timestamp when processing was completed.
+platform	String	Source platform (for indexing).
+5.2.2.3	AnalyticsCache Entity (in analytics_cache)
+Description: Stores aggregated results for rapid dashboard loading.
+Attribute	Type	Description
+_id	ObjectId	Unique identifier for the cache entry.
+date	Date	The date for which the statistics are aggregated (e.g., YYYY-MM-DD).
+total_posts	Number	Total count of posts analyzed on this date.
+positive	Number	Count of positive sentiment posts.
+negative	Number	Count of negative sentiment posts.
+neutral	Number	Count of neutral sentiment posts.
+top_keywords	[String]	An array of the most frequent keywords for the period.
+generated_at	Date	Timestamp when this cache entry was computed.
+5.2.2.4	SystemLog Entity (in system_logs)
+Description: Records system-level events for monitoring.
+Attribute	Type	Description
+_id	ObjectId	Unique identifier for the log entry.
+level	String	Log level (e.g., "info", "warning", "error").
+message	String	A descriptive message of the event or error.
+timestamp	Date	The exact time the event occurred.
+component	String	The system component that generated the log (e.g., "scraper", "backend").
+
+5.3	Relational Database Design (PostgreSQL)
+The relational database is selected to manage structured application data, ensuring ACID compliance, relational integrity, and high reliability. It handles all operational data not related to the sentiment analysis pipeline itself.
+5.3.1	PostgreSQL Entity Definitions
+5.3.1.1	User Entity
+Description: Manages user authentication and foundational account information.
+Field	Type	Description
+id	SERIAL (PK)	Unique, auto-incrementing user identifier.
+full_name	VARCHAR(100)	The user's display name.
+email	VARCHAR(255) (Unique)	The user's email address, used for login.
+password_hash	VARCHAR(255)	The user's encrypted (bcrypt) password.
+created_at	TIMESTAMP	Timestamp of account creation.
+updated_at	TIMESTAMP	Timestamp of the last profile update.
+is_active	BOOLEAN	Account activation status.
+5.3.1.2	UserPreference Entity
+Description: Stores individual user settings for the application interface.
+Field	Type	Description
+id	SERIAL (PK)	Unique identifier for the preference set.
+user_id	INTEGER (FK → User.id)	Foreign key linking to the User table.
+theme	VARCHAR(20)	The preferred UI theme (e.g., "dark", "light").
+default_platform	VARCHAR(50)	The default data source to display on login.
+default_language	VARCHAR(10)	Preferred language for the application UI.
+items_per_page	INTEGER	Dashboard pagination size preference.
+5.3.1.3	ApiKey Entity
+Description: Manages API keys for programmatic access by users or internal services.
+Field	Type	Description
+id	SERIAL (PK)	Unique identifier for the API key.
+user_id	INTEGER (FK → User.id)	The user account that owns this key.
+api_key	VARCHAR(255)	The encrypted API key.
+created_at	TIMESTAMP	Timestamp of key generation.
+expires_at	TIMESTAMP	Optional expiry date for the key.
+5.3.1.4	SystemConfig Entity
+Description: A key-value store for global, system-level settings.
+Field	Type	Description
+id	SERIAL (PK)	Unique identifier for the configuration.
+config_key	VARCHAR(100) (Unique)	The name of the setting (e.g., "enable_translation").
+config_value	VARCHAR(255) / JSON	The value of the setting.
+updated_at	TIMESTAMP	Timestamp of the last modification.

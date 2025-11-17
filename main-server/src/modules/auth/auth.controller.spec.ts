@@ -1,9 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { JwtService } from '@nestjs/jwt';
 
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { UsersService } from './users.service';
-import { JwtService } from '@nestjs/jwt';
+import { UserEntity } from '../../database/entities/user.entity';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -18,6 +20,14 @@ describe('AuthController', () => {
           provide: JwtService,
           useValue: {
             signAsync: jest.fn().mockResolvedValue('token'),
+          },
+        },
+        {
+          provide: getRepositoryToken(UserEntity),
+          useValue: {
+            create: jest.fn().mockReturnValue({}),
+            save: jest.fn(),
+            findOne: jest.fn(),
           },
         },
       ],

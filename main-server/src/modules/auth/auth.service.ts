@@ -12,9 +12,9 @@ import { LoginWithEmailAndPasswordDTO } from './dto/login-user.dto';
 import { RegisterUserDTO } from './dto/regiester-user.dto';
 import { GoogleAuthDto } from './dto/google-auth.dto';
 import { UsersService } from './users.service';
-import { UserEntity } from './interfaces/user.interface';
+import { UserEntity } from '../../database/entities/user.entity';
 
-interface AuthResponse {
+export interface AuthResponse {
   accessToken: string;
   user: Omit<UserEntity, 'passwordHash'>;
 }
@@ -40,9 +40,9 @@ export class AuthService {
     }
 
     const passwordHash = await hash(dto.password, 10);
+    const fullName = `${dto.firstName} ${dto.lastName}`.trim();
     const user = await this.usersService.createLocalUser({
-      firstName: dto.firstName,
-      lastName: dto.lastName,
+      fullName,
       email: dto.email,
       passwordHash,
     });
@@ -91,11 +91,11 @@ export class AuthService {
 
     const firstName = payload.given_name ?? payload.name ?? 'Google';
     const lastName = payload.family_name ?? '';
+    const fullName = `${firstName} ${lastName}`.trim();
 
     const user = await this.usersService.upsertGoogleUser({
       email: payload.email,
-      firstName,
-      lastName,
+      fullName,
       googleId: payload.sub ?? payload.email,
     });
 

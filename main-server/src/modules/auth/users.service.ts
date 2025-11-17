@@ -1,69 +1,66 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
-import { UserEntity } from './interfaces/user.interface';
+import { UserEntity } from '../../database/entities/user.entity';
 
 interface CreateLocalUserPayload {
-  firstName: string;
-  lastName: string;
+  fullName: string;
   email: string;
   passwordHash: string;
 }
 
 interface UpsertGoogleUserPayload {
-  firstName: string;
-  lastName: string;
+  fullName: string;
   email: string;
   googleId: string;
 }
 
 @Injectable()
 export class UsersService {
-  private users: UserEntity[] = [];
-  private idCounter = 1;
+  constructor(
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
+  ) {}
 
   async createLocalUser(payload: CreateLocalUserPayload): Promise<UserEntity> {
-    const newUser: UserEntity = {
-      id: this.idCounter++,
-      firstName: payload.firstName,
-      lastName: payload.lastName,
+    const user = this.userRepository.create({
+      fullName: payload.fullName,
       email: payload.email.toLowerCase(),
       provider: 'local',
       passwordHash: payload.passwordHash,
-      createdAt: new Date(),
-    };
-    this.users.push(newUser);
-    return newUser;
+      isActive: true,
+    });
+    return this.userRepository.save(user);
   }
 
   async upsertGoogleUser(
     payload: UpsertGoogleUserPayload,
   ): Promise<UserEntity> {
-    const existing = await this.findByEmail(payload.email);
-    if (existing) {
-      existing.googleId = payload.googleId;
-      existing.provider = 'google';
-      existing.firstName = payload.firstName;
-      existing.lastName = payload.lastName;
-      return existing;
+    let user = await this.findByEmail(payload.email);
+    if (user) {
+      user.fullName = payload.fullName;
+      user.googleId = payload.googleId;
+      user.provider = 'google';
+      return this.userRepository.save(user);
     }
 
-    const newUser: UserEntity = {
-      id: this.idCounter++,
-      firstName: payload.firstName,
-      lastName: payload.lastName,
+    user = this.userRepository.create({
+      fullName: payload.fullName,
       email: payload.email.toLowerCase(),
       provider: 'google',
       googleId: payload.googleId,
-      createdAt: new Date(),
-    };
-    this.users.push(newUser);
-    return newUser;
+      isActive: true,
+    });
+
+    return this.userRepository.save(user);
   }
 
   async findByEmail(email: string): Promise<UserEntity | undefined> {
-    return this.users.find(
-      (user) => user.email.toLowerCase() === email.toLowerCase(),
-    );
+    const user = await this.userRepository.findOne({
+      where: { email: email.toLowerCase() },
+    });
+    return user ?? undefined;
   }
 }
 
