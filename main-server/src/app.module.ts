@@ -7,14 +7,24 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UserEntity } from './database/entities/user.entity';
 import { UserPreferenceEntity } from './database/entities/user-preference.entity';
 import { ApiKeyEntity } from './database/entities/api-key.entity';
+import { UserActivityEntity } from './database/entities/user-activity.entity';
 import { SystemConfigEntity } from './database/entities/system-config.entity';
 import { RawPostEntity } from './database/entities/mongo/raw-post.entity';
 import { ProcessedPostEntity } from './database/entities/mongo/processed-post.entity';
 import { AnalyticsCacheEntity } from './database/entities/mongo/analytics-cache.entity';
 import { SystemLogEntity } from './database/entities/mongo/system-log.entity';
+import { AnalysisSessionEntity } from './database/entities/mongo/analysis-session.entity';
+
+import { ActivityModule } from './modules/activity/activity.module';
+import { AiModule } from './modules/ai/ai.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
     TypeOrmModule.forRootAsync({
       useFactory: () => ({
         type: 'postgres',
@@ -27,6 +37,7 @@ import { SystemLogEntity } from './database/entities/mongo/system-log.entity';
           UserEntity,
           UserPreferenceEntity,
           ApiKeyEntity,
+          UserActivityEntity,
           SystemConfigEntity,
         ],
         synchronize: true,
@@ -44,14 +55,17 @@ import { SystemLogEntity } from './database/entities/mongo/system-log.entity';
           ProcessedPostEntity,
           AnalyticsCacheEntity,
           SystemLogEntity,
+          AnalysisSessionEntity,
         ],
         synchronize: true,
       }),
     }),
     AuthModule,
+    ActivityModule,
+    AiModule,
     RawDataModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

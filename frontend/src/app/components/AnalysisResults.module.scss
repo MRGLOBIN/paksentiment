@@ -128,6 +128,7 @@
 .sentimentBadge {
   padding: 0.5rem 1rem;
   border-radius: 20px;
+  border: 2px solid;
   font-size: var(--font-size-sm);
   font-weight: 600;
   text-transform: capitalize;
@@ -135,21 +136,6 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-
-  &.positive {
-    background: #d1fae5;
-    color: #065f46;
-  }
-
-  &.negative {
-    background: #fee2e2;
-    color: #991b1b;
-  }
-
-  &.neutral {
-    background: #e5e7eb;
-    color: #374151;
-  }
 }
 
 .confidence {
@@ -231,6 +217,29 @@
   }
 }
 
+.chartsContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.chartCard {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px var(--box-shadow);
+  border: 1px solid var(--border-color);
+}
+
+.chartTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
 @media (max-width: 768px) {
   .resultsSection {
     padding: 2rem 1rem;
@@ -245,6 +254,10 @@
   }
 
   .statsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .chartsContainer {
     grid-template-columns: 1fr;
   }
 }

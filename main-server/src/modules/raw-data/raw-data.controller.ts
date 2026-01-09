@@ -1,13 +1,17 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Body, Controller, Post, Get, UseGuards, Request, Param } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
-  ApiQuery,
   ApiInternalServerErrorResponse,
   ApiBadGatewayResponse,
   ApiNotFoundResponse,
+  ApiBody,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
+
+import { AuthGuard } from '../auth/auth.guard';
+import { ActivityService } from '../activity/activity.service';
 
 import {
   RedditRawDataQueryDto,
@@ -17,6 +21,14 @@ import {
   TwitterRawDataQueryDto,
   TwitterSentimentQueryDto,
 } from './dto/twitter-raw-data-query.dto';
+import {
+  YouTubeSearchDto,
+  YouTubeCommentsDto,
+  YouTubeTranscriptDto,
+} from './dto/youtube-query.dto';
+import { CommonCrawlQueryDto } from './dto/commoncrawl-query.dto';
+import { StoredDataQueryDto } from './dto/stored-data-query.dto';
+import { ScraplingFetchDto } from './dto/scrapling-query.dto';
 import { RawDataService } from './raw-data.service';
 import {
   RedditRawDataResponse,
@@ -26,377 +38,185 @@ import {
 } from './interfaces/api-response.interface';
 
 @ApiTags('Reddit', 'Twitter')
+@ApiBearerAuth()
+@UseGuards(AuthGuard)
 @Controller('raw-data')
+/**
+ * Controller for retrieving raw and analyzed data from various social sources.
+ * Acts as a facade to the Python Data Gateway.
+ */
 export class RawDataController {
-  constructor(private readonly rawDataService: RawDataService) {}
+  constructor(
+    private readonly rawDataService: RawDataService,
+    private readonly activityService: ActivityService
+  ) { }
 
-  @Get('reddit')
+  @Post('reddit')
   @ApiOperation({
     summary: 'Fetch Reddit posts (raw data)',
-    description: `
-Fetch raw posts from a specific subreddit using a search query.
-
-This endpoint proxies requests to the FastAPI data gateway and returns unprocessed Reddit posts.
-Use \`/raw-data/reddit/sentiment\` for full sentiment analysis.
-
-### Process:
-1. Searches specified subreddit for matching posts
-2. Returns post metadata (title, content, author, score, etc.)
-3. No translation or sentiment analysis performed
-
-### Rate Limits:
-Reddit API rate limits are handled automatically with retry logic (max 3 attempts, 60s wait between retries).
-
-**Note**: Large requests may take 10-30 seconds depending on Reddit API response time.
-    `,
+    description: `Fetch raw posts from a specific subreddit using a search query (POST request).`,
   })
-  @ApiQuery({
-    name: 'subreddit',
-    required: true,
-    type: String,
-    description: 'Subreddit name (without r/ prefix)',
-    example: 'pakistan',
-  })
-  @ApiQuery({
-    name: 'query',
-    required: true,
-    type: String,
-    description: 'Search term to find posts',
-    example: 'education',
-  })
-  @ApiQuery({
-    name: 'limit',
-    required: false,
-    type: Number,
-    description: 'Maximum number of posts to return (1-100)',
-    example: 10,
-  })
+  @ApiBody({ type: RedditRawDataQueryDto })
   @ApiResponse({
-    status: 200,
+    status: 201, // Changed to 201 for POST
     description: 'Successfully retrieved Reddit posts',
-    schema: {
-      example: {
-        posts: [
-          {
-            post_id: 'abc123',
-            title: 'Discussion about education reform',
-            text: 'Post content here...',
-            author: 'username',
-            subreddit: 'pakistan',
-            created_utc: 1700000000,
-            score: 42,
-            num_comments: 10,
-            url: 'https://reddit.com/r/pakistan/comments/abc123',
-          },
-        ],
-        count: 1,
-      },
-    },
+    // ... schema ...
   })
   @ApiInternalServerErrorResponse({
     description: 'Failed to fetch data from FastAPI gateway',
   })
   async fetchRedditRawData(
-    @Query() query: RedditRawDataQueryDto,
+    @Body() query: RedditRawDataQueryDto,
+    @Request() req,
   ): Promise<RedditRawDataResponse> {
-    return await this.rawDataService.fetchRedditPosts(query);
+    const result = await this.rawDataService.fetchRedditPosts(query, req.user.sub);
+    await this.activityService.logActivity(req.user.sub, 'SEARCH_REDDIT', { ...query, sessionId: result.sessionId });
+    return result;
   }
 
-  @Get('twitter')
+  @Post('twitter')
   @ApiOperation({
     summary: 'Fetch Twitter/X posts (raw data)',
-    description: `
-Fetch raw tweets using Twitter's search API.
-
-This endpoint proxies requests to the FastAPI data gateway and returns unprocessed tweets.
-Use \`/raw-data/twitter/sentiment\` for full sentiment analysis.
-
-### Process:
-1. Searches Twitter for matching tweets
-2. Returns tweet metadata (text, author, metrics, etc.)
-3. No translation or sentiment analysis performed
-
-### Requirements:
-Twitter API requires a minimum of 10 results per request.
-
-**Note**: May take 10-20 seconds depending on Twitter API response time.
-    `,
+    description: `Fetch raw tweets using Twitter's search API (POST request).`,
   })
-  @ApiQuery({
-    name: 'query',
-    required: true,
-    type: String,
-    description: 'Twitter search query (supports Twitter search operators)',
-    example: 'Pakistan economy',
-  })
-  @ApiQuery({
-    name: 'maxResults',
-    required: false,
-    type: Number,
-    description: 'Number of tweets to fetch (10-100, Twitter minimum is 10)',
-    example: 10,
-  })
+  @ApiBody({ type: TwitterRawDataQueryDto })
   @ApiResponse({
-    status: 200,
+    status: 201,
     description: 'Successfully retrieved tweets',
-    schema: {
-      example: {
-        tweets: [
-          {
-            id: '1234567890',
-            text: 'Tweet content here...',
-            author_id: '987654321',
-            created_at: '2024-01-01T12:00:00Z',
-            public_metrics: {
-              retweet_count: 5,
-              like_count: 20,
-              reply_count: 3,
-              quote_count: 1,
-            },
-          },
-        ],
-        count: 1,
-      },
-    },
+    // ... schema ...
   })
-  @ApiNotFoundResponse({
-    description: 'No tweets found for the query',
-  })
-  @ApiBadGatewayResponse({
-    description: 'Twitter API service unavailable',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Failed to fetch data from FastAPI gateway',
-  })
+  @ApiNotFoundResponse({ description: 'No tweets found' })
+  @ApiBadGatewayResponse({ description: 'Twitter API service unavailable' })
+  @ApiInternalServerErrorResponse({ description: 'Failed to fetch data' })
   async fetchTwitterRawData(
-    @Query() query: TwitterRawDataQueryDto,
+    @Body() query: TwitterRawDataQueryDto,
+    @Request() req,
   ): Promise<TwitterRawDataResponse> {
-    return await this.rawDataService.fetchTwitterPosts(query);
+    const result = await this.rawDataService.fetchTwitterPosts(query, req.user.sub);
+    await this.activityService.logActivity(req.user.sub, 'SEARCH_TWITTER', { ...query, sessionId: result.sessionId });
+    return result;
   }
 
-  @Get('reddit/sentiment')
+  @Post('reddit/sentiment')
   @ApiOperation({
     summary: 'Reddit sentiment analysis (full pipeline)',
-    description: `
-Fetch Reddit posts and perform comprehensive sentiment analysis.
-
-### Complete Analysis Pipeline:
-
-1. **Data Collection**: Fetch posts from specified subreddit
-2. **Language Detection**: Automatically detect content language (English, Urdu, etc.)
-3. **Translation**: Translate non-English content to English using Groq's LLaMA models
-4. **Sentiment Analysis**: Classify sentiment using Google Gemini AI
-5. **Summarization**: Generate brief content summaries
-6. **Storage**: Save raw and processed data to MongoDB
-
-### Response Includes:
-- Original Reddit posts with full metadata
-- Language detection results for each post
-- Translations (if needed)
-- Sentiment classification (positive/negative/neutral)
-- Confidence scores (0-1 range)
-- AI-generated summaries
-
-### Processing Time:
-**30-90 seconds** depending on:
-- Number of posts requested
-- Language detection and translation needs
-- AI API response times
-- Reddit API rate limits
-
-### Supported Languages:
-- English (en) - No translation needed
-- Urdu (ur) - Translated to English
-- Other languages - Automatically detected and translated
-
-**Tip**: Start with smaller limits (5-10) for faster results during testing.
-    `,
+    description: `Fetch Reddit posts and perform comprehensive sentiment analysis (POST request).`,
   })
-  @ApiQuery({
-    name: 'subreddit',
-    required: true,
-    type: String,
-    description: 'Subreddit name (without r/ prefix)',
-    example: 'pakistan',
-  })
-  @ApiQuery({
-    name: 'query',
-    required: true,
-    type: String,
-    description: 'Search term to find posts',
-    example: 'healthcare reforms',
-  })
-  @ApiQuery({
-    name: 'limit',
-    required: false,
-    type: Number,
-    description:
-      'Maximum number of posts to analyze (1-50, lower for faster processing)',
-    example: 10,
-  })
+  @ApiBody({ type: RedditSentimentQueryDto })
   @ApiResponse({
-    status: 200,
+    status: 201,
     description: 'Successfully analyzed Reddit posts',
-    schema: {
-      example: {
-        source: 'reddit',
-        count: 2,
-        posts: [
-          {
-            post_id: 'abc123',
-            title: 'Great news about healthcare',
-            text: 'Content here...',
-            author: 'user123',
-            subreddit: 'pakistan',
-            created_utc: 1700000000,
-            score: 45,
-            num_comments: 12,
-            url: 'https://reddit.com/...',
-          },
-        ],
-        translations: [
-          {
-            id: 'abc123',
-            language: 'ur',
-            translated: true,
-            translatedText: 'This is great news about healthcare policy',
-          },
-        ],
-        sentiment: [
-          {
-            id: 'abc123',
-            sentiment: 'positive',
-            score: 0.87,
-            summary: 'User expresses optimism about new healthcare reforms',
-          },
-        ],
-      },
-    },
-  })
-  @ApiNotFoundResponse({
-    description: 'No Reddit posts found to analyze',
-  })
-  @ApiBadGatewayResponse({
-    description:
-      'Translation or sentiment analysis service error (Groq/Gemini API)',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Failed to process request - Reddit API or internal error',
+    // ... schema ...
   })
   async fetchRedditSentiment(
-    @Query() query: RedditSentimentQueryDto,
+    @Body() query: RedditSentimentQueryDto,
+    @Request() req,
   ): Promise<RedditSentimentResponse> {
-    return await this.rawDataService.fetchRedditSentiment(query);
+    const result = await this.rawDataService.fetchRedditSentiment(query, req.user.sub);
+    await this.activityService.logActivity(req.user.sub, 'ANALYZE_REDDIT', { ...query, sessionId: result.sessionId });
+    return result;
   }
 
-  @Get('twitter/sentiment')
+  @Post('twitter/sentiment')
   @ApiOperation({
     summary: 'Twitter sentiment analysis (full pipeline)',
-    description: `
-Fetch tweets and perform comprehensive sentiment analysis.
-
-### Complete Analysis Pipeline:
-
-1. **Data Collection**: Fetch tweets matching search query
-2. **Language Detection**: Automatically detect content language (English, Urdu, etc.)
-3. **Translation**: Translate non-English content to English using Groq's LLaMA models
-4. **Sentiment Analysis**: Classify sentiment using Google Gemini AI
-5. **Summarization**: Generate brief content summaries
-6. **Storage**: Save raw and processed data to MongoDB
-
-### Response Includes:
-- Original tweets with full metadata and engagement metrics
-- Language detection results for each tweet
-- Translations (if needed)
-- Sentiment classification (positive/negative/neutral)
-- Confidence scores (0-1 range)
-- AI-generated summaries
-
-### Processing Time:
-**30-90 seconds** depending on:
-- Number of tweets requested
-- Language detection and translation needs
-- AI API response times
-
-### Requirements:
-Twitter API requires minimum 10 results per request.
-
-### Supported Languages:
-- English (en) - No translation needed
-- Urdu (ur) - Translated to English
-- Other languages - Automatically detected and translated
-
-**Tip**: Use 10-20 tweets for optimal balance between data quality and processing speed.
-    `,
+    description: `Fetch tweets and perform comprehensive sentiment analysis (POST request).`,
   })
-  @ApiQuery({
-    name: 'query',
-    required: true,
-    type: String,
-    description: 'Twitter search query (supports Twitter search operators)',
-    example: 'Pakistan technology',
-  })
-  @ApiQuery({
-    name: 'maxResults',
-    required: false,
-    type: Number,
-    description:
-      'Number of tweets to analyze (10-50, lower for faster processing)',
-    example: 10,
-  })
+  @ApiBody({ type: TwitterSentimentQueryDto })
   @ApiResponse({
-    status: 200,
+    status: 201,
     description: 'Successfully analyzed tweets',
+    // ... schema ...
+  })
+  async fetchTwitterSentiment(
+    @Body() query: TwitterSentimentQueryDto,
+    @Request() req,
+  ): Promise<TwitterSentimentResponse> {
+    const result = await this.rawDataService.fetchTwitterSentiment(query, req.user.sub);
+    await this.activityService.logActivity(req.user.sub, 'ANALYZE_TWITTER', { ...query, sessionId: result.sessionId });
+    return result;
+  }
+
+  @Post('youtube/search')
+  @ApiOperation({ summary: 'Search YouTube Videos' })
+  @ApiBody({ type: YouTubeSearchDto })
+  async fetchYouTubeVideos(@Body() query: YouTubeSearchDto, @Request() req) {
+    const result = await this.rawDataService.fetchYouTubeVideos(query, req.user.sub);
+    await this.activityService.logActivity(req.user.sub, 'SEARCH_YOUTUBE', { ...query, sessionId: result.sessionId });
+    return result;
+  }
+
+  @Post('youtube/comments')
+  @ApiOperation({ summary: 'Get YouTube Video Comments' })
+  @ApiBody({ type: YouTubeCommentsDto })
+  async fetchYouTubeComments(@Body() query: YouTubeCommentsDto) {
+    return await this.rawDataService.fetchYouTubeComments(query);
+  }
+
+  @Post('youtube/transcript')
+  @ApiOperation({ summary: 'Get YouTube Video Transcript' })
+  @ApiBody({ type: YouTubeTranscriptDto })
+  async fetchYouTubeTranscript(@Body() query: YouTubeTranscriptDto) {
+    return await this.rawDataService.fetchYouTubeTranscript(query);
+  }
+
+  @Post('commoncrawl')
+  @ApiOperation({ summary: 'Fetch Common Crawl Records' })
+  @ApiBody({ type: CommonCrawlQueryDto })
+  async fetchCommonCrawl(@Body() query: CommonCrawlQueryDto, @Request() req) {
+    const result = await this.rawDataService.fetchCommonCrawl(query, req.user.sub);
+    await this.activityService.logActivity(req.user.sub, 'SEARCH_COMMONCRAWL', { ...query, sessionId: result.sessionId });
+    return result;
+  }
+
+  @Post('plan')
+  @ApiOperation({ summary: 'Generate Search Plan (AI Only)' })
+  @ApiBody({ schema: { type: 'object', properties: { query: { type: 'string', example: 'find news regarding pti' } } } })
+  @ApiResponse({ status: 201, description: 'Execution plan generated' })
+  async planQuery(@Body('query') query: string, @Request() req) {
+    await this.activityService.logActivity(req.user.sub, 'PLAN_QUERY', { query });
+    return await this.rawDataService.planQuery(query);
+  }
+
+  @Post('smart')
+  @ApiOperation({
+    summary: 'Smart Search (AI Planner + Execution + Aggregation)',
+    description: 'Uses AI to understand natural language query, plan efficient search across multiple sources, execute them, and aggregate results.'
+  })
+  @ApiBody({
     schema: {
-      example: {
-        source: 'twitter',
-        count: 10,
-        tweets: [
-          {
-            id: '1234567890',
-            text: 'Exciting developments in tech sector',
-            author_id: '987654321',
-            created_at: '2024-01-01T12:00:00Z',
-            public_metrics: {
-              retweet_count: 15,
-              like_count: 45,
-              reply_count: 8,
-              quote_count: 3,
-            },
-          },
-        ],
-        translations: [
-          {
-            id: '1234567890',
-            language: 'en',
-            translated: false,
-            translatedText: '',
-          },
-        ],
-        sentiment: [
-          {
-            id: '1234567890',
-            sentiment: 'positive',
-            score: 0.82,
-            summary: 'User discusses positive tech sector growth',
-          },
-        ],
+      type: 'object',
+      properties: {
+        query: { type: 'string', example: 'What is the sentiment about elections in Pakistan?' },
+        customTags: { type: 'string', example: 'Positive, Negative, Neutral', description: 'Optional comma-separated tags for classification' }
       },
     },
   })
-  @ApiNotFoundResponse({
-    description: 'No tweets found to analyze',
-  })
-  @ApiBadGatewayResponse({
-    description:
-      'Translation or sentiment analysis service error (Groq/Gemini API)',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Failed to process request - Twitter API or internal error',
-  })
-  async fetchTwitterSentiment(
-    @Query() query: TwitterSentimentQueryDto,
-  ): Promise<TwitterSentimentResponse> {
-    return await this.rawDataService.fetchTwitterSentiment(query);
+  @ApiResponse({ status: 201, description: 'Smart search completed successfully' })
+  async smartSearch(@Body('query') query: string, @Body('customTags') customTags: string, @Request() req) {
+    await this.activityService.logActivity(req.user.sub, 'SMART_SEARCH', { query, customTags });
+    return await this.rawDataService.executeSmartSearch(query, req.user.sub, customTags);
+  }
+
+  @Post('scrapling')
+  @ApiOperation({ summary: 'Fetch Page via Scrapling' })
+  @ApiBody({ type: ScraplingFetchDto })
+  async fetchScrapling(@Body() query: ScraplingFetchDto, @Request() req) {
+    const result = await this.rawDataService.fetchScrapling(query, req.user.sub);
+    await this.activityService.logActivity(req.user.sub, 'ANALYZE_WEB', { ...query, sessionId: result.sessionId });
+    return result;
+  }
+  @Post('stored')
+  @ApiOperation({ summary: 'Fetch processed data from database' })
+  @ApiBody({ type: StoredDataQueryDto })
+  async fetchStoredData(@Body() query: StoredDataQueryDto, @Request() req) {
+    await this.activityService.logActivity(req.user.sub, 'VIEW_STORED', query);
+    return await this.rawDataService.getStoredData(query);
+  }
+
+  @Get('session/:sessionId')
+  @ApiOperation({ summary: 'Retrieve specific analysis session history' })
+  async getSessionData(@Param('sessionId') sessionId: string) {
+    return await this.rawDataService.getSessionData(sessionId);
   }
 }

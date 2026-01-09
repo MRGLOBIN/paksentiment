@@ -1,0 +1,12 @@
+fastapi[standard]>=0.119.0
+scraper@ file:///Users/mrgoblin/workspace/uni/fyp/current%20pakentiment/PakSentiment-data-gateway/scraper
+google-generativeai>=0.8.3
+dynaconf>=3.2.5
+langdetect>=1.0.9
+groq>=0.8.0
+
+[dev]
+pytest>=8.0.0
+pytest-asyncio>=0.23.0
+pytest-cov>=4.1.0
+httpx>=0.27.0

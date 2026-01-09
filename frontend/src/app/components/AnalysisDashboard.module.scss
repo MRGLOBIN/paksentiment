@@ -1,0 +1,206 @@
+// ============ THEME VARIABLES (Mapped to globals.css) ============
+$bg-primary: var(--background);
+$bg-card: var(--card-bg);
+$bg-hover: var(--box-shadow-hover);
+$text-primary: var(--foreground);
+$text-muted: var(--text-muted);
+$accent-green: var(--primary);
+$accent-light: var(--primary-hover);
+$border-color: var(--border-color);
+
+// ============ DASHBOARD CONTAINER ============
+.dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100%;
+    background-color: $bg-primary;
+    padding: 1.5rem;
+    min-height: 100vh;
+    font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+// ============ HEADER ============
+.header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid $accent-green;
+
+    .title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: $text-primary;
+        margin: 0;
+    }
+
+    .subtitle {
+        font-size: 0.875rem;
+        color: $text-muted;
+
+        strong {
+            color: $accent-green;
+        }
+    }
+}
+
+// ============ KPI CARDS ============
+.kpiGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.kpiCard {
+    background: $bg-card;
+    border: 1px solid $border-color;
+    border-radius: 12px;
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    transition: all 0.2s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(5, 150, 105, 0.15);
+        border-color: $accent-green;
+    }
+
+    .kpiIcon {
+        font-size: 1.75rem;
+        opacity: 0.9;
+    }
+
+    .kpiContent {
+        display: flex;
+        flex-direction: column;
+        gap: 0.125rem;
+    }
+
+    .kpiValue {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: $text-primary;
+        line-height: 1.2;
+    }
+
+    .kpiTitle {
+        font-size: 0.75rem;
+        color: $text-muted;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+}
+
+// ============ CHARTS GRID ============
+.chartsGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); // Max 2 per row
+    gap: 1.5rem;
+}
+
+.chartCard {
+    background-color: $bg-card;
+    border: 1px solid $border-color;
+    border-radius: 12px;
+    padding: 1.5rem;
+    min-height: 450px; // Bigger charts
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+
+    .chartTitle {
+        font-size: 1rem;
+        font-weight: 600;
+        color: $text-primary;
+        margin: 0 0 1rem 0;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid $border-color;
+    }
+
+    &.fullWidth {
+        grid-column: 1 / -1; // Span all columns
+        min-height: 520px;
+    }
+}
+
+// ============ DATA GRID SECTION ============
+.dataGridSection {
+    background-color: $bg-card;
+    border: 1px solid $accent-green;
+    border-radius: 12px;
+    padding: 1.25rem;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+
+    .sectionHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid $border-color;
+
+        h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: $text-primary;
+            margin: 0;
+        }
+
+        .recordCount {
+            font-size: 0.75rem;
+            color: $accent-green;
+            background-color: rgba(5, 150, 105, 0.1);
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+    }
+}
+
+// ============ TOPIC BADGE ============
+.topicBadge {
+    padding: 0.25rem 0.625rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    display: inline-block;
+    border: 1px solid;
+}
+
+// Legacy support
+.sentimentTag {
+    @extend .topicBadge;
+}
+
+// ============ RESPONSIVE ============
+@media (max-width: 768px) {
+    .dashboard {
+        padding: 1rem;
+    }
+
+    .chartsGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .kpiGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .header .title {
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .kpiGrid {
+        grid-template-columns: 1fr;
+    }
+}

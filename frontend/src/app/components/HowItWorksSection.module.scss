@@ -1,0 +1,109 @@
+$primary: #059669;
+$primary-light: #10b981;
+$bg-section: var(--background);
+$text-primary: var(--foreground);
+$text-muted: var(--text-muted);
+$border: var(--border-color);
+
+.howItWorks {
+    background-color: $bg-section;
+    padding: 5rem 2rem;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+.title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: $text-primary;
+    margin-bottom: 1rem;
+}
+
+.subtitle {
+    font-size: 1.125rem;
+    color: $text-muted;
+}
+
+.stepsContainer {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    position: relative;
+
+    @media (max-width: 800px) {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+}
+
+.stepCard {
+    position: relative;
+    text-align: center;
+    padding: 2rem;
+    background: var(--card-bg);
+    border: 1px solid $border;
+    border-radius: 16px;
+    transition: all 0.2s ease;
+
+    &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 40px rgba(5, 150, 105, 0.12);
+    }
+}
+
+.stepNumber {
+    position: absolute;
+    top: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: $primary;
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 700;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+}
+
+.stepIcon {
+    font-size: 3rem;
+    margin: 1.5rem 0 1rem;
+}
+
+.stepTitle {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: $text-primary;
+    margin-bottom: 0.75rem;
+}
+
+.stepDesc {
+    font-size: 0.95rem;
+    color: $text-muted;
+    line-height: 1.6;
+}
+
+.connector {
+    position: absolute;
+    right: -1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+
+    @media (max-width: 800px) {
+        display: none;
+    }
+}
+
+.arrow {
+    font-size: 1.5rem;
+    color: $primary;
+    font-weight: bold;
+}

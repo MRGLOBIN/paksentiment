@@ -1,6 +1,27 @@
 'use client'
 
+import {
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts'
+import { ArrowUpward, ArrowForward } from '@mui/icons-material'
 import styles from './AnalysisResults.module.scss'
+
+// ... (existing interfaces)
+
+// ... (inside component)
+
+// ... (render loop)
+
 
 interface SentimentData {
   id: string
@@ -41,35 +62,56 @@ interface AnalysisResultsProps {
 }
 
 export default function AnalysisResults({ data }: AnalysisResultsProps) {
+  // Generate color palette for sentiments
+  const generateColor = (index: number, total: number) => {
+    const hue = (index * 360) / total
+    return `hsl(${hue}, 65%, 55%)`
+  }
+
   const getSentimentColor = (sentiment: string) => {
-    switch (sentiment.toLowerCase()) {
-      case 'positive':
-        return styles.positive
-      case 'negative':
-        return styles.negative
-      default:
-        return styles.neutral
+    const normalizedSentiment = sentiment.toLowerCase()
+
+    // Default colors for common sentiments
+    const defaultColors: Record<string, string> = {
+      positive: '#10b981',
+      negative: '#ef4444',
+      neutral: '#6b7280',
+      happy: '#fbbf24',
+      sad: '#3b82f6',
+      angry: '#dc2626',
+      fearful: '#8b5cf6',
+      optimistic: '#10b981',
+      pessimistic: '#ef4444',
+      anxious: '#f59e0b',
+      hopeful: '#22c55e',
     }
+
+    return defaultColors[normalizedSentiment] || '#64748b'
   }
 
   const getSentimentStats = () => {
     const total = data.sentiment.length
-    const positive = data.sentiment.filter(
-      s => s.sentiment.toLowerCase() === 'positive'
-    ).length
-    const negative = data.sentiment.filter(
-      s => s.sentiment.toLowerCase() === 'negative'
-    ).length
-    const neutral = total - positive - negative
+    const sentimentCounts: Record<string, number> = {}
+
+    // Count occurrences of each sentiment
+    data.sentiment.forEach(s => {
+      const sentiment = s.sentiment
+      sentimentCounts[sentiment] = (sentimentCounts[sentiment] || 0) + 1
+    })
+
+    // Calculate percentages
+    const sentimentStats = Object.entries(sentimentCounts).map(
+      ([sentiment, count]) => ({
+        sentiment,
+        count,
+        percentage: ((count / total) * 100).toFixed(1),
+      })
+    )
 
     return {
       total,
-      positive,
-      negative,
-      neutral,
-      positivePercent: ((positive / total) * 100).toFixed(1),
-      negativePercent: ((negative / total) * 100).toFixed(1),
-      neutralPercent: ((neutral / total) * 100).toFixed(1),
+      sentimentCounts,
+      sentimentStats,
     }
   }
 
@@ -78,6 +120,27 @@ export default function AnalysisResults({ data }: AnalysisResultsProps) {
   const formatDate = (timestamp: number) => {
     return new Date(timestamp * 1000).toLocaleString()
   }
+
+  // Prepare chart data dynamically based on actual sentiments
+  const pieChartData = stats.sentimentStats.map(stat => ({
+    name: stat.sentiment.charAt(0).toUpperCase() + stat.sentiment.slice(1),
+    value: stat.count,
+    color: getSentimentColor(stat.sentiment),
+  }))
+
+  const barChartData = stats.sentimentStats.map(stat => ({
+    sentiment: stat.sentiment.charAt(0).toUpperCase() + stat.sentiment.slice(1),
+    count: stat.count,
+    percentage: parseFloat(stat.percentage),
+  }))
+
+  // Create dynamic color mapping
+  const COLORS: Record<string, string> = {}
+  stats.sentimentStats.forEach(stat => {
+    const capitalized =
+      stat.sentiment.charAt(0).toUpperCase() + stat.sentiment.slice(1)
+    COLORS[capitalized] = getSentimentColor(stat.sentiment)
+  })
 
   return (
     <section className={styles.resultsSection}>
@@ -92,24 +155,68 @@ export default function AnalysisResults({ data }: AnalysisResultsProps) {
               <span className={styles.statLabel}>Total Posts</span>
               <span className={styles.statValue}>{stats.total}</span>
             </div>
-            <div className={styles.statItem}>
-              <span className={styles.statLabel}>Positive</span>
-              <span className={`${styles.statValue} ${styles.positive}`}>
-                {stats.positive} ({stats.positivePercent}%)
-              </span>
-            </div>
-            <div className={styles.statItem}>
-              <span className={styles.statLabel}>Negative</span>
-              <span className={`${styles.statValue} ${styles.negative}`}>
-                {stats.negative} ({stats.negativePercent}%)
-              </span>
-            </div>
-            <div className={styles.statItem}>
-              <span className={styles.statLabel}>Neutral</span>
-              <span className={`${styles.statValue} ${styles.neutral}`}>
-                {stats.neutral} ({stats.neutralPercent}%)
-              </span>
-            </div>
+            {stats.sentimentStats.map(stat => {
+              const sentimentLabel =
+                stat.sentiment.charAt(0).toUpperCase() + stat.sentiment.slice(1)
+              const color = getSentimentColor(stat.sentiment)
+              return (
+                <div key={stat.sentiment} className={styles.statItem}>
+                  <span className={styles.statLabel}>{sentimentLabel}</span>
+                  <span className={styles.statValue} style={{ color: color }}>
+                    {stat.count} ({stat.percentage}%)
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Visualization Charts */}
+        <div className={styles.chartsContainer}>
+          <div className={styles.chartCard}>
+            <h3 className={styles.chartTitle}>Sentiment Distribution</h3>
+            <ResponsiveContainer width='100%' height={300}>
+              <PieChart>
+                <Pie
+                  data={pieChartData}
+                  cx='50%'
+                  cy='50%'
+                  labelLine={false}
+                  label={({ name, percent }) =>
+                    `${name} ${((percent ?? 0) * 100).toFixed(0)}%`
+                  }
+                  outerRadius={100}
+                  fill='#8884d8'
+                  dataKey='value'
+                >
+                  {pieChartData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className={styles.chartCard}>
+            <h3 className={styles.chartTitle}>Sentiment Breakdown</h3>
+            <ResponsiveContainer width='100%' height={300}>
+              <BarChart data={barChartData}>
+                <CartesianGrid strokeDasharray='3 3' />
+                <XAxis dataKey='sentiment' />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey='count' name='Post Count'>
+                  {barChartData.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[entry.sentiment as keyof typeof COLORS]}
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
@@ -127,22 +234,29 @@ export default function AnalysisResults({ data }: AnalysisResultsProps) {
                   <div className={styles.postInfo}>
                     <h4 className={styles.postTitle}>{post.title}</h4>
                     <div className={styles.postMeta}>
-                      <span key='subreddit'>r/{post.subreddit}</span>
-                      <span key='sep1'>•</span>
-                      <span key='author'>u/{post.author}</span>
-                      <span key='sep2'>•</span>
-                      <span key='date'>{formatDate(post.created_utc)}</span>
-                      <span key='sep3'>•</span>
-                      <span key='score'>↑ {post.score}</span>
+                      <span>r/{post.subreddit}</span>
+                      <span>•</span>
+                      <span>u/{post.author}</span>
+                      <span>•</span>
+                      <span>{formatDate(post.created_utc)}</span>
+                      <span>•</span>
+                      <span>
+                        <ArrowUpward fontSize="inherit" style={{ verticalAlign: 'middle' }} /> {post.score}
+                      </span>
                     </div>
                   </div>
                   {sentimentData && (
                     <div
-                      className={`${styles.sentimentBadge} ${getSentimentColor(
-                        sentimentData.sentiment
-                      )}`}
+                      className={styles.sentimentBadge}
+                      style={{
+                        backgroundColor:
+                          getSentimentColor(sentimentData.sentiment) + '20',
+                        color: getSentimentColor(sentimentData.sentiment),
+                        borderColor: getSentimentColor(sentimentData.sentiment),
+                      }}
                     >
-                      {sentimentData.sentiment}
+                      {sentimentData.sentiment.charAt(0).toUpperCase() +
+                        sentimentData.sentiment.slice(1)}
                       <span className={styles.confidence}>
                         {(sentimentData.confidence * 100).toFixed(0)}%
                       </span>
@@ -177,8 +291,9 @@ export default function AnalysisResults({ data }: AnalysisResultsProps) {
                   target='_blank'
                   rel='noopener noreferrer'
                   className={styles.viewLink}
+                  style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
                 >
-                  View on Reddit →
+                  View on Reddit <ArrowForward fontSize="inherit" />
                 </a>
               </div>
             )

@@ -40,11 +40,13 @@ export interface SentimentAnalysis {
 export interface RedditRawDataResponse {
   posts: RedditPost[];
   count: number;
+  sessionId?: string;
 }
 
 export interface TwitterRawDataResponse {
   tweets: TwitterPost[];
   count: number;
+  sessionId?: string;
 }
 
 export interface RedditSentimentResponse {
@@ -52,6 +54,7 @@ export interface RedditSentimentResponse {
   translations: Translation[];
   sentiment: SentimentAnalysis[];
   count: number;
+  sessionId?: string;
 }
 
 export interface TwitterSentimentResponse {
@@ -59,4 +62,5 @@ export interface TwitterSentimentResponse {
   translations: Translation[];
   sentiment: SentimentAnalysis[];
   count: number;
+  sessionId?: string;
 }

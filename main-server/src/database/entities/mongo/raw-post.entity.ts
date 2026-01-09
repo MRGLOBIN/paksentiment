@@ -8,7 +8,7 @@ export class RawPostEntity {
   @Column()
   platform: string;
 
-  @Column({ name: 'source_id', nullable: true })
+  @Column({ nullable: true })
   sourceId?: string;
 
   @Column()

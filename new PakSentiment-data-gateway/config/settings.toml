@@ -1,0 +1,4 @@
+[default]
+ENV = "development"
+LOG_LEVEL = "INFO"
+REDDIT_USER_AGENT = "PakSentimentScraper/0.0.1"

@@ -5,7 +5,7 @@ export class ProcessedPostEntity {
   @ObjectIdColumn()
   _id: ObjectId;
 
-  @Column({ name: 'raw_post_source_id', nullable: true })
+  @Column({ nullable: true })
   rawPostSourceId?: string;
 
   @Column()
