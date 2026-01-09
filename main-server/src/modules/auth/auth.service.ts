@@ -12,6 +12,7 @@ import { LoginWithEmailAndPasswordDTO } from './dto/login-user.dto';
 import { RegisterUserDTO } from './dto/regiester-user.dto';
 import { GoogleAuthDto } from './dto/google-auth.dto';
 import { UsersService } from './users.service';
+import { ActivityService } from '../activity/activity.service';
 import { UserEntity } from '../../database/entities/user.entity';
 
 export interface AuthResponse {
@@ -26,6 +27,7 @@ export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly usersService: UsersService,
+    private readonly activityService: ActivityService,
   ) {
     const googleClientId = process.env.GOOGLE_CLIENT_ID;
     if (googleClientId) {
@@ -33,6 +35,13 @@ export class AuthService {
     }
   }
 
+  /**
+   * Register a new user with email and password.
+   * 
+   * @param dto Registration data (email, password, name)
+   * @returns AuthResponse with new access token and user info
+   * @throws BadRequestException if email already exists
+   */
   async register(dto: RegisterUserDTO): Promise<AuthResponse> {
     const existingUser = await this.usersService.findByEmail(dto.email);
     if (existingUser) {
@@ -47,9 +56,18 @@ export class AuthService {
       passwordHash,
     });
 
+    await this.activityService.logActivity(user.id, 'REGISTER', { email: dto.email });
+
     return this.buildAuthResponse(user);
   }
 
+  /**
+   * Authenticate a user using email and password.
+   * 
+   * @param loginDto Login credentials
+   * @returns AuthResponse with access token
+   * @throws UnauthorizedException if credentials are invalid or provider mismatch
+   */
   async loginWithEmailAndPassword(
     loginDto: LoginWithEmailAndPasswordDTO,
   ): Promise<AuthResponse> {
@@ -69,9 +87,19 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    await this.activityService.logActivity(user.id, 'LOGIN', { method: 'email' });
+
     return this.buildAuthResponse(user);
   }
 
+  /**
+   * Authenticate or Register a user using Google OAuth ID Token.
+   * 
+   * @param dto Google Auth DTO containing idToken
+   * @returns AuthResponse with access token
+   * @throws InternalServerErrorException if Google Client ID is missing
+   * @throws UnauthorizedException if token is invalid
+   */
   async loginWithGoogle(dto: GoogleAuthDto): Promise<AuthResponse> {
     if (!this.googleClient) {
       throw new InternalServerErrorException(
@@ -99,9 +127,18 @@ export class AuthService {
       googleId: payload.sub ?? payload.email,
     });
 
+    await this.activityService.logActivity(user.id, 'LOGIN', { method: 'google' });
+
     return this.buildAuthResponse(user);
   }
 
+  /**
+   * Initiate password reset flow.
+   * Note: Currently returns a mock response for security.
+   * 
+   * @param email User's email address
+   * @returns Message indicating status
+   */
   async forgotPassword(email: string): Promise<{ message: string }> {
     const user = await this.usersService.findByEmail(email);
     if (!user) {
@@ -116,6 +153,10 @@ export class AuthService {
     };
   }
 
+  /**
+   * Helper to build the standardized AuthResponse.
+   * Generates JWT token and sanitizes user object.
+   */
   private async buildAuthResponse(user: UserEntity): Promise<AuthResponse> {
     const payload = {
       sub: user.id,

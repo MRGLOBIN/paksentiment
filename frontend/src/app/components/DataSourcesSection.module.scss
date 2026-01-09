@@ -1,0 +1,97 @@
+$primary: #059669;
+$bg-section: var(--background);
+$text-primary: var(--foreground);
+$text-muted: var(--text-muted);
+$border: var(--border-color);
+
+.sources {
+    background-color: $bg-section;
+    padding: 5rem 2rem;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: $text-primary;
+    margin-bottom: 1rem;
+}
+
+.subtitle {
+    font-size: 1.125rem;
+    color: $text-muted;
+}
+
+.sourcesGrid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.sourceCard {
+    background: var(--card-bg);
+    border: 1px solid $border;
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    text-align: center;
+    min-width: 180px;
+    transition: all 0.2s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        border-color: $primary;
+    }
+}
+
+.icon {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 0.75rem;
+}
+
+.sourceName {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: $text-primary;
+    margin-bottom: 0.5rem;
+}
+
+.sourceDesc {
+    font-size: 0.85rem;
+    color: $text-muted;
+    line-height: 1.5;
+}
+
+.disclaimer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1rem 2rem;
+    background: rgba(5, 150, 105, 0.08);
+    border-radius: 12px;
+    max-width: 700px;
+    margin: 0 auto;
+
+    .shieldIcon {
+        font-size: 1.5rem;
+    }
+
+    p {
+        font-size: 0.9rem;
+        color: $text-muted;
+        margin: 0;
+    }
+}

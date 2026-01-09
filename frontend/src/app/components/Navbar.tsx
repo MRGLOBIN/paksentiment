@@ -4,9 +4,11 @@ import { useState } from 'react'
 import Link from 'next/link'
 import styles from './Navbar.module.scss'
 import ThemeToggle from './ThemeToggle'
+import { useAuthStore } from '../../store/useAuthStore'
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const { isAuthenticated, user, logout } = useAuthStore()
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen)
@@ -29,6 +31,12 @@ export default function Navbar() {
           <Link href='/analytics' className={styles.navLink}>
             Analytics
           </Link>
+          <Link href='/chat' className={styles.navLink}>
+            Chat
+          </Link>
+          <Link href='/translate' className={styles.navLink}>
+            Translate
+          </Link>
           <Link href='/about' className={styles.navLink}>
             About
           </Link>
@@ -36,12 +44,30 @@ export default function Navbar() {
 
         <div className={styles.navActions}>
           <ThemeToggle />
-          <Link href='/login' className={styles.loginButton}>
-            Login
-          </Link>
-          <Link href='/register' className={styles.registerButton}>
-            Sign Up
-          </Link>
+
+          {isAuthenticated ? (
+            <>
+              <span className={styles.navLink} style={{ fontSize: '0.9rem', cursor: 'default' }}>
+                {user?.fullName?.split(' ')[0]}
+              </span>
+              <button
+                onClick={logout}
+                className={styles.loginButton}
+                style={{ background: 'transparent', border: '1px solid currentColor', width: 'auto', padding: '0.5rem 1rem' }}
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link href='/login' className={styles.loginButton}>
+                Login
+              </Link>
+              <Link href='/register' className={styles.registerButton}>
+                Sign Up
+              </Link>
+            </>
+          )}
           <button
             className={styles.mobileMenuButton}
             onClick={toggleMobileMenu}
@@ -79,6 +105,20 @@ export default function Navbar() {
             Analytics
           </Link>
           <Link
+            href='/chat'
+            className={styles.mobileNavLink}
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            Chat
+          </Link>
+          <Link
+            href='/translate'
+            className={styles.mobileNavLink}
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            Translate
+          </Link>
+          <Link
             href='/about'
             className={styles.mobileNavLink}
             onClick={() => setIsMobileMenuOpen(false)}
@@ -86,20 +126,36 @@ export default function Navbar() {
             About
           </Link>
           <div className={styles.mobileDivider}></div>
-          <Link
-            href='/login'
-            className={styles.mobileNavLink}
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            Login
-          </Link>
-          <Link
-            href='/register'
-            className={styles.mobileNavLink}
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            Sign Up
-          </Link>
+
+          {isAuthenticated ? (
+            <button
+              onClick={() => {
+                logout()
+                setIsMobileMenuOpen(false)
+              }}
+              className={styles.mobileNavLink}
+              style={{ textAlign: 'left', width: '100%', border: 'none', background: 'none' }}
+            >
+              Logout ({user?.fullName})
+            </button>
+          ) : (
+            <>
+              <Link
+                href='/login'
+                className={styles.mobileNavLink}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Login
+              </Link>
+              <Link
+                href='/register'
+                className={styles.mobileNavLink}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Sign Up
+              </Link>
+            </>
+          )}
         </div>
       )}
     </nav>

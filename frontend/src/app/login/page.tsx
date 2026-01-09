@@ -16,6 +16,7 @@ import { Visibility, VisibilityOff } from '@mui/icons-material'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import styles from './login.module.scss'
+import { useAuthStore } from '../../store/useAuthStore'
 
 interface FormErrors {
   email?: string
@@ -25,6 +26,7 @@ interface FormErrors {
 const LoginPage = () => {
   const theme = useTheme()
   const router = useRouter()
+  const { login } = useAuthStore()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -82,9 +84,8 @@ const LoginPage = () => {
 
       const data = await response.json()
 
-      // Store the access token
-      localStorage.setItem('accessToken', data.accessToken)
-      localStorage.setItem('user', JSON.stringify(data.user))
+      // Use the auth context to login
+      login(data.accessToken, data.user)
 
       // Redirect to home page
       router.push('/')

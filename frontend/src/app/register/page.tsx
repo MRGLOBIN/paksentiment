@@ -16,6 +16,7 @@ import { Visibility, VisibilityOff } from '@mui/icons-material'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import styles from './register.module.scss'
+import { useAuthStore } from '../../store/useAuthStore'
 
 interface FormErrors {
   firstName?: string
@@ -28,6 +29,7 @@ interface FormErrors {
 const RegisterPage = () => {
   const theme = useTheme()
   const router = useRouter()
+  const { login } = useAuthStore()
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
@@ -118,9 +120,8 @@ const RegisterPage = () => {
 
       const data = await response.json()
 
-      // Store the access token
-      localStorage.setItem('accessToken', data.accessToken)
-      localStorage.setItem('user', JSON.stringify(data.user))
+      // Use the auth context to login
+      login(data.accessToken, data.user)
 
       setSuccess(true)
 

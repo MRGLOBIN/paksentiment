@@ -44,6 +44,10 @@ export default function AnalysisInput() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [results, setResults] = useState<AnalysisResponse | null>(null)
+  const [useCustomSentiments, setUseCustomSentiments] = useState(false)
+  const [customSentiments, setCustomSentiments] = useState(
+    'positive, neutral, negative'
+  )
 
   const handleAnalysis = async () => {
     if (!inputText.trim()) return
@@ -59,6 +63,10 @@ export default function AnalysisInput() {
         query: inputText,
         limit: '10',
       })
+
+      if (useCustomSentiments && customSentiments.trim()) {
+        params.append('sentiments', customSentiments)
+      }
 
       const response = await fetch(
         `${apiUrl}/raw-data/reddit/sentiment?${params}`,
@@ -127,6 +135,38 @@ export default function AnalysisInput() {
                 rows={6}
               />
             </div>
+
+            <div className={styles.inputGroup}>
+              <label className={styles.checkboxLabel}>
+                <input
+                  type='checkbox'
+                  checked={useCustomSentiments}
+                  onChange={e => setUseCustomSentiments(e.target.checked)}
+                  className={styles.checkbox}
+                />
+                Use Custom Sentiment Categories (AI-powered)
+              </label>
+            </div>
+
+            {useCustomSentiments && (
+              <div className={styles.inputGroup}>
+                <label htmlFor='customSentiments' className={styles.label}>
+                  Custom Sentiment Categories
+                  <span className={styles.hint}>
+                    (comma-separated, e.g., &quot;happy, sad, angry,
+                    fearful&quot;)
+                  </span>
+                </label>
+                <input
+                  id='customSentiments'
+                  type='text'
+                  className={styles.input}
+                  placeholder='e.g., optimistic, pessimistic, anxious, hopeful'
+                  value={customSentiments}
+                  onChange={e => setCustomSentiments(e.target.value)}
+                />
+              </div>
+            )}
 
             {error && <div className={styles.error}>{error}</div>}
 

@@ -1,4 +1,4 @@
-import { Match } from '@decorators/match.decorator';
+import { Match } from '../../../common/decorators/match.decorator';
 import {
   IsEmail,
   IsNotEmpty,
@@ -52,7 +52,7 @@ export class RegisterUserDTO {
   })
   @MinLength(8)
   @IsNotEmpty()
-  @Matches(/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$%&*?!#])[A-Za-z\d!#$%&*?]{8,}$/, {
+  @Matches(/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$%&*?!#])[A-Za-z\d@$!%*?&#]{8,}$/, {
     message:
       'A Password Should be greater than 8 characters and must contain alphabet, number and special character',
   })
