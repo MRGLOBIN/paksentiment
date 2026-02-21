@@ -14,9 +14,11 @@ import { ProcessedPostEntity } from './database/entities/mongo/processed-post.en
 import { AnalyticsCacheEntity } from './database/entities/mongo/analytics-cache.entity';
 import { SystemLogEntity } from './database/entities/mongo/system-log.entity';
 import { AnalysisSessionEntity } from './database/entities/mongo/analysis-session.entity';
+import { CrawlJobEntity } from './database/entities/mongo/crawl-job.entity';
 
 import { ActivityModule } from './modules/activity/activity.module';
 import { AiModule } from './modules/ai/ai.module';
+import { CrawlerModule } from './modules/crawler/crawler.module';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
@@ -56,6 +58,7 @@ import { ConfigModule } from '@nestjs/config';
           AnalyticsCacheEntity,
           SystemLogEntity,
           AnalysisSessionEntity,
+          CrawlJobEntity,
         ],
         synchronize: true,
       }),
@@ -64,6 +67,7 @@ import { ConfigModule } from '@nestjs/config';
     ActivityModule,
     AiModule,
     RawDataModule,
+    CrawlerModule,
   ],
   controllers: [AppController],
   providers: [AppService],

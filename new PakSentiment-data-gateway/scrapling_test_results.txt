@@ -1,0 +1,29 @@
+2026-02-19 12:41:18,344 - INFO - Starting Scrapling Mock Verification...
+2026-02-19 12:41:18,344 - INFO - (Using mock response to bypass sandbox browser restrictions)
+2026-02-19 12:41:18,346 - INFO - Fetching https://example.com/js-test (SIMULATED)...
+2026-02-19 12:41:18,357 - INFO - jusText: 17 total blocks → 6 good paragraphs (1677 chars)
+2026-02-19 12:41:18,357 - INFO - SUCCESS: Main content preserved, boilerplate removed.
+
+============================================================
+  SCRAPLING (MOCK) TEST RESULTS
+============================================================
+Status Code: 200
+Cleaning Method: justext
+Original Length: 3401 chars
+Cleaned Length:  1677 chars
+------------------------------------------------------------
+  EXTRACTED TEXT OUTPUT
+------------------------------------------------------------
+The Future of AI in Web Scraping and Data Extraction
+
+Artificial Intelligence is revolutionizing how we extract data from the web. In the past, developers had to rely on brittle regular expressions and specific CSS selectors that would break whenever a website updated its layout. This approach was not only time-consuming but also prone to errors, requiring constant maintenance and updates to keep the scrapers functional.
+
+Loading related posts...
+
+Today, with the advent of Large Language Models (LLMs) and computer vision, we are entering a new era of "agentic" scraping. These intelligent agents can utilize visual understanding to interpret the DOM just like a human user would. They can identify the main content of a page, distinguish it from advertisements and navigation menus, and extract structured data with high accuracy.
+
+One of the key challenges in modern web scraping is handling JavaScript-heavy websites. Traditional tools often struggle with Single Page Applications (SPAs) where content is loaded dynamically after the initial page load. Headless browsers like Playwright and Puppeteer have bridged this gap, allowing scrapers to execute JavaScript and render the full page content before extraction.
+
+However, fetching the rendered HTML is only half the battle. The resulting markup is often cluttered with scripts, styles, and boilerplate code. This is where tools like jusText come into play. By analyzing the density of stopwords and the structure of the HTML, jusText can effectively isolate the "good" paragraphs—the actual textual content—from the "bad" boilerplate, providing a clean stream of text ready for downstream analysis or LLM ingestion.
+============================================================
+

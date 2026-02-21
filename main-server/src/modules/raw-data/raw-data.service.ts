@@ -1,6 +1,9 @@
-
 import { HttpService } from '@nestjs/axios';
-import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MongoRepository } from 'typeorm';
 import * as crypto from 'crypto';
@@ -45,11 +48,11 @@ export class RawDataService {
     private readonly youtubeProvider: YouTubeProvider,
     private readonly commonCrawlProvider: CommonCrawlProvider,
     private readonly scraplingProvider: ScraplingProvider,
-  ) { }
+  ) {}
 
   /**
    * Retrieve stored session data (Raw + Processed).
-   * 
+   *
    * @param sessionId Unique session ID
    * @returns Aggregated session object with posts and sentiment
    */
@@ -62,48 +65,60 @@ export class RawDataService {
     // Fetch both Processed (Sentiment) and Raw (Content/Metadata)
     const [processedResult, rawResult] = await Promise.all([
       this.postStorage.getProcessedPostsBySourceIds(session.postIds),
-      this.postStorage.getRawPostsBySourceIds(session.postIds)
+      this.postStorage.getRawPostsBySourceIds(session.postIds),
     ]);
 
-    const processedMap = new Map(processedResult.posts.map(p => [p.rawPostSourceId, p]));
-    const rawMap = new Map(rawResult.posts.map(p => [p.sourceId, p]));
+    const processedMap = new Map(
+      processedResult.posts.map((p) => [p.rawPostSourceId, p]),
+    );
+    const rawMap = new Map(rawResult.posts.map((p) => [p.sourceId, p]));
 
-    const normalizedPosts = session.postIds.map(id => {
-      const raw = rawMap.get(id);
-      const processed = processedMap.get(id);
+    const normalizedPosts = session.postIds
+      .map((id) => {
+        const raw = rawMap.get(id);
+        const processed = processedMap.get(id);
 
-      const cleanText = processed?.cleanText || raw?.content || '';
-      const title = (cleanText || '').substring(0, 50) + '...';
-      const author = raw?.author || raw?.metadata?.author || raw?.metadata?.author_name || 'Session Record';
+        const cleanText = processed?.cleanText || raw?.content || '';
+        const title = (cleanText || '').substring(0, 50) + '...';
+        const author =
+          raw?.author ||
+          raw?.metadata?.author ||
+          raw?.metadata?.author_name ||
+          'Session Record';
 
-      return {
-        id: id,
-        title: title,
-        text: cleanText,
-        content: cleanText,
-        author: author,
-        url: (raw?.metadata?.url as string) || (raw?.sourceId?.startsWith('http') ? raw.sourceId : undefined),
-        timestamp: raw?.timestamp,
-        sentiment: processed?.sentiment,
-        confidence: processed?.confidence,
-        metadata: raw?.metadata
-      };
-    }).filter(p => p.text || p.url);
+        return {
+          id: id,
+          title: title,
+          text: cleanText,
+          content: cleanText,
+          author: author,
+          url:
+            (raw?.metadata?.url as string) ||
+            (raw?.sourceId?.startsWith('http') ? raw.sourceId : undefined),
+          timestamp: raw?.timestamp,
+          sentiment: processed?.sentiment,
+          confidence: processed?.confidence,
+          metadata: raw?.metadata,
+        };
+      })
+      .filter((p) => p.text || p.url);
 
-    this.logger.log(`[getSessionData] Session ${sessionId}: Returning ${normalizedPosts.length} posts.`);
+    this.logger.log(
+      `[getSessionData] Session ${sessionId}: Returning ${normalizedPosts.length} posts.`,
+    );
 
-    const normalizedSentiment = normalizedPosts.map(p => ({
+    const normalizedSentiment = normalizedPosts.map((p) => ({
       id: p.id,
       sentiment: p.sentiment,
       score: p.confidence,
-      summary: processedMap.get(p.id)?.metadata?.summary
+      summary: processedMap.get(p.id)?.metadata?.summary,
     }));
 
     return {
       source: session.source + ' (History)',
       count: normalizedPosts.length,
       posts: normalizedPosts,
-      sentiment: normalizedSentiment
+      sentiment: normalizedSentiment,
     };
   }
 
@@ -133,7 +148,10 @@ export class RawDataService {
   /**
    * Fetch Tweets and perform sentiment analysis via Gateway.
    */
-  async fetchTwitterSentiment(query: TwitterSentimentQueryDto, userId?: number) {
+  async fetchTwitterSentiment(
+    query: TwitterSentimentQueryDto,
+    userId?: number,
+  ) {
     return this.twitterProvider.fetchSentiment(query, userId);
   }
 
@@ -168,7 +186,11 @@ export class RawDataService {
   /**
    * Execute a Smart Search using AI Planning.
    */
-  async executeSmartSearch(userQuery: string, userId: number, customTags?: string): Promise<any> {
+  async executeSmartSearch(
+    userQuery: string,
+    userId: number,
+    customTags?: string,
+  ): Promise<any> {
     this.logger.log(`[SmartSearch] Starting for user ${userId}: ${userQuery}`);
 
     // 1. Generate Plan
@@ -176,7 +198,9 @@ export class RawDataService {
     const plans = planResult.plan || [];
 
     if (plans.length === 0) {
-      throw new InternalServerErrorException('AI could not generate a valid search plan.');
+      throw new InternalServerErrorException(
+        'AI could not generate a valid search plan.',
+      );
     }
 
     this.logger.log(`[SmartSearch] Plan generated with ${plans.length} steps`);
@@ -191,40 +215,48 @@ export class RawDataService {
           dto.limit = p.params?.limit || 10;
           if (customTags) dto.customTags = customTags; // <--- ADDED
           return await this.redditProvider.fetchSentiment(dto, undefined);
-        }
-        else if (p.source === 'twitter_sentiment' || p.source === 'twitter') {
+        } else if (p.source === 'twitter_sentiment' || p.source === 'twitter') {
           const dto = new TwitterSentimentQueryDto();
           dto.query = p.params?.query || userQuery;
           dto.maxResults = parseInt(String(p.params?.maxResults || 10), 10);
           if (customTags) dto.customTags = customTags; // <--- ADDED
           return await this.twitterProvider.fetchSentiment(dto, undefined);
-        }
-        else if (p.source === 'scrapling') {
+        } else if (p.source === 'scrapling') {
           if (!p.params?.url) return null;
-          return await this.scraplingProvider.fetchSentiment({
-            url: p.params.url,
-            fetchLimit: p.params.fetchLimit,
-            useLocal: true,
-            customTags: customTags // <--- ADDED (Assuming Scrapling DTO handles it, we will verify)
-          }, undefined);
-        }
-        else if (p.source === 'commoncrawl') {
+          return await this.scraplingProvider.fetchSentiment(
+            {
+              url: p.params.url,
+              fetchLimit: p.params.fetchLimit,
+              useLocal: true,
+              customTags: customTags, // <--- ADDED (Assuming Scrapling DTO handles it, we will verify)
+            },
+            undefined,
+          );
+        } else if (p.source === 'commoncrawl') {
           if (!p.params?.domain) return null;
-          // CommonCrawl might not support sentiment re-classification easily if it's just raw text, 
+          // CommonCrawl might not support sentiment re-classification easily if it's just raw text,
           // but we'll try to pass it if the provider supports it.
           // For now, let's skip for CommonCrawl or assume it ignores extra fields.
-          return await this.commonCrawlProvider.fetchSentiment(p.params, undefined);
+          return await this.commonCrawlProvider.fetchSentiment(
+            p.params,
+            undefined,
+          );
         }
         return null;
       } catch (e) {
-        this.logger.error(`[SmartSearch] Step failed for ${p.source}:`, e.message);
+        this.logger.error(
+          `[SmartSearch] Step failed for ${p.source}:`,
+          e.message,
+        );
         return null;
       }
     });
 
     // Also fetch historical data
     promises.push(
-      this.getStoredData({ limit: 100 }).then(res => ({ ...res, source: 'database' })).catch(() => null)
+      this.getStoredData({ limit: 100 })
+        .then((res) => ({ ...res, source: 'database' }))
+        .catch(() => null),
     );
 
     const results = await Promise.all(promises);
@@ -240,19 +272,25 @@ export class RawDataService {
       const sentiment = res.sentiment || [];
       allPosts = [...allPosts, ...posts];
       allSentiment = [...allSentiment, ...sentiment];
-      totalCount += (res.count || posts.length);
+      totalCount += res.count || posts.length;
     });
 
     // 4. Save Unified Session
     const sessionId = crypto.randomUUID();
-    // Use provider helper logic? No, provider logic saves individual session. 
+    // Use provider helper logic? No, provider logic saves individual session.
     // Here we save a mixed session using existing SessionRepo.
 
-    // Logic from AbstractDataProvider.saveSession duplicated here? 
+    // Logic from AbstractDataProvider.saveSession duplicated here?
     // Ideally we'd move saveSession to a SessionService, but for now we reproduce or use protected method if we extended...
     // But RawDataService is NOT extending AbstractDataProvider.
     // So we use local logic.
-    await this.saveSessionLocal(sessionId, userId, userQuery, 'smart_search_mixed', allPosts);
+    await this.saveSessionLocal(
+      sessionId,
+      userId,
+      userQuery,
+      'smart_search_mixed',
+      allPosts,
+    );
 
     return {
       source: 'Smart Search (AI)',
@@ -260,7 +298,7 @@ export class RawDataService {
       posts: allPosts,
       sentiment: allSentiment,
       sessionId: sessionId,
-      plan: plans
+      plan: plans,
     };
   }
 
@@ -272,18 +310,20 @@ export class RawDataService {
     rawPosts: any[],
   ) {
     if (!userId) return;
-    const postIds = rawPosts.map((post) => {
-      return (
-        post.post_id ??
-        post.id ??
-        post.tweet_id ??
-        post.comment_id ??
-        post.url ??
-        post.video_id ??
-        post.comment_id ??
-        ''
-      ).toString();
-    }).filter(id => id && id !== 'undefined');
+    const postIds = rawPosts
+      .map((post) => {
+        return (
+          post.post_id ??
+          post.id ??
+          post.tweet_id ??
+          post.comment_id ??
+          post.url ??
+          post.video_id ??
+          post.comment_id ??
+          ''
+        ).toString();
+      })
+      .filter((id) => id && id !== 'undefined');
 
     const session = this.sessionRepo.create({
       sessionId,
@@ -299,14 +339,16 @@ export class RawDataService {
   async planQuery(userQuery: string): Promise<any> {
     const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) {
-      throw new InternalServerErrorException('GROQ_API_KEY not configured on server');
+      throw new InternalServerErrorException(
+        'GROQ_API_KEY not configured on server',
+      );
     }
 
     const payload = {
-      model: "llama-3.3-70b-versatile",
+      model: 'llama-3.3-70b-versatile',
       messages: [
         {
-          role: "system",
+          role: 'system',
           content: `You are a data retrieval assistant for the PakSentiment platform.
 Your goal is to analyze the user's natural language request and generate a plan to fetch data from available sources.
 
@@ -335,24 +377,30 @@ RESPONSE FORMAT:
   { "source": "commoncrawl", "params": { "domain": "dawn.com", "limit": 50 } }
 ]
 }
-`
+`,
         },
         {
-          role: "user",
-          content: userQuery
-        }
+          role: 'user',
+          content: userQuery,
+        },
       ],
-      response_format: { type: "json_object" }
+      response_format: { type: 'json_object' },
     };
 
     let processedQuery = userQuery;
     try {
       const translation = await translate(userQuery, { to: 'en' });
-      if (translation.from.language.iso && translation.from.language.iso !== 'en') {
+      if (
+        translation.from.language.iso &&
+        translation.from.language.iso !== 'en'
+      ) {
         processedQuery = translation.text;
       }
     } catch (error) {
-      this.logger.warn('[PlanQuery] Translation failed, proceeding with original text:', error.message);
+      this.logger.warn(
+        '[PlanQuery] Translation failed, proceeding with original text:',
+        error.message,
+      );
     }
 
     payload.messages[1].content = processedQuery;
@@ -362,13 +410,16 @@ RESPONSE FORMAT:
         this.httpService.post(
           'https://api.groq.com/openai/v1/chat/completions',
           payload,
-          { headers: { Authorization: `Bearer ${apiKey}` } }
-        )
+          { headers: { Authorization: `Bearer ${apiKey}` } },
+        ),
       );
       const content = response.data.choices[0].message.content;
       return JSON.parse(content);
     } catch (error) {
-      this.logger.error('[PlanQuery] Error:', error?.response?.data || error.message);
+      this.logger.error(
+        '[PlanQuery] Error:',
+        error?.response?.data || error.message,
+      );
       throw new InternalServerErrorException('Failed to generate query plan');
     }
   }
