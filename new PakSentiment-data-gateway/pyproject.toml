@@ -17,6 +17,8 @@ dependencies = [
     "sentencepiece>=0.2.0",
     "bytez>=0.1.0",
     "numpy<2",
+    "justext>=3.0.0",
+    "lxml>=5.0.0",
 ]
 
 [project.optional-dependencies]
