@@ -1,33 +1,33 @@
 ==========================================================
   CLEAN CONTENT EXTRACTION TEST RESULTS
   (Smart Selectors + JS Detection + Scrapling Fallback)
-  Date: 2026-02-20T12:55:43+05:00
+  Date: 2026-02-21T19:42:01+05:00
 ==========================================================
 
 SUMMARY
 -------
 JS-heavy pages detected:       0
-Pages scraped by Colly:         11 (480210 clean chars / 468.96 KB)
+Pages scraped by Colly:         11 (478207 clean chars / 467.00 KB)
 Pages scraped by Scrapling:     0 (0 chars / 0.00 KB)
-Headlines extracted:            7
+Headlines extracted:            4
 Deep crawl pages:               11 (839803 chars / 820.12 KB)
-Total time:                     13.207625236s
+Total time:                     13.947600148s
 
 ALL PAGES
 ---------
 URL                                                | Method          | Time       | Clean Text   | Links  | JS?   | Headlines
 ----------------------------------------------------------------------------------------------------------------------------------
-https://news.google.com                            | css-selectors   | 1.483505546s | 1664     chr | 4      |       | 3
-https://news.google.com/search?q=Pakistan          | css-selectors   | 1.341366752s | 11261    chr | 2      |       | 4
-https://news.google.com/search?q=technology        | css-selectors   | 1.05709501s | 11528    chr | 2      |       | 0
-https://en.wikipedia.org/wiki/Main_Page            | css-selectors   | 711.153011ms | 6829     chr | 670    |       | 0
-https://en.wikipedia.org/wiki/Pakistan             | css-selectors   | 503.137958ms | 237259   chr | 5110   |       | 0
-https://en.wikipedia.org/w/index.php?search=sent   | css-selectors   | 591.223984ms | 49823    chr | 684    |       | 0
-https://en.wikipedia.org/wiki/Natural_language_p   | css-selectors   | 162.722735ms | 43327    chr | 883    |       | 0
-https://en.wikipedia.org/wiki/Web_scraping         | css-selectors   | 136.173816ms | 25261    chr | 358    |       | 0
-https://docs.python.org/3/whatsnew/3.12.html       | readability     | 724.655325ms | 89228    chr | 330    |       | 0
-https://news.ycombinator.com                       | readability     | 1.577133472s | 2299     chr | 34     |       | 0
-https://www.aljazeera.com/news                     | readability     | 905.913646ms | 1731     chr | 83     |       | 0
+https://news.google.com                            | css-selectors   | 1.524834152s | 1704     chr | 4      |       | 3
+https://news.google.com/search?q=Pakistan          | css-selectors   | 1.359534016s | 11406    chr | 2      |       | 1
+https://news.google.com/search?q=technology        | css-selectors   | 1.41956744s | 11152    chr | 2      |       | 0
+https://en.wikipedia.org/wiki/Main_Page            | css-selectors   | 566.327745ms | 5495     chr | 634    |       | 0
+https://en.wikipedia.org/wiki/Pakistan             | css-selectors   | 471.612503ms | 237259   chr | 5110   |       | 0
+https://en.wikipedia.org/w/index.php?search=sent   | css-selectors   | 775.82845ms | 49823    chr | 684    |       | 0
+https://en.wikipedia.org/wiki/Natural_language_p   | css-selectors   | 144.388573ms | 43327    chr | 883    |       | 0
+https://en.wikipedia.org/wiki/Web_scraping         | css-selectors   | 366.343136ms | 25261    chr | 358    |       | 0
+https://docs.python.org/3/whatsnew/3.12.html       | readability     | 632.933386ms | 89228    chr | 330    |       | 0
+https://news.ycombinator.com                       | readability     | 1.330271787s | 1886     chr | 34     |       | 0
+https://www.aljazeera.com/news                     | readability     | 1.380550691s | 1666     chr | 82     |       | 0
 
 ==========================================================
   DETAILED RESULTS (Clean Extracted Text)
@@ -38,9 +38,9 @@ URL:         https://news.google.com
 Engine:      colly
 Title:       Google News
 Status:      200
-Clean Text:  1664 chars (1.62 KB)
+Clean Text:  1704 chars (1.66 KB)
 Links:       4
-Time:        1.483505546s
+Time:        1.524834152s
 Method:      css-selectors
 JS Heavy:    false
 
@@ -50,7 +50,7 @@ JS Heavy:    false
   3. Picks for you
 
 --- CLEAN TEXT (first 5000 chars) ---
-briefingToday23°13°Sat23°13°Sun23°13°Mon23°13°Your local weather23°CGoogle Weather#i11 {color: #1867DC;}.dm7YTc #i11 {color: #8BB8F8;}Top storiesDawnMoreTarar says Pakistan earned ‘great recognition and honour’ at Board of Peace meeting1 hour agoBusiness RecorderMore‘I like this guy’: Trump to PM7 hours agoGeo NewsMoreUS thanks Pakistan for backing Trump's Gaza plan and joining peace board3 hours agoThe Nation (Pakistan )MorePrime Minister Shehbaz Sharif to visit U.S. for Board of Peace meetingYesterdaySee more headlines and perspectivesReutersMoreMorning Bid: Trump threatens Iran with force2 hours agoBBCMoreTrump's foreign policy dilemma laid bare by Iran tensions6 hours agoBy Daniel BushDawnMoreWar clouds loom as US amasses military hardware in Middle East6 hours agoThe New York TimesMoreU.S. Aircraft Carrier Will Be Sent to the Middle East From Venezuela, Officials Say7 days agoBy John Ismay and Eric P. SchmittSee more headlines and perspectivesBBCMoreTrump's Board of Peace members pledge $7bn in Gaza relief10 hours agoBy Amy WalkerSee moreThe GuardianMoreTrump says he will order the release of Pentagon files on aliens and UFOs3 hours agoBy Robert MackeySee more#i30 {color: #00758C;}.dm7YTc #i30 {color: #75B8B1;}Local newsManage local news#i32 {background-color: #DAF1F6;}.dm7YTc #i32 {background-color: #293D3B;}#i32 {color: #00758C;}.dm7YTc #i32 {color: #BDDDDA;}#i32 {fill: #00758C;}.dm7YTc #i32 {fill: #BDDDDA;}#i33 {color: #592FD0;}.dm7YTc #i33 {color: #A596CF;}Picks for you#i34 {background-color: #592FD0;}.dm7YTc #i34 {background-color: #A596CF;}Sign in for personalised stories in your briefing and news feedSign in
+briefingToday24°12°Sun24°12°Mon24°12°Tue25°13°Islamabad17°CGoogle Weather#i11 {color: #1867DC;}.dm7YTc #i11 {color: #8BB8F8;}Top storiesDawnMoreLieutenant colonel among two army personnel martyred in Bannu suicide attack: ISPR4 hours agoAl JazeeraMoreTwo soldiers killed during military operation in Pakistan’s northwest: Army1 hour agoReutersMoreTwo soldiers, five militants killed in Bannu, Pakistan army says4 hours agoThe Express TribuneMoreArmy says officer, soldier martyred, five terrorists killed in Bannu attack4 hours agoSee more headlines and perspectivesBusiness RecorderMoreAurangzeb, Lutnick hold high-level talks to boost Pakistan-US trade & investment4 hours agoDawnMorePakistan, US express desire to enhance economic cooperation2 hours agoThe Express TribuneMorePM Shehbaz seeks expanded US investment in meeting with DFC chiefYesterdayAaj NewsMoreTrends - United States International Development Finance CorporationYesterdaySee more headlines and perspectivesMinute MirrorMoreSindh govt to add new buses in Karachi, speeds up red line BRT project3 hours agoBy Seerat FatimaSee moreThe Express TribuneMoreBlocking CNIC to enforce court decree violates right to life, SC rules7 hours agoBy Jehanzeb AbbasiSee more#i30 {color: #00758C;}.dm7YTc #i30 {color: #75B8B1;}Local newsManage local news#i32 {background-color: #DAF1F6;}.dm7YTc #i32 {background-color: #293D3B;}#i32 {color: #00758C;}.dm7YTc #i32 {color: #BDDDDA;}#i32 {fill: #00758C;}.dm7YTc #i32 {fill: #BDDDDA;}#i33 {color: #592FD0;}.dm7YTc #i33 {color: #A596CF;}Picks for you#i34 {background-color: #592FD0;}.dm7YTc #i34 {background-color: #A596CF;}Sign in for personalised stories in your briefing and news feedSign in
 
 
 --- Result 2 ---
@@ -58,20 +58,17 @@ URL:         https://news.google.com/search?q=Pakistan
 Engine:      colly
 Title:       Google News - Search
 Status:      200
-Clean Text:  11261 chars (11.00 KB)
+Clean Text:  11406 chars (11.14 KB)
 Links:       2
-Time:        1.341366752s
+Time:        1.359534016s
 Method:      css-selectors
 JS Heavy:    false
 
---- HEADLINES (4) ---
-  1. News about Afghanistan • Pakistan
-  2. News about Gaza • Pakistan
-  3. Pakistan defeats Namibia by 102 runs to reach T20 World Cup Super Eights
-  4. News about Roosevelt Hotel • Pakistan
+--- HEADLINES (1) ---
+  1. New Zealand vs Pakistan T20 World Cup Super Eights match
 
 --- CLEAN TEXT (first 5000 chars) ---
-News about Afghanistan • PakistanDawnMorePakistan’s patience with Afghanistan wearing thin6 hours agoBy Baqir SajjadFrance 24MoreFocus - Pakistan becomes major drug hub as Afghanistan exports crisis20 hours agoBy Shahzaib Wahlah and Ondine de GaulleArab News PKMoreSecurity forces kill four militants in Pakistani province bordering Afghanistan2 hours agoBy Ismail DilawarAl JazeeraMorePakistan’s Punjab police kill 900 people in eight months: What’s going on?2 days agoNews about Gaza • PakistanArab News PKMorePakistan, US discuss investment in energy, minerals and counter-terrorism fields17 minutes agoBy Naimat KhanDawnMorePakistan not among 5 nations announced to have committed troops for International Stabilisation Force in Gaza12 hours agoDawnMoreTarar says Pakistan earned ‘great recognition and honour’ at Board of Peace meeting1 hour agoDawnMorePakistan’s energy sector isn’t broken by chance. It’s broken by design31 minutes agoBy Muhammad Hamza LatifPakistan defeats Namibia by 102 runs to reach T20 World Cup Super EightsAl JazeeraMoreNew Zealand vs Pakistan: T20 World Cup Super Eights – teams, start, lineups8 hours agoBy Kevin HandBBCMoreT20 World Cup: Pakistan reach Super 8s by beating Namibia2 days agoBy Marc HigginsonPCBMorePakistan Shaheens to take on England Lions in T20 series opener on Friday17 hours agoNews about Roosevelt Hotel • PakistanReutersMorePakistan, US sign pact to redevelop New York's Roosevelt Hotel17 hours agoBy Ariba ShahidDawnMorePakistan, US sign pact to redevelop New York’s Roosevelt Hotel16 hours agoDaily PakistanMorePakistan, US sign deal for redevelopment of PIA-owned Roosevelt Hotel3 hours agoArab News PKMorePakistan extends airspace ban on Indian aircraft until Mar. 238 minutes agoBy Naimat KhanThe Diplomat – Asia-Pacific Current Affairs MagazineMoreBNP’s Victory in Bangladesh Opens Door Wider for Islamabad2 hours agoBy Umair JamalThe Express TribuneMoreRecord-breaking broadcast deal likely in Pakistan history4 hours agoBy Saleem KhaliqThe Times of IndiaMorePakistan says Imran Khan rejected 'serious deals' twice for release from jail2 hours agoProfit by Pakistan TodayMoreGold price in Pakistan for today, February 20, 20264 hours agoReliefWebMoreUNICEF Pakistan Humanitarian Situation Report No. 3 (End of Year), 31 December 20256 hours agocpecinfo.comMoreChinese, Pakistani employees at CPEC projects celebrate Spring Festival25 minutes agoThe Diplomat – Asia-Pacific Current Affairs MagazineMoreDead or Alive, Imran Khan Puts Pakistan’s General Munir in a Catch-22 Situation18 hours agoBy Asif Ullah KhanICCMorePakistan go through in commanding fashion | Match Highlights | T20WC 20262 days agoBBCMoreThe Hundred: IPL-linked teams 'not considering Pakistan players'18 hours agoBy Tom GrundyIUCNMoreWorld Wetlands Day 2026 Observed Across Pakistan3 hours agoAl JazeeraMoreGas explosion kills 16 in Pakistan’s Karachi, collapsing building20 hours agoReliefWebMoreUNICEF Pakistan Humanitarian Situation Report No. 2- January-September 20256 hours agoArab News PKMorePakistan’s Sharif hails Trump as ‘man of peace’ at inaugural Gaza board meeting1 hour agoBy Fatimah AmjadThe Express TribuneMorePakistan, Philippines hold second Joint Economic Commission meeting1 hour agoDawnMoreTrump paints Pakistan as ‘responsible nuclear state’6 hours agoBy Anwar IqbalAssociated Press of PakistanMorePakistan, US agree to enhance bilateral trade, economic ties, counterterrorism cooperation9 minutes agoBusiness RecorderMoreIMF lauds Pakistan’s reforms, eyes Feb 25 visit for EFF & RSF review1 hour agoBusiness RecorderMoreUS ‘appreciates’ Pakistan’s support for Gaza peace plan, joining peace board47 minutes agoDawnMoreRamazan moon sighted; holy month to begin in Pakistan on Thursday2 days agoThe Express TribuneMorePHF lifts Ammad Butt ban, promises fresh start for Pakistan hockey1 hour agoBy Zulfiqar BaigGlobal VoicesMorePakistan jails two lawyers for 17 years over old tweets54 minutes agoBy Syed Salman MehdiICCMorePakistan seal Super 8 spot; India, South Africa finish unbeatenYesterdayAnadolu AjansıMoreUS holds discussions with Pakistan on development of its critical minerals and energy sectors2 hours agoProfit by Pakistan TodayMorePakistan extends airspace ban on Indian aircraft until March 233 hours agoReliefWebMoreUNHCR-IOM Pakistan Flash update # 82 on Arrest and Detention/Flow Monitoring, 15 Sep 2023 to 14 February 202610 hours agoDawnMorePakistan, Austria agree to further strengthen bilateral ties4 days agoArab News PKMorePakistan expands crypto engagement with appearance at Mar-a-Lago finance forum14 hours agoThe Express TribuneMoreApple to manufacture iPhones in PakistanYesterdayBy Zaffar BhuttaProfit by Pakistan TodayMoreMultinationals repatriate $1.68 billion in profits from Pakistan in seven months of FY2025-264 hours agoThe Nation (Pakistan )MoreDFC CEO meets Pakistan PM to boost investment ties1 hour agoMettis GlobalMorePakistan, Russia to Boost Dig
+PCBMorePakistan to tour Bangladesh in MarchYesterdayDawnMorePakistan not among 5 nations announced to have committed troops for International Stabilisation Force in Gaza2 days agoAl JazeeraMoreTwo soldiers killed during military operation in Pakistan’s northwest: Army1 hour agoArab News PKMorePakistan plans digital wheat tracking system, steps up Ramadan price monitoring1 hour agoFrance 24MoreFocus - Pakistan becomes major drug hub as Afghanistan exports crisis2 days agoBy Shahzaib Wahlah and Ondine de GaulleThe Diplomat – Asia-Pacific Current Affairs MagazineMoreDead or Alive, Imran Khan Puts Pakistan’s General Munir in a Catch-22 Situation2 days agoBy Asif Ullah KhanNDTVMore"Whose Card Is This?" Pakistan Soldiers Cry In Baloch Custody As Deadline NearsYesterdayBy Aditya Raj Kaul and Sanstuti NathBloomberg.comMoreA Bollywood Spy Thriller Crosses the India-Pakistan DivideYesterdayBy Jeanette Rodrigues and Tooba KhanReutersMoreTwo soldiers, five militants killed in Bannu, Pakistan army says4 hours agoNew Zealand vs Pakistan T20 World Cup Super Eights matchESPNcricinfoMoreNew Zealand vs Pakistan LIVE cricket score, T20 World Cup 2026: Pakistan opt to bat in rainy Colombo1 hour agoBy Danyal RasoolAl JazeeraMoreLIVE: Pakistan vs New Zealand – T20 World Cup Super Eights30 minutes agoESPNcricinfoMoreFakhar in for Nafay as Pakistan bat in Colombo1 hour agoICCMoreLIVE: Pakistan v New Zealand delayed due to rain1 hour agoArab News PKMoreArmy officer among two soldiers killed in suicide attack in Pakistan’s northwest5 hours agoBy Naimat KhanESPNcricinfoMoreBall by Ball Commentary & Live Score - PAK vs NZ, 41st Match, Super Eights, Group 21 hour agoBBCMoreNew Zealand vs Pakistan LIVE: ICC T20 World Cup 2026 - cricket score, radio & video highlights1 hour agoGeo SuperMorePakistan vs New Zealand Live Score, T20 World Cup 2026, Super Eights, PAK vs NZ Match 412 hours agoPCBMorePakistan and South Africa women ODI series to begin on Sunday1 hour agoGeo NewsMoreWill rain disrupt Pakistan vs New Zealand match in Colombo?2 hours agoDawnMorePakistan, US express desire to enhance economic cooperation2 hours agoProfit by Pakistan TodayMoreSilver price in Pakistan for today, February 21, 20269 hours agoICCMoreNew Zealand vs. Pakistan2 hours agoArab News PKMorePakistan to hold US trade forum on March 31, invites American commerce secretary’s office1 hour agoBy Ismail DilawarICCMorePakistan set for Bangladesh ODI tour in March 202620 hours agoICCMoreNew Zealand v Pakistan | Feel The Thrill | T20WC 202619 hours agoArab News PKMorePakistan arrests woman suspected of planning suicide attack in northwest3 hours agoBy Naimat KhanICCMorePakistan elect to bat in Colombo | T20WC 20261 hour agoNDTV SportsMorePakistan vs New Zealand LIVE Score, T20 World Cup 2026: Rain Delays Start, Pak vs NZ To Lose Overs From This Time22 minutes agoArab News PKMorePakistan to face New Zealand today in T20 World Cup Super Eight encounter in Colombo6 hours agoBy Usama Iqbal and Usama Iqbal KhawajaAl JazeeraMoreNew Zealand vs Pakistan: T20 World Cup Super Eights – teams, start, lineupsYesterdayBy Kevin HandTapmadMorePak vs NZ Weather Update: Rain Threatens Super 8 Opener in Colombo3 hours agoAl JazeeraMoreMore than a dozen killed in bomb blasts, gunfire in Pakistan’s northwest4 days agoArab News PKMorePakistan weekly inflation rises 5.19% year on year as Ramadan begins8 hours agoBy Ismail DilawarThe Express TribuneMorePakistan opt to bat against New Zealand in Super Eight opener1 hour agoDeccan HeraldMorePakistan Punjab CM Maryam comes under fire over acquisition of luxury jet for PKR 11.7 billion1 hour agoArab News PKMorePakistan says UN liquidity crisis undermining peacekeeping, urges predictable financing8 hours agoBy Kashif ImranAl JazeeraMorePakistan’s Punjab police kill 900 people in eight months: What’s going on?3 days agoICCMorePakistan go through in commanding fashion | Match Highlights | T20WC 20263 days agoArab News PKMorePakistan to tour Bangladesh for ODI series in March as bilateral ties warm9 hours agoBy Naimat KhanOutlook IndiaMorePakistan Vs New Zealand LIVE Score, T20 World Cup 2026 Super 8: Covers Still On As Rain Persists In Colombo5 minutes agoBy Vikas PatwalFirstpostMorePakistan vs New Zealand: Start of Super 8s delayed due to rain in Colombo after PAK win toss40 minutes agoNDTV SportsMorePakistan Playing XI vs New Zealand For T20 World Cup Super 8 Mocked By Saqlain Mushtaq: "Hira, Nikku, Bala"4 hours agoBy Abhishek PaulCrictodayMorePakistan vs New Zealand Who Won the Toss Today? – Super 8 Group 2 ICC T20 World Cup 2026 Toss Update1 hour agoCrictodayMoreT20 World Cup 2026: Pakistan vs New Zealand Super 8 Match delayed due to rain1 hour agoHindustan TimesMoreWhat happens to Pakistan's semifinal chances if rain washes out New Zealand Super 8 tie? Does ICC have reserve day? | Cricket37 minutes agoBy Aratrick MondalOutlook IndiaMoreNew Zealand Vs Pakistan, ICC T20 World Cup 2026 Super 8: See Best Photos From R. Premadas
 
 
 --- Result 3 ---
@@ -79,14 +76,14 @@ URL:         https://news.google.com/search?q=technology
 Engine:      colly
 Title:       Google News - Search
 Status:      200
-Clean Text:  11528 chars (11.26 KB)
+Clean Text:  11152 chars (10.89 KB)
 Links:       2
-Time:        1.05709501s
+Time:        1.41956744s
 Method:      css-selectors
 JS Heavy:    false
 
 --- CLEAN TEXT (first 5000 chars) ---
-Al JazeeraMoreEpstein’s shadow: Why Bill Gates pulled out of Modi’s AI summit20 hours agoBy Nils AdlerTRT WorldMoreUN steps in to help governments regulate AI as fears grow over technology's misuse33 minutes agoAl JazeeraMoreVisualising AI spending: How does it compare with history’s mega projects?22 hours agoThe GuardianMoreWhat technology takes from us – and how to take it back | Rebecca Solnit29 JanBy Rebecca SolnitThe New York TimesMoreHow ICE Already Knows Who Minneapolis Protesters Are31 JanBy Aaron Krolik and Sheera FrenkelNASA (.gov)MoreNASA Technology Brings Golden Age of Exploration to Earth26 JanMIT Technology ReviewMoreA “QuitGPT” campaign is urging people to cancel their ChatGPT subscriptions10 days agoBy Michelle KimThe Washington PostMoreThe powerful tools in ICE’s arsenal to track suspects — and protesters29 JanBy Artur Galocha, Kevin Schaul and Eva Doublog.googleMoreIntroducing Gemini: our largest and most capable AI model6 Dec 2023By Sundar PichaiHarvard Business ReviewMoreDesign Processes to Evolve with Emerging Technology30 JanIRU | World Road Transport OrganisationMoreIRU Technology and Innovation Roundtable at Daimler pushes interoperability15 hours agosamsung.comMoreSamsung Electronics and KT Corporation Verify X-MIMO Technology in 7 GHz Band for 6G Development8 hours agoPhys.orgMoreAI-based technology can detect gender violence from the voice16 hours agoDaily Lead PakistanMoreTCL offer up to 12% off on smart home technology3 hours agoKPMGMoreHow digital technologies are making the chemical industry's supply chains more resilient3 hours agoSeed WorldMoreHarnessing Technology to Protect the World’s Crop Diversity2 hours agoNEC GlobalMoreEnvisioning a future with +AI: NEC’s technology and thought leadership: NEC Stories7 hours agoCNETMoreSharp Invented a New High-Speed Cooking Technology Called the 'Golden Heater'18 hours agoBy David WatskyComputerworldMoreIs AI killing technology?51 minutes agoBy Mike ElganDefenseScoopMoreArmy says it’s using AI to help produce doctrine, but acknowledges the technology’s flaws7 hours agoBy Drew F. Lawrencehok.comMoreDesigning for Advanced Technology: Q+A with HOK’s David Pugh13 hours agoKhaleej TimesMoreCute meets technology in fashion’s latest obsession2 hours agoBy Louise Nicholvindy.comMore‘Technology should work for people’1 hour agoEnergy Digital MagazineMoreSchneider Electric: The Next Generation of Energy Technology10 hours agoBy James DarleyEnergy Industry ReviewMoreSIMAI TECHNOLOGY: Leader in Energy Solutions of the Future45 minutes agoUnmanned Systems TechnologyMoreEmbention Named in Deloitte Technology Fast 50 Spain for Sustained Growth1 hour agoGOV.UKMoreEnhanced package of cutting-edge technology to combat waste crime7 hours agoBy Emma ReynoldsBloomberg.comMoreBrazil and India to Deepen Critical Mineral and Technology Ties3 hours agoGOV.UKMoreWales becomes UK launchpad for next generation autonomous technology7 hours agoBy John HealeyASU NewsMoreRegents Professor recognized as pioneer in educational technology10 hours agoBy Lisa Robbinsfacebook.comMoreMedia Release - ShikshaNext: Rs 170 Cr multi-partner initiative launched to strengthen learning through EdTech and AI for children across India • The initiative will enable over 13 million children to access meaningful, technology - and AI-enabled learning op2 hours agoNDTVMoreAI To Starlink: How Drone Technology Transformed Battlefield In Ukraine2 hours agoThe Fast ModeMoreAeris, Palo Alto Networks Expand Technology Partner Program with Zero-Trust 5G Security6 hours agoBy Ray SharmaPublic KnowledgeMoreMore than a Seat: Who Gets to Shape Technology Policy10 hours agoBy Michele AmbadiangPR NewswireMorePrism Technology Strengthens Global Position with Eco-Friendly, High-Quality Upgraded Ink Line6 hours agoASU NewsMoreProfessor’s expertise in technology transfer leads to top faculty honor15 hours agoBy Mary Beth FallereKathimerini.comMoreGreek-US cooperation prospects in technology2 hours agoAnadolu AjansıMoreRising energy demand, limited finance, and technology strain emerging economies2 hours agoThe GuardianMoreAI (artificial intelligence)1 hour agoconstellationenergy.comMoreAdvancing Energy Innovation & Technology | Constellation9 hours agoSiemensMoreQAL upgrades plant with Siemens technology2 hours agoAtrium AIMoreTechnology & Software10 hours agoRetail Technology Innovation HubMoreAI driven experiences transform e-commerce: this week's biggest retail tech stories1 hour agoSchool of Foreign Service | Georgetown UniversityMoreBrady Stoffregen (SFS’26) navigates the intersection of creativity, technology and social systems15 hours agoPhys.orgMorePreservation through technology: 3D modeling of a historic building from 15th century7 hours agovocal.mediaMoreDenocka Wardrick Recognized as Male Ally for Advancing NFC Technology and Community Innovation8 hours agoRetail Technology Innovation HubMoreKim Lewis takes on expanded marketing and technology role at Ca
+BBCMoreUrgent research needed to tackle AI threats, says Google AI bossYesterdayBy Zoe KleinmanDaily SabahMoreTürkiye’s military leads world in drone technology, top commander says | Daily Sabah23 hours agoThe GuardianMoreNascent tech, real fear: how AI anxiety is upending career ambitions18 hours agoBy Aaron MokTechJuiceMoreSamsung Takes a Significant Leap in Advancing 6G Network Technology6 hours agoBy Zohaib ShahNASA (.gov)MoreNASA Technology Brings Golden Age of Exploration to Earth26 JanThe New York TimesMoreHow ICE Already Knows Who Minneapolis Protesters Are31 JanBy Aaron Krolik and Sheera FrenkelMIT Technology ReviewMore10 Breakthrough Technologies 202612 JanBy Amy NordrumHarvard Business ReviewMoreDesign Processes to Evolve with Emerging Technology30 JanThe Washington PostMoreThe powerful tools in ICE’s arsenal to track suspects — and protesters29 JanBy Artur Galocha, Kevin Schaul and Eva DouGOV.UKMoreNew technology and medicines to combat drug and alcohol addiction5 days agoBy Zubir AhmedBritannicaMoreArtificial intelligence (AI) | Definition, Examples, Types, Applications, Companies, & Facts3 hours agoBy Jack CopelandSimplilearn.comMore20 New Technology Trends for 2026 | Emerging Technologies 20266 hours agoBy Nikita Duggalsamsung.comMoreSamsung Electronics and KT Corporation Verify X-MIMO Technology in 7 GHz Band for 6G DevelopmentYesterdayBuilt InMoreThe Future of AI: How AI Is Changing the World2 days agoBy Mike Thomasorfonline.orgMoreMapping Gulf Sovereign Wealth Funds in the Global Energy Transition: Capital, Technology, and Diplomacy3 hours agoBy Parul BakshiChina DailyMoreTechnology transforming creativity15 hours agoFujitsu GlobalMoreFugaku and associated technologies help to solve major challenges in the world todayYesterdayBloomberg.comMoreVietnam Says Trump Will Let Nation Access Restricted Technology10 hours agoBy Nguyen DieuAwaz The VoiceMoreUK AI minister says Bihar is chasing future of technology6 hours agoPR NewswireMoreUniversity of Phoenix CIO Jamie Smith Shares How Technology Is Redefining Online Education for Adults on National Podcast19 hours agoThe World Economic ForumMoreTechnology will take our jobs? We've heard that one before2 days agoBy John LetzingThe GuardianMoreAI hit: India hungry to harness US tech giants’ technology at Delhi summit21 hours agoBy Robert BoothSouth China Morning PostMoreIs magnetic heating technology a new weapon in the fight against cancer?3 hours agoForbesMoreSmall Business Technology News: How Will ChatGPT Ads Actually Work?2 hours agoBy Gene MarksEconomist ImpactMoreHow global technology change is driving Net Positive businessYesterdayCNETMoreSharp Invented a New High-Speed Cooking Technology Called the 'Golden Heater'2 days agoBy David WatskyEHF EUROMoreThe power of technology: How the EHF & VOGO are making handball fairerYesterdayThe Quantum InsiderMorePhoenix and Quantum Technology: Arizona’s Industrial Bet on the Quantum Economy16 hours agoThe New York TimesMoreAt A.I. Summit, India Tries to Find a Way Between the U.S. and China5 hours agoBy Anupreeta Das and Pragati KbHanoi TimesMoreVietnam, US move to deepen ties in science, technology and innovation2 hours agoFast CompanyMoreHow technology is reinventing global payments23 hours agoBy Ken MooreThe Futurum GroupMoreCIO & Technology Buyers17 hours agoTechRadarMore'Modern technologies have revolutionised virtually every aspect of sport': Get ready for more AI coming to all the sports you love6 hours agoBy Mike MooreThe HinduMoreDonald Trump to remove Vietnam from restricted technology list: Hanoi10 hours agoGOV.UKMoreEnhanced package of cutting-edge technology to combat waste crimeYesterdayBy Emma ReynoldsResearch InformationMoreSony and Nature announce 2026 Women in Technology Award winnersYesterdayCalifornia Courts Newsroom (.gov)MoreCouncil Approves Funding for Technology Projects to Improve Services for the Public10 hours agoBy Blaine CorrenComputerworldMoreIs AI killing technology?YesterdayBy Mike ElganPopular ScienceMoreMan accidentally gains control of 7,000 robot vacuums41 minutes agoBy Mack DeGeurinMIT Technology ReviewMoreExclusive eBook: The great Al hype correction of 202519 hours agoSHRMMoreThe Executive Download: HR Technology Trends, February 202615 hours agoAerospace Manufacturing and DesignMoreBoost your productivity with the latest workholding technology8 hours agoBy Clare ScottCleanroom TechnologyMoreInterflow and High Purity Systems unite to create Netherlands’ largest clean technology provider22 hours agoThe Policy EdgeMoreMeitY: Advancing Inclusive Voice Technologies in India3 hours agoLive ScienceMoreYour own voice could be your biggest privacy threat. How can we stop AI technologies exploiting it?21 hours agoBy Drew TurneyRochester Institute of Technology AthleticsMoreWomen's Basketball defeats Bard, 58-4310 hours agoNorth Penn NowMoreSirene Abou-Chakra Champions Accountability in Civic Technology10 hours agothedetroitbureau.comMoreIRetail Technology Solut
 
 
 --- Result 4 ---
@@ -94,40 +91,42 @@ URL:         https://en.wikipedia.org/wiki/Main_Page
 Engine:      colly
 Title:       Main Page
 Status:      200
-Clean Text:  6829 chars (6.67 KB)
-Links:       670
-Time:        711.153011ms
+Clean Text:  5495 chars (5.37 KB)
+Links:       634
+Time:        566.327745ms
 Method:      css-selectors
 JS Heavy:    false
 
 --- CLEAN TEXT (first 5000 chars) ---
 the free encyclopedia that anyone can edit.
-293,013 active editors 7,139,925 articles in English
-Zhang Jingsheng (20 February 1888 – 18 June 1970) was a Chinese philosopher and sexologist. Born to merchants in rural Guangdong, he was a militant supporter of the Tongmenghui revolutionaries. After being expelled from school, Zhang entered Peking University and became an advocate for European ideas of social Darwinism, scientific racism, and eugenics. He changed his personal name to Jingsheng, meaning 'competition for survival'. After the 1911 Revolution, Zhang went to France to study philosophy, receiving his doctorate in 1919. He soon became a professor at Peking, publishing two books advocating for a utopian society arranged around aesthetics. In 1926, he published the sexology text Sex Histories. Zhang was ridiculed by the Chinese media and academia for this work, and tabloids gave him the mocking nickname Dr. Sex. After an unsuccessful bookstore venture in Shanghai, he returned home and worked in obscurity. Zhang was persecuted during the Cultural Revolution and died in confinement. (Full article...)
+293,013 active editors 7,140,551 articles in English
+Shigi Qutuqu (c. 1178 – 1260) was a high-ranking official during the early decades of the Mongol Empire. The adopted son of the empire's founder Temüjin (later titled Genghis Khan) and his wife Börte, Shigi Qutuqu played an important role in the codification of Mongol law, serving with distinction as an administrator in northern China. He was brought up in Temüjin's household and was one of the first Mongols to become literate. The Secret History exaggerates Shigi Qutuqu's role in the years after the empire's foundation, but he was nevertheless appointed to several high-ranking legal positions, in which he served during the Mongol conquest of the Jin dynasty. He was the commander during the only Mongol defeat in the western campaign against Khwarazmia, being overcome by Jalal al-Din at the 1221 Battle of Parwan. Shigi Qutuqu continued his career as an official during the reign of his adopted brother Ögedei Khan, Genghis's successor. (Full article...)
 Ælfwynn, wife of Æthelstan Half-King
 Did you know ...
-... that a medieval illuminated manuscript (pictured) was rediscovered in the attic of a castle under rubble and piles of paper?
-... that Call of Duty: Black Ops 6's four-year development cycle was the longest in Call of Duty's history?
-... that Aleksandar Vučić, the president of Serbia, is said to have dominated the 2023 Serbian parliamentary election campaign despite not being a candidate?
-... that when Ardfry House fell into a state of dilapidation, the 3rd Lord Wallscourt used his wife's dowry to carry out restoration work?
-... that Ma Aung Phyu was said to have been buried alive as a human sacrifice during the construction of Tharrawaddy's town pillar?
-... that one writer claimed that Quizone would "forever outrank" The Cube, The Crystal Maze and Jungle Run?
-... that former Salvadoran president Rafael Campo ran for re-election in 1864 and received less than 20 votes?
-... that one of the main characters of the manga NakiNagi is named after a deity from the mythology of Kiribati?
-... that Nine Inch Nails wrote the soundtrack to a Walt Disney World ride?
-Former president of South Korea Yoon Suk Yeol (pictured) is sentenced to life imprisonment for orchestrating a failed insurrection.
-José Jerí is removed as the president of Peru by Congress, and replaced by José María Balcázar.
+... that former NFL player Mike Brunson (pictured) was known for making banana ice cream?
+... that "There's a Hole in the City" is a Nebula Award–nominated short story that describes the September 11 attacks alongside the "summoned ghosts from past disasters" in New York City?
+... that French businessman André Kieffer was described as a "one-man party" and "easily the most aggressive and controversial figure" in the territorial assembly of Chad?
+... that only black Girardinus metallicus males put on a courtship show, while yellow and colorless males rely on coercion?
+... that Hermann E. Sieger, a Nazi Party official, was considered to be a trusted contact of the Liechtenstein government?
+... that the murder of a gay man in Afghanistan forced his brother to flee to Turkey and his boyfriend to go into hiding due to harassment from the Taliban?
+... that the Group Architects led strikes against traditional teaching styles at the Auckland School of Architecture in 1948, which were attended by 142 of 160 students?
+... that GameChat was inspired by Nintendo developers' frustrations over video-conferencing software during the COVID-19 pandemic?
+... that Sukumar Barua chose to work as a chef instead of pursuing poetry as a career because his pay was too good?
+José Jerí (pictured) is removed as the president of Peru by Congress, and replaced by José María Balcázar.
 American civil rights leader Jesse Jackson dies at the age of 84.
 The Nationalist Party, led by Tarique Rahman, wins the Bangladeshi general election.
-February 20: Day of the Heavenly Hundred Heroes in Ukraine (2014)
-1816 – The Barber of Seville, an opera buffa composed by Gioachino Rossini, premiered at the Teatro Argentina in Rome to jeers from the audience.
-1846 – Polish insurgents in the Free City of Kraków led an uprising (depicted) attempting to incite a fight for national independence that was put down by the Austrian Empire nine days later.
-1931 – Paraguayan anarchists briefly seized the city of Encarnación as part of a larger plan to initiate a social revolution in the country.
-1943 – The Saturday Evening Post published the first of Norman Rockwell's Four Freedoms, among the most widely distributed paintings ever produced, in support of U.S. president Franklin D. Roosevelt's Four Freedoms.
-1965 – The NASA spacecraft Ranger 8 spacecraft transmitted 7,137 photographs of the Moon in the final 23 minutes of its mission before crashing as planned into Mare Tranquillitatis.
-Judith Montefiore  (b. 1784)Forbes Burnham  (b. 1923)Percy Grainger  (d. 1961)Audrey Munson  (d. 1996)
-The filmography of Billy Wilder, an American filmmaker, comprises 50 films from 1929 to 1981. Billy Wilder's first screenplay was for the German silent thriller The Daredevil Reporter (1929). In 1938, he began collaborating with Charles Brackett on screenplays with Ernst Lubitsch's romantic comedy Bluebeard's Eighth Wife. It was the first of 14 consecutive commercially successful films co-written by Wilder and Brackett, including the comedy Ninotchka (1939) and the romantic drama Hold Back the Dawn (1941). In 1944, Wilder directed and co-wrote the screenplay for the film noir Double Indemnity, which is considered to be a classic of its genre. He followed this with The Lost Weekend (1945), a drama about a writer struggling with alcoholism, for which Wilder won his first Academy Award for Best Director and shared the Best Original Screenplay award with Brackett. He won his second Academy Award for Best Original Screenplay with Brackett for Sunset Boulevard (1950), as well as the Writers Guild of America Award for Best Written Drama. During the 1950s, Wilder also received Best Director nominations at the Oscars for Stalag 17 (1953), Sabrina (1954), Witness for the Prosecution (1957), and Some Like It Hot (1959). (Full list...)
-The BL 60-pounder gun was a British 5-inch (127
+In the Barbadian general election, the Labour Party wins a third term and every seat in the House of Assembly.
+1828 – The inaugural issue of the Cherokee Phoenix, the first newspaper in a Native American language, was published.
+1866 – Lucy Hobbs Taylor (pictured) became the first woman to receive a doctorate from a dental college.
+1919 – Bavarian socialist Kurt Eisner, who had organized the German Revolution that overthrew the Wittelsbach monarchy and established Bavaria as a republic, was assassinated.
+1929 – Nanjing decade: In the first battle of the Warlord Rebellion in northeastern Shandong against the Nationalist government of China, a 24,000-strong rebel force led by Zhang Zongchang was defeated at Zhifu by 7,000 NRA troops.
+1973 – After accidentally straying into the airspace of the Israeli-occupied Sinai Peninsula, Libyan Arab Airlines Flight 114 was shot down by two Israeli fighter aircraft, killing 108 of the 113 people on board.
+Goscombe John  (b. 1860)Rhonda Sing  (b. 1961)Helen Hooven Santmyer  (d. 1986)Margot Fonteyn  (d. 1991)
+The masked trogon (Trogon personatus) is a species of bird in the family Trogonidae, the trogons. Fairly common in humid highland forests in South America, mainly in the Andes and on tepuis, it is resident in Bolivia, Brazil, Colombia, Ecuador, Guyana, Peru and Venezuela. It is a mid-sized trogon, averaging 27 centimetres (11 in) in length and 56 grams (2.0 oz) in mass. Like all members of its family, it displays sexual dimorphism. The male has upperparts, head and upper chest of variously green or reddish-bronze colouring, with a red belly and lower breast, while the female is brown above, with a pinkish to red belly and breast. Like all trogons, it feeds on both fruits and insects. It makes its nest by excavating into the soft wood of a rotting vertical tree trunk. This masked trogon of the subspecies T. p. temperatus (the highland trogon) was photographed at San Isidro Lodge near Cosanga in Napo Province, Ecuador.
+Community portal – The central hub for editors, with resources, links, tasks, and announcements.
+Village pump – Forum for discussions about Wikipedia itself, including policies and technical issues.
+Site news – Sources of news about Wikipedia and the broader Wikimedia movement.
+Teahouse – Ask basic questions about 
 
 
 --- Result 5 ---
@@ -137,7 +136,7 @@ Title:       Pakistan
 Status:      200
 Clean Text:  237259 chars (231.70 KB)
 Links:       5110
-Time:        503.137958ms
+Time:        471.612503ms
 Method:      css-selectors
 JS Heavy:    false
 
@@ -163,7 +162,7 @@ Title:       Sentiment analysis
 Status:      200
 Clean Text:  49823 chars (48.66 KB)
 Links:       684
-Time:        591.223984ms
+Time:        775.82845ms
 Method:      css-selectors
 JS Heavy:    false
 
@@ -185,7 +184,7 @@ Title:       Natural language processing
 Status:      200
 Clean Text:  43327 chars (42.31 KB)
 Links:       883
-Time:        162.722735ms
+Time:        144.388573ms
 Method:      css-selectors
 JS Heavy:    false
 
@@ -211,7 +210,7 @@ Title:       Web scraping
 Status:      200
 Clean Text:  25261 chars (24.67 KB)
 Links:       358
-Time:        136.173816ms
+Time:        366.343136ms
 Method:      css-selectors
 JS Heavy:    false
 
@@ -240,7 +239,7 @@ Title:       What’s New In Python 3.12
 Status:      200
 Clean Text:  89228 chars (87.14 KB)
 Links:       330
-Time:        724.655325ms
+Time:        632.933386ms
 Method:      readability
 JS Heavy:    false
 
@@ -295,43 +294,42 @@ URL:         https://news.ycombinator.com
 Engine:      colly
 Title:       Hacker News
 Status:      200
-Clean Text:  2299 chars (2.25 KB)
+Clean Text:  1886 chars (1.84 KB)
 Links:       34
-Time:        1.577133472s
+Time:        1.330271787s
 Method:      readability
 JS Heavy:    false
 
 --- CLEAN TEXT (first 5000 chars) ---
-1.	Defer available in gcc and clang (gustedt.wordpress.com)
-2.	Consistency diffusion language models: Up to 14x faster, no quality loss (together.ai)
-3.	Gemini 3.1 Pro (blog.google)
-696 points by MallocVoidstar 16 hours ago |  | 776 comments
-4.	Reading the undocumented MEMS accelerometer on Apple Silicon MacBooks via iokit (github.com/olvvier)
-5.	An AI Agent Published a Hit Piece on Me – The Operator Came Forward (theshamblog.com)
-6.	Pi for Excel: AI sidebar add-in for Excel (github.com/tmustier)
-8.	Show HN: Micasa – track your house from the terminal (micasa.dev)
-9.	An ARM Homelab Server, or a Minisforum MS-R1 Review (sour.coffee)
-10.	Almost Every infrastructure decision I endorse or regret after 4 years (cep.dev)
-11.	US plans online portal to bypass content bans in Europe and elsewhere (reuters.com)
-12.	Mystery donor gives Japanese city $3.6M in gold bars to fix water system (bbc.com)
-13.	A beginner's guide to split keyboards (justinmklam.com)
-14.	Micropayments as a reality check for news sites (zgp.org)
-15.	America vs. Singapore: You can't save your way out of economic shocks (governance.fyi)
-16.	A terminal weather app with ASCII animations driven by real-time weather data (github.com/veirt)
-17.	Show HN: Fostrom, an IoT Cloud Platform built for developers (fostrom.io)
-18.	MuMu Player (NetEase) silently runs 17 reconnaissance commands every 30 minutes (gist.github.com)
-19.	Paged Out Issue #8 [pdf] (pagedout.institute)
-20.	Fast KV Compaction via Attention Matching (arxiv.org)
-21.	Debugging Kernel Oops (2024) (lfhernandez.com)
-22.	A Famous Enigma: On Alexandre Kojève (clereviewofbooks.com)
-23.	Lindenmayer.jl: Defining recursive patterns in Julia (cormullion.github.io)
-24.	Archaeologists find possible first direct evidence of Hannibal's war elephants (smithsonianmag.com)
-25.	Pebble Production: February Update (repebble.com)
-26.	Show HN: A small, simple music theory library in C99 (github.com/thelowsunoverthemoon)
-27.	Show HN: Ghostty-based terminal with vertical tabs and notifications (github.com/manaflow-ai)
-28.	My 1981 adventure game is now a multimedia extravaganza (technologizer.com)
-29.	Don't Trust the Salt: AI Summarization, Multilingual Safety, and LLM Guardrails (royapakzad.substack.com)
-30.	Measuring AI agent autonomy in practice (anthropic.com)
+1.	I Verified My LinkedIn Identity. Here's What I Handed Over (thelocalstack.eu)
+2.	Keep Android Open (f-droid.org)
+3.	Turn Dependabot off (filippo.io)
+4.	I found a Vulnerability. They found a Lawyer (dixken.de)
+5.	Andrej Karpathy talks about "Claws" (simonwillison.net)
+6.	Facebook is cooked (pilk.website)
+7.	Ggml.ai joins Hugging Face to ensure the long-term progress of Local AI (github.com/ggml-org)
+8.	Wikipedia deprecates Archive.today, starts removing archive links (arstechnica.com)
+9.	CERN rebuilt the original browser from 1989 (2019) (cern.ch)
+10.	Padlet (YC W13) Is Hiring in San Francisco and Singapore (padlet.jobs)
+11.	Coccinelle: The Linux kernel's source-to-source transformation tool (github.com/coccinelle)
+12.	Understanding Std:Shared_mutex from C++17 (cppstories.com)
+13.	AI uBlock Blacklist (github.com/alvi-se)
+14.	Lean 4: How the theorem prover works and why it's the new competitive edge in AI (venturebeat.com)
+15.	What Is OAuth? (leaflet.pub)
+16.	Every company building your AI assistant is now an ad company (juno-labs.com)
+17.	JWasm: Masm Compatible Assembler (github.com/baron-von-riedesel)
+18.	Gitas – A tool for Git account switching (github.com/letmutex)
+19.	Index, Count, Offset, Size (tigerbeetle.com)
+20.	Large Language Model Reasoning Failures (arxiv.org)
+21.	The bare minimum for syncing Git repos (alexwlchan.net)
+22.	Instant AI Response (chatjimmy.ai)
+23.	Blue light filters don't work – controlling total luminance is a better bet (neuroai.science)
+24.	Cord: Coordinating Trees of AI Agents (june.kim)
+25.	Choose Your Fictions Well (2010) (henryjenkins.org)
+26.	The path to ubiquitous AI (17k tokens/sec) (taalas.com)
+27.	When etcd crashes, check your disks first (nubificus.co.uk)
+29.	Show HN: Mines.fyi – all the mines in the US in a leaflet visualization (mines.fyi)
+30.	Trump's global tariffs struck down by US Supreme Court (bbc.com)
 
 
 --- Result 11 ---
@@ -339,39 +337,38 @@ URL:         https://www.aljazeera.com/news
 Engine:      colly
 Title:       News | Today's latest from Al Jazeera
 Status:      200
-Clean Text:  1731 chars (1.69 KB)
-Links:       83
-Time:        905.913646ms
+Clean Text:  1666 chars (1.63 KB)
+Links:       82
+Time:        1.380550691s
 Method:      readability
 JS Heavy:    false
 
 --- CLEAN TEXT (first 5000 chars) ---
-IMF warns Venezuela’s economy and humanitarian situation is ‘quite fragile’
-Figures show Venezuela’s public debt sits at roughly 180 percent of its GDP as the country struggles with tumult.
-Pakistan target T20 World Cup title ahead of New Zealand Super 8s opener
-New Zealand and Pakistan play the first game of the Super Eights stage at the T20 World Cup with both eyeing title tilt.
-Macron and Meloni clash over killing of French far-right activist in Lyon
-A war of words has erupted between the French president and Italian prime minister over the murder of Quentin Deranque.
-Strike over labour reforms brings Argentina’s capital to a near-standstill
-The Chamber of Deputies is weighing a labour bill that would increase work hours, cut severance pay and ease firing.
-Why was former Prince Andrew arrested by UK police?
-Mountbatten-Windsor, the former UK prince, has not been charged with a crime and was released under investigation.
-Ex-Prince Andrew’s arrest spurs Epstein accountability calls from UK to US
-US lawmakers call on the Trump administration to pursue justice for victims, as UN expert urges probes across the world.
-Is social media addictive?
-Meta is accused of harming young users with its addictive features.
-The US trade deficit deteriorated even though President Trump unleashed a barrage of tariffs to close trade imbalances.
-South Africa police arrest son of former Zimbabwe leader Robert Mugabe
-The youngest son of the former Zimbabwe president was detained after a gardener was shot at his home in South Africa.
-Files reveal Epstein was offered chance to buy US Pentagon, FBI buildings
-New files show Epstein, who had close ties to Israel, was offered sensitive US government real estate deals.
+Violence breaks out near parliament as demonstrators demand accountability in a corruption investigation.
+UK weighs removing ex-Prince Andrew from succession line amid Epstein probe
+The report comes as police widen investigations into former prince, including questioning his close protection teams.
+Where are the most endangered languages in the world?
+February 21 is World Mother Language Day. Al Jazeera looks at the most spoken languages and which ones are endangered.
+Brazil’s Lula says Maduro should face trial in Venezuela, not US
+Brazil’s President Lula says fate of Venezuelan president should be determined by the ‘people of Venezuela’.
+Gunmen on motorcycles kill at least 50 in northwest Nigeria: Report
+Nigerian lawmaker reports ‘at least 50 people dead’ after attack as list of missing is still being compiled.
+Trump, JD Vance vilify ‘lawless’ Supreme Court justices over tariff ruling
+President Trump calls Supreme Court justices an ’embarrassment to their families’ in 45-minute address to media.
+Russia-Ukraine war: List of key events, day 1,458
+These are the key developments from day 1,458 of Russia’s war on Ukraine.
+US military says it attacked vessel in Pacific Ocean, killing three people
+US military’s Southern Command (SOUTHCOM) claimed the vessel was involved in drug trafficking, without providing proof.
+US envoy suggests it would be ‘fine’ if Israel expands across Middle East
+‘It would be fine if they took it all,’ Mike Huckabee says when asked about expanding Israel from Nile to Euphrates.
+Bailed activists include four former hunger strikers: Teuta Hoxha, Kamran Ahmed, Qesser Zuhrah and Heba Muraisi.
 
 
 ==========================================================
   DEEP CRAWL (Wikipedia Pakistan sub-links)
 ==========================================================
 
-Duration: 4.009708653s | Pages: 11
+Duration: 3.970930314s | Pages: 11
 
 --- Crawled Page 1 ---
 URL:         https://en.wikipedia.org/wiki/Pakistan
@@ -397,7 +394,7 @@ URL:         https://en.wikipedia.org/wiki/Pakistan_(disambiguation)
 Title:       Pakistan (disambiguation)
 Clean Text:  1009 chars (0.99 KB)
 Links:       92
-Time:        512.475549ms
+Time:        347.774607ms
 
 --- CLEAN TEXT (first 3000 chars) ---
 Look up Pakistan or Päkistan in Wiktionary, the free dictionary.
@@ -418,7 +415,7 @@ URL:         https://en.wikipedia.org/wiki/Urdu_language
 Title:       Urdu
 Clean Text:  127354 chars (124.37 KB)
 Links:       2387
-Time:        1.604869048s
+Time:        178.146797ms
 
 --- CLEAN TEXT (first 3000 chars) ---
 Urduاردو (Urdū)Urdu written in the Nastaliq calligraphic handPronunciation[ˈʊɾd̪uː] ⓘNative toSouth Asia[1][2]Region
@@ -445,7 +442,7 @@ URL:         https://en.wikipedia.org/wiki/Flag_of_Pakistan
 Title:       Flag of Pakistan
 Clean Text:  16710 chars (16.32 KB)
 Links:       835
-Time:        154.027163ms
+Time:        130.897431ms
 
 --- CLEAN TEXT (first 3000 chars) ---
 Islamic Republic of Pakistanپرچمِ ستارہ و ہلال('Flag of the Star and Crescent')UseNational flag    Proportion2:3Adopted11 August 1947; 78 years ago (1947-08-11)DesignA white star and crescent on a dark green field, with a vertical white stripe at the hoistDesigned byAmiruddin Kidwai
@@ -460,7 +457,7 @@ URL:         https://en.wikipedia.org/wiki/State_emblem_of_Pakistan
 Title:       State emblem of Pakistan
 Clean Text:  3632 chars (3.55 KB)
 Links:       313
-Time:        122.122493ms
+Time:        119.379488ms
 
 --- CLEAN TEXT (first 3000 chars) ---
 State emblem of Pakistanپاکستان کا قومی نشانArmigerIslamic Republic of PakistanAdopted1954[1]CrestA mullet and crescent increscent, both vertShieldQuarterly, first vert a lozenge argent, charged with a cotton flower argent, second argent with tea stalk vert, third argent charged with a garb of wheat vert, fourth party fer fess argent and vert four jute stalks eradicated counterchangedSupportersTwo jasmine branches embowed vert in their natural colorsCompartmentRibbon vert, backed argent  upon which is written in argent the word national motto in the Urdu language.Mottoایمان، اتحاد، نظم  "Faith, Unity, Discipline"
@@ -485,7 +482,7 @@ URL:         https://en.wikipedia.org/wiki/%C4%AAm%C4%81n,_Ittih%C4%81d,_Nazam
 Title:       Faith, Unity, Discipline
 Clean Text:  4932 chars (4.82 KB)
 Links:       163
-Time:        489.010865ms
+Time:        1.152383437s
 
 --- CLEAN TEXT (first 3000 chars) ---
 Faith, Unity, Discipline (Urdu: ایمان، اتحاد، نظم, romanized: Īmān, Ittiḥād, Naẓm) is the national motto of Pakistan, regarded as the guiding principle of Pakistani nationhood. It is derived from the principles laid down by Muhammad Ali Jinnah, the founding father of Pakistan. The motto was officially adopted in 1948, and was inscribed on the national emblem of Pakistan (originally in both Urdu and Bengali) in 1954.[1]
@@ -508,7 +505,7 @@ URL:         https://en.wikipedia.org/wiki/Urdu
 Title:       Urdu
 Clean Text:  127354 chars (124.37 KB)
 Links:       2386
-Time:        195.899187ms
+Time:        186.826294ms
 
 --- CLEAN TEXT (first 3000 chars) ---
 Urduاردو (Urdū)Urdu written in the Nastaliq calligraphic handPronunciation[ˈʊɾd̪uː] ⓘNative toSouth Asia[1][2]Region
@@ -534,8 +531,8 @@ Urdu originated geographically in the upper Ganga-Yamuna doab, in and around the
 URL:         https://en.wikipedia.org/wiki/Qaumi_Taranah
 Title:       Qaumi Taranah
 Clean Text:  13440 chars (13.12 KB)
-Links:       536
-Time:        136.538335ms
+Links:       537
+Time:        432.805417ms
 
 --- CLEAN TEXT (first 3000 chars) ---
 This article is about the national anthem of Pakistan. "Pak sarzamin" redirects here. For other uses, see Pak sar zamin (disambiguation).
@@ -554,7 +551,7 @@ URL:         https://en.wikipedia.org/wiki/Kashmir_conflict
 Title:       Kashmir conflict
 Clean Text:  267747 chars (261.47 KB)
 Links:       2944
-Time:        257.936055ms
+Time:        246.983394ms
 
 --- CLEAN TEXT (first 3000 chars) ---
 html body.mediawiki This article may be too long to read and navigate comfortably.  When this tag was added, its readable prose size was 18,000 words. Consider splitting content into sub-articles, condensing it, or adding subheadings. Please discuss this issue on the article's talk page.  (November 2023)
@@ -570,7 +567,7 @@ URL:         https://en.wikipedia.org/wiki/Annexation_of_Junagadh
 Title:       Annexation of Junagadh
 Clean Text:  23660 chars (23.11 KB)
 Links:       556
-Time:        134.845167ms
+Time:        783.705744ms
 
 --- CLEAN TEXT (first 3000 chars) ---
 Annexation of JunagadhDateNovember 1947 – February 1948LocationJunagadh StateResult
@@ -588,7 +585,7 @@ URL:         https://en.wikipedia.org/wiki/Sir_Creek#Indo-Pakistani_border_dispu
 Title:       Sir Creek
 Clean Text:  16706 chars (16.31 KB)
 Links:       371
-Time:        130.12753ms
+Time:        128.031153ms
 
 --- CLEAN TEXT (first 3000 chars) ---
 Sir CreekSir CreekPhysical characteristicsMouth  • locationIndian Ocean • coordinates23°58′N 68°48′E﻿ / ﻿23.967°N 68.800°E﻿ / 23.967; 68.800Basin featuresRiver systemIndus River Delta

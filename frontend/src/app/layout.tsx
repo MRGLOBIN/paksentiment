@@ -1,36 +1,24 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { ThemeProvider } from "./providers/ThemeProvider";
-
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import type { Metadata } from 'next'
+import './globals.css'
+import { ThemeProvider } from './providers/ThemeProvider'
 
 export const metadata: Metadata = {
-  title: "PakSentiment",
-  description: "Sentiment analysis platform for Pakistan",
-};
+  title: 'PakSentiment — AI-Powered Sentiment Analysis',
+  description:
+    "Monitor public sentiment, detect trends, and gain real-time insights across Pakistan's digital landscape using advanced AI.",
+  keywords: 'sentiment analysis, Pakistan, AI, NLP, social media analytics',
+}
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <ThemeProvider>
-          {children}
-        </ThemeProvider>
+    <html lang='en' suppressHydrationWarning>
+      <body>
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
-  );
+  )
 }

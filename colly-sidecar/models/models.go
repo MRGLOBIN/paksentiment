@@ -23,14 +23,34 @@ type CrawlRequest struct {
 
 // PageResult represents a single scraped page.
 type PageResult struct {
-	URL       string            `json:"url" bson:"url"`
-	Status    int               `json:"status" bson:"status"`
-	Title     string            `json:"title" bson:"title"`
-	Text      string            `json:"text" bson:"text"`
-	Links     []string          `json:"links" bson:"links"`
-	Extracted map[string]string `json:"extracted,omitempty" bson:"extracted,omitempty"`
-	CachedHit bool              `json:"cached_hit" bson:"cached_hit"`
-	ScrapedAt time.Time         `json:"scraped_at" bson:"scraped_at"`
+	URL             string            `json:"url" bson:"url"`
+	Status          int               `json:"status" bson:"status"`
+	Title           string            `json:"title" bson:"title"`
+	Text            string            `json:"text" bson:"text"`
+	Headlines       []string          `json:"headlines,omitempty" bson:"headlines,omitempty"`
+	Links           []string          `json:"links" bson:"links"`
+	Extracted       map[string]string `json:"extracted,omitempty" bson:"extracted,omitempty"`
+	CachedHit       bool              `json:"cached_hit" bson:"cached_hit"`
+	Method          string            `json:"method,omitempty" bson:"method,omitempty"`
+	Engine          string            `json:"engine,omitempty" bson:"engine,omitempty"`
+	JSHeavy         bool              `json:"js_heavy" bson:"js_heavy"`
+	ScrapedAt       time.Time         `json:"scraped_at" bson:"scraped_at"`
+	Sentiment       string            `json:"sentiment,omitempty" bson:"sentiment,omitempty"`
+	Confidence      float64           `json:"confidence,omitempty" bson:"confidence,omitempty"`
+	Summary         string            `json:"summary,omitempty" bson:"summary,omitempty"`
+	Topic           string            `json:"topic,omitempty" bson:"topic,omitempty"`
+	SentimentEngine string            `json:"sentiment_engine,omitempty" bson:"sentiment_engine,omitempty"`
+}
+
+// ScraplingResponse matches the FastAPI /scrapling/fetch JSON response.
+type ScraplingResponse struct {
+	Results []struct {
+		URL   string   `json:"url"`
+		Title string   `json:"title"`
+		Text  string   `json:"text"`
+		Links []string `json:"links"`
+	} `json:"results"`
+	Count int `json:"count"`
 }
 
 // ScrapeResponse is returned for single-page scrapes.
@@ -74,4 +94,16 @@ type HealthResponse struct {
 	Status  string `json:"status"`
 	Redis   string `json:"redis"`
 	MongoDB string `json:"mongodb"`
+}
+
+// SearchRequest represents a web search query.
+type SearchRequest struct {
+	Query string `json:"query" binding:"required"`
+}
+
+// SearchResult represents a single item from web search results.
+type SearchResult struct {
+	Title   string `json:"title"`
+	Link    string `json:"link"`
+	Snippet string `json:"snippet"`
 }

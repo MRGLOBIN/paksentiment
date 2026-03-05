@@ -34,7 +34,7 @@ export class TwitterProvider extends AbstractDataProvider {
             },
         );
 
-        await this.storeRaw('twitter', response.tweets ?? []);
+        await this.storeRaw('twitter', response.tweets ?? [], 'social_post');
 
         if (userId) {
             const sessionId = crypto.randomUUID();
@@ -66,7 +66,7 @@ export class TwitterProvider extends AbstractDataProvider {
             { params },
         );
 
-        await this.storeRaw('twitter', response.tweets ?? []);
+        await this.storeRaw('twitter', response.tweets ?? [], 'social_post');
         await this.storeProcessed(
             'twitter',
             response.tweets ?? [],

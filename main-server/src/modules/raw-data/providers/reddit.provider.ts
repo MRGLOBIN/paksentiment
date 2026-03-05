@@ -35,7 +35,7 @@ export class RedditProvider extends AbstractDataProvider {
             },
         );
 
-        await this.storeRaw('reddit', response.posts ?? []);
+        await this.storeRaw('reddit', response.posts ?? [], 'social_post');
 
         if (userId) {
             const sessionId = crypto.randomUUID();
@@ -66,7 +66,7 @@ export class RedditProvider extends AbstractDataProvider {
             { params },
         );
 
-        await this.storeRaw('reddit', response.posts ?? []);
+        await this.storeRaw('reddit', response.posts ?? [], 'social_post');
         await this.storeProcessed(
             'reddit',
             response.posts ?? [],

@@ -7,6 +7,7 @@ import {
     UseGuards,
     Request,
     Logger,
+    HttpCode,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '../auth/auth.guard';
@@ -56,6 +57,7 @@ export class CrawlerController {
      * Deep crawl via Go Colly sidecar (follows links).
      */
     @Post('crawl')
+    @HttpCode(202)
     @ApiOperation({
         summary: 'Deep Crawl (Colly)',
         description: 'Performs a multi-page deep crawl using Go Colly with configurable depth, limits, and domain restrictions.',
@@ -77,7 +79,7 @@ export class CrawlerController {
             required: ['url'],
         },
     })
-    @ApiResponse({ status: 201, description: 'Crawl completed successfully' })
+    @ApiResponse({ status: 202, description: 'Crawl job started securely in the background. Polling session UUID returned.' })
     async crawl(
         @Body('url') url: string,
         @Body('max_depth') maxDepth?: number,

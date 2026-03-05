@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { UserEntity } from '../../database/entities/user.entity';
+import { IdentityEntity } from '../../database/entities/identity.entity';
 
 interface CreateLocalUserPayload {
   fullName: string;
@@ -21,39 +22,61 @@ export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
-  ) {}
+    @InjectRepository(IdentityEntity)
+    private readonly identityRepository: Repository<IdentityEntity>,
+  ) { }
 
   async createLocalUser(payload: CreateLocalUserPayload): Promise<UserEntity> {
     const user = this.userRepository.create({
       fullName: payload.fullName,
       email: payload.email.toLowerCase(),
-      provider: 'local',
       passwordHash: payload.passwordHash,
       isActive: true,
     });
-    return this.userRepository.save(user);
+    const savedUser = await this.userRepository.save(user);
+
+    const identity = this.identityRepository.create({
+      provider: 'local',
+      userId: savedUser.id,
+    });
+    await this.identityRepository.save(identity);
+
+    return savedUser;
   }
 
   async upsertGoogleUser(
     payload: UpsertGoogleUserPayload,
   ): Promise<UserEntity> {
     let user = await this.findByEmail(payload.email);
-    if (user) {
+    if (!user) {
+      user = this.userRepository.create({
+        fullName: payload.fullName,
+        email: payload.email.toLowerCase(),
+        isActive: true,
+      });
+      user = await this.userRepository.save(user);
+    } else {
       user.fullName = payload.fullName;
-      user.googleId = payload.googleId;
-      user.provider = 'google';
-      return this.userRepository.save(user);
+      user = await this.userRepository.save(user);
     }
 
-    user = this.userRepository.create({
-      fullName: payload.fullName,
-      email: payload.email.toLowerCase(),
-      provider: 'google',
-      googleId: payload.googleId,
-      isActive: true,
+    let identity = await this.identityRepository.findOne({
+      where: { provider: 'google', userId: user.id }
     });
 
-    return this.userRepository.save(user);
+    if (!identity) {
+      identity = this.identityRepository.create({
+        provider: 'google',
+        providerId: payload.googleId,
+        userId: user.id,
+      });
+      await this.identityRepository.save(identity);
+    } else if (identity.providerId !== payload.googleId) {
+      identity.providerId = payload.googleId;
+      await this.identityRepository.save(identity);
+    }
+
+    return user;
   }
 
   async findByEmail(email: string): Promise<UserEntity | undefined> {
@@ -61,6 +84,18 @@ export class UsersService {
       where: { email: email.toLowerCase() },
     });
     return user ?? undefined;
+  }
+
+  async updateSubscriptionTier(
+    userId: number,
+    newTier: 'free' | 'premium' | 'super_premium',
+  ): Promise<UserEntity> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new Error('User not found');
+    }
+    user.subscriptionTier = newTier;
+    return this.userRepository.save(user);
   }
 }
 

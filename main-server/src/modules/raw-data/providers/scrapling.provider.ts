@@ -56,7 +56,7 @@ export class ScraplingProvider extends AbstractDataProvider {
         });
 
         // 3. Store Raw
-        await this.storeRaw('scrapling', posts);
+        await this.storeRaw('scrapling', posts, 'article');
 
         // 4. Sentiment Analysis
         let sentiment: any[] = [];
@@ -142,7 +142,7 @@ export class ScraplingProvider extends AbstractDataProvider {
         };
 
         if (userId) {
-            const sessionId = crypto.randomUUID();
+            const sessionId = query.sessionId || crypto.randomUUID();
             finalResponse.sessionId = sessionId;
             await this.saveSession(sessionId, userId, url, 'scrapling', posts);
         }
