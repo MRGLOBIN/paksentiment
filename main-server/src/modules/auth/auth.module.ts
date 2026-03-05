@@ -7,11 +7,12 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { UsersService } from './users.service';
 import { UserEntity } from '../../database/entities/user.entity';
+import { IdentityEntity } from '../../database/entities/identity.entity';
 import { ActivityModule } from '../activity/activity.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserEntity]),
+    TypeOrmModule.forFeature([UserEntity, IdentityEntity]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -24,6 +25,6 @@ import { ActivityModule } from '../activity/activity.module';
   ],
   controllers: [AuthController],
   providers: [AuthService, UsersService],
-  exports: [AuthService, JwtModule],
+  exports: [AuthService, JwtModule, UsersService],
 })
 export class AuthModule { }

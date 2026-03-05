@@ -78,7 +78,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    if (user.provider !== 'local' || !user.passwordHash) {
+    if (!user.passwordHash) {
       throw new UnauthorizedException('Please login using Google');
     }
 
@@ -161,7 +161,6 @@ export class AuthService {
     const payload = {
       sub: user.id,
       email: user.email,
-      provider: user.provider,
     };
     const accessToken = await this.jwtService.signAsync(payload);
 

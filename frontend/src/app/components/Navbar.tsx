@@ -1,163 +1,170 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import styles from './Navbar.module.scss'
 import ThemeToggle from './ThemeToggle'
 import { useAuthStore } from '../../store/useAuthStore'
+import {
+  Dashboard,
+  BarChart,
+  Chat,
+  Translate,
+  Info,
+  Payments,
+  Menu as MenuIcon,
+  Close as CloseIcon,
+  Person,
+  Logout as LogoutIcon,
+} from '@mui/icons-material'
+
+const NAV_ITEMS = [
+  {
+    href: '/dashboard',
+    label: 'Dashboard',
+    icon: <Dashboard fontSize='small' />,
+  },
+  {
+    href: '/analytics',
+    label: 'Analytics',
+    icon: <BarChart fontSize='small' />,
+  },
+  { href: '/chat', label: 'Chat', icon: <Chat fontSize='small' /> },
+  {
+    href: '/translate',
+    label: 'Translate',
+    icon: <Translate fontSize='small' />,
+  },
+  { href: '/pricing', label: 'Pricing', icon: <Payments fontSize='small' /> },
+  { href: '/about', label: 'About', icon: <Info fontSize='small' /> },
+]
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
   const { isAuthenticated, user, logout } = useAuthStore()
+  const pathname = usePathname()
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen)
-  }
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 10)
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  useEffect(() => {
+    setIsMobileMenuOpen(false)
+  }, [pathname])
 
   return (
-    <nav className={styles.navbar}>
+    <nav className={`${styles.navbar} ${scrolled ? styles.scrolled : ''}`}>
       <div className={styles.navContainer}>
         <Link href='/' className={styles.logo}>
+          <span className={styles.logoIcon}>P</span>
           <span className={styles.logoText}>PakSentiment</span>
         </Link>
 
         <div className={styles.navLinks}>
-          <Link href='/' className={styles.navLink}>
-            Home
-          </Link>
-          <Link href='/dashboard' className={styles.navLink}>
-            Dashboard
-          </Link>
-          <Link href='/analytics' className={styles.navLink}>
-            Analytics
-          </Link>
-          <Link href='/chat' className={styles.navLink}>
-            Chat
-          </Link>
-          <Link href='/translate' className={styles.navLink}>
-            Translate
-          </Link>
-          <Link href='/about' className={styles.navLink}>
-            About
-          </Link>
+          {NAV_ITEMS.map(item => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`${styles.navLink} ${pathname === item.href ? styles.active : ''}`}
+            >
+              {item.label}
+            </Link>
+          ))}
         </div>
 
         <div className={styles.navActions}>
           <ThemeToggle />
 
           {isAuthenticated ? (
-            <>
-              <span className={styles.navLink} style={{ fontSize: '0.9rem', cursor: 'default' }}>
+            <div className={styles.userSection}>
+              <div className={styles.userAvatar}>
+                <Person fontSize='small' />
+              </div>
+              <span className={styles.userName}>
                 {user?.fullName?.split(' ')[0]}
               </span>
               <button
                 onClick={logout}
-                className={styles.loginButton}
-                style={{ background: 'transparent', border: '1px solid currentColor', width: 'auto', padding: '0.5rem 1rem' }}
+                className={styles.logoutBtn}
+                title='Sign out'
               >
-                Logout
+                <LogoutIcon fontSize='small' />
               </button>
-            </>
+            </div>
           ) : (
-            <>
+            <div className={styles.authButtons}>
               <Link href='/login' className={styles.loginButton}>
-                Login
+                Sign In
               </Link>
               <Link href='/register' className={styles.registerButton}>
-                Sign Up
+                Get Started
               </Link>
-            </>
+            </div>
           )}
+
           <button
             className={styles.mobileMenuButton}
-            onClick={toggleMobileMenu}
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label='Toggle menu'
           >
-            <span className={styles.hamburger}></span>
-            <span className={styles.hamburger}></span>
-            <span className={styles.hamburger}></span>
+            {isMobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
           </button>
         </div>
       </div>
 
       {/* Mobile Menu */}
-      {isMobileMenuOpen && (
-        <div className={styles.mobileMenu}>
-          <Link
-            href='/'
-            className={styles.mobileNavLink}
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            Home
-          </Link>
-          <Link
-            href='/dashboard'
-            className={styles.mobileNavLink}
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            Dashboard
-          </Link>
-          <Link
-            href='/analytics'
-            className={styles.mobileNavLink}
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            Analytics
-          </Link>
-          <Link
-            href='/chat'
-            className={styles.mobileNavLink}
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            Chat
-          </Link>
-          <Link
-            href='/translate'
-            className={styles.mobileNavLink}
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            Translate
-          </Link>
-          <Link
-            href='/about'
-            className={styles.mobileNavLink}
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            About
-          </Link>
-          <div className={styles.mobileDivider}></div>
+      <div
+        className={`${styles.mobileMenu} ${isMobileMenuOpen ? styles.mobileMenuOpen : ''}`}
+      >
+        <div className={styles.mobileMenuInner}>
+          {NAV_ITEMS.map(item => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`${styles.mobileNavLink} ${pathname === item.href ? styles.active : ''}`}
+            >
+              {item.icon}
+              {item.label}
+            </Link>
+          ))}
+
+          <div className={styles.mobileDivider} />
 
           {isAuthenticated ? (
-            <button
-              onClick={() => {
-                logout()
-                setIsMobileMenuOpen(false)
-              }}
-              className={styles.mobileNavLink}
-              style={{ textAlign: 'left', width: '100%', border: 'none', background: 'none' }}
-            >
-              Logout ({user?.fullName})
-            </button>
-          ) : (
             <>
-              <Link
-                href='/login'
+              <div className={styles.mobileUserInfo}>
+                <div className={styles.userAvatar}>
+                  <Person fontSize='small' />
+                </div>
+                <span>{user?.fullName}</span>
+              </div>
+              <button
+                onClick={() => {
+                  logout()
+                  setIsMobileMenuOpen(false)
+                }}
                 className={styles.mobileNavLink}
-                onClick={() => setIsMobileMenuOpen(false)}
               >
-                Login
-              </Link>
-              <Link
-                href='/register'
-                className={styles.mobileNavLink}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Sign Up
-              </Link>
+                <LogoutIcon fontSize='small' />
+                Sign Out
+              </button>
             </>
+          ) : (
+            <div className={styles.mobileAuthButtons}>
+              <Link href='/login' className={styles.mobileLoginBtn}>
+                Sign In
+              </Link>
+              <Link href='/register' className={styles.mobileRegisterBtn}>
+                Get Started
+              </Link>
+            </div>
           )}
         </div>
-      )}
+      </div>
     </nav>
   )
 }

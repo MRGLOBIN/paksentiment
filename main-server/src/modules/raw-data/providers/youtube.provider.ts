@@ -23,7 +23,7 @@ export class YouTubeProvider extends AbstractDataProvider {
         const response = await this.proxyRequest<any>('/youtube/search', {
             params: query
         });
-        await this.storeRaw('youtube', response.videos ?? []);
+        await this.storeRaw('youtube', response.videos ?? [], 'video');
 
         if (userId) {
             const sessionId = crypto.randomUUID();
@@ -38,7 +38,7 @@ export class YouTubeProvider extends AbstractDataProvider {
         const response = await this.proxyRequest<any>('/youtube/comments', {
             params: query
         });
-        await this.storeRaw('youtube_comments', response.comments ?? []);
+        await this.storeRaw('youtube_comments', response.comments ?? [], 'comment');
         return response;
     }
 

@@ -47,7 +47,8 @@ export abstract class AbstractDataProvider {
         config: AxiosRequestConfig,
     ): Promise<T> {
         try {
-            const url = `${this.fastApiBaseUrl}${path}`;
+            const baseUrl = config.baseURL || this.fastApiBaseUrl;
+            const url = `${baseUrl}${path}`;
             const method = config.method || 'GET';
             this.logger.log(`Calling FastAPI [${method}]: ${url}`);
 
@@ -93,24 +94,42 @@ export abstract class AbstractDataProvider {
             ).toString();
         }).filter(id => id && id !== 'undefined');
 
-        const session = this.sessionRepo.create({
-            sessionId,
-            userId,
-            query,
-            source,
-            postIds,
-            createdAt: new Date(),
-        });
+        const existingSession = await this.sessionRepo.findOne({ where: { sessionId } });
 
-        await this.sessionRepo.save(session);
-        this.logger.log(`Saved session ${sessionId} with ${postIds.length} posts for user ${userId}`);
+        if (existingSession) {
+            // Append new unique post IDs
+            const newPostIds = postIds.filter(id => !existingSession.postIds.includes(id));
+            if (newPostIds.length > 0) {
+                existingSession.postIds = [...existingSession.postIds, ...newPostIds];
+                await this.sessionRepo.save(existingSession);
+                this.logger.log(`Appended ${newPostIds.length} posts to existing session ${sessionId}`);
+            }
+        } else {
+            // Create brand new session
+            const session = this.sessionRepo.create({
+                sessionId,
+                userId,
+                query,
+                source,
+                postIds,
+                createdAt: new Date(),
+            });
+            await this.sessionRepo.save(session);
+            this.logger.log(`Saved new session ${sessionId} with ${postIds.length} posts for user ${userId}`);
+        }
     }
 
     /**
      * Helper to store raw posts via PostStorageService.
      */
-    protected async storeRaw(platform: string, posts: any[]) {
-        await this.postStorage.storeRawPosts(platform, posts);
+    protected async storeRaw(platform: string, posts: any[], contentType: string = 'social_post') {
+        try {
+            const enhancedPosts = posts.map(p => ({ ...p, contentType }));
+            await this.postStorage.storeRawPosts(platform, enhancedPosts);
+            this.logger.log(`Successfully completed storeRaw via provider`);
+        } catch (e) {
+            this.logger.error(`FATAL ERROR IN storeRaw: ${e.message}`, e.stack);
+        }
     }
 
     /**

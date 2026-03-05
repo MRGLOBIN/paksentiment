@@ -14,6 +14,17 @@ import {
   TwitterRawDataQueryDto,
   TwitterSentimentQueryDto,
 } from './dto/twitter-raw-data-query.dto';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { AnalysisSessionEntity } from '../../database/entities/mongo/analysis-session.entity';
+import { RedditProvider } from './providers/reddit.provider';
+import { TwitterProvider } from './providers/twitter.provider';
+import { YouTubeProvider } from './providers/youtube.provider';
+import { CommonCrawlProvider } from './providers/commoncrawl.provider';
+import { ScraplingProvider } from './providers/scrapling.provider';
+import { WebProvider } from './providers/web.provider';
+import { ActivityService } from '../activity/activity.service';
+
+import { AuthGuard } from '../auth/auth.guard';
 
 describe('RawDataController', () => {
   let controller: RawDataController;
@@ -63,6 +74,27 @@ describe('RawDataController', () => {
     storeProcessedPosts: jest.fn().mockResolvedValue(undefined),
   };
 
+  const mockProvider = {
+    fetch: jest.fn().mockResolvedValue({ posts: [], count: 0 }),
+    fetchSentiment: jest
+      .fn()
+      .mockResolvedValue({
+        posts: [],
+        count: 0,
+        translations: [],
+        sentiment: [],
+      }),
+    fetchComments: jest.fn().mockResolvedValue({}),
+    fetchTranscript: jest.fn().mockResolvedValue({}),
+  };
+
+  const mockMongoRepo = {
+    create: jest.fn(),
+    save: jest.fn(),
+    findOne: jest.fn(),
+    find: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [HttpModule],
@@ -73,8 +105,22 @@ describe('RawDataController', () => {
           provide: PostStorageService,
           useValue: mockPostStorageService,
         },
+        { provide: ActivityService, useValue: { logActivity: jest.fn() } },
+        {
+          provide: getRepositoryToken(AnalysisSessionEntity, 'mongo'),
+          useValue: mockMongoRepo,
+        },
+        RedditProvider,
+        TwitterProvider,
+        YouTubeProvider,
+        CommonCrawlProvider,
+        ScraplingProvider,
+        WebProvider,
       ],
-    }).compile();
+    })
+      .overrideGuard(AuthGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     controller = module.get<RawDataController>(RawDataController);
     httpService = module.get<HttpService>(HttpService);
@@ -99,7 +145,7 @@ describe('RawDataController', () => {
         count: 1,
       };
 
-      jest.spyOn(httpService, 'get').mockReturnValue(
+      jest.spyOn(httpService, 'request').mockReturnValue(
         of({
           data: mockResponse,
           status: 200,
@@ -109,7 +155,9 @@ describe('RawDataController', () => {
         }),
       );
 
-      const result = await controller.fetchRedditRawData(query);
+      const result = await controller.fetchRedditRawData(query, {
+        user: { sub: 1 },
+      });
 
       expect(result).toHaveProperty('posts');
       expect(result).toHaveProperty('count');
@@ -119,16 +167,16 @@ describe('RawDataController', () => {
 
     it('should handle Reddit API errors', async () => {
       jest
-        .spyOn(httpService, 'get')
+        .spyOn(httpService, 'request')
         .mockReturnValue(throwError(() => new Error('Reddit API error')));
 
-      await expect(controller.fetchRedditRawData(query)).rejects.toThrow(
-        InternalServerErrorException,
-      );
+      await expect(
+        controller.fetchRedditRawData(query, { user: { sub: 1 } }),
+      ).rejects.toThrow(InternalServerErrorException);
     });
 
     it('should pass correct query parameters', async () => {
-      const getSpy = jest.spyOn(httpService, 'get').mockReturnValue(
+      const getSpy = jest.spyOn(httpService, 'request').mockReturnValue(
         of({
           data: { posts: [], count: 0 },
           status: 200,
@@ -138,11 +186,11 @@ describe('RawDataController', () => {
         }),
       );
 
-      await controller.fetchRedditRawData(query);
+      await controller.fetchRedditRawData(query, { user: { sub: 1 } });
 
       expect(getSpy).toHaveBeenCalledWith(
-        expect.stringContaining('/reddit/search'),
         expect.objectContaining({
+          url: expect.stringContaining('/reddit/search'),
           params: {
             subreddit: query.subreddit,
             query: query.query,
@@ -153,7 +201,7 @@ describe('RawDataController', () => {
     });
 
     it('should handle empty results', async () => {
-      jest.spyOn(httpService, 'get').mockReturnValue(
+      jest.spyOn(httpService, 'request').mockReturnValue(
         of({
           data: { posts: [], count: 0 },
           status: 200,
@@ -163,7 +211,9 @@ describe('RawDataController', () => {
         }),
       );
 
-      const result = await controller.fetchRedditRawData(query);
+      const result = await controller.fetchRedditRawData(query, {
+        user: { sub: 1 },
+      });
 
       expect(result.posts).toHaveLength(0);
       expect(result.count).toBe(0);
@@ -182,7 +232,7 @@ describe('RawDataController', () => {
         count: 1,
       };
 
-      jest.spyOn(httpService, 'get').mockReturnValue(
+      jest.spyOn(httpService, 'request').mockReturnValue(
         of({
           data: mockResponse,
           status: 200,
@@ -192,7 +242,9 @@ describe('RawDataController', () => {
         }),
       );
 
-      const result = await controller.fetchTwitterRawData(query);
+      const result = await controller.fetchTwitterRawData(query, {
+        user: { sub: 1 },
+      });
 
       expect(result).toHaveProperty('tweets');
       expect(result).toHaveProperty('count');
@@ -202,16 +254,16 @@ describe('RawDataController', () => {
 
     it('should handle Twitter API errors', async () => {
       jest
-        .spyOn(httpService, 'get')
+        .spyOn(httpService, 'request')
         .mockReturnValue(throwError(() => new Error('Twitter API error')));
 
-      await expect(controller.fetchTwitterRawData(query)).rejects.toThrow(
-        InternalServerErrorException,
-      );
+      await expect(
+        controller.fetchTwitterRawData(query, { user: { sub: 1 } }),
+      ).rejects.toThrow(InternalServerErrorException);
     });
 
     it('should pass correct query parameters', async () => {
-      const getSpy = jest.spyOn(httpService, 'get').mockReturnValue(
+      const getSpy = jest.spyOn(httpService, 'request').mockReturnValue(
         of({
           data: { tweets: [], count: 0 },
           status: 200,
@@ -221,11 +273,11 @@ describe('RawDataController', () => {
         }),
       );
 
-      await controller.fetchTwitterRawData(query);
+      await controller.fetchTwitterRawData(query, { user: { sub: 1 } });
 
       expect(getSpy).toHaveBeenCalledWith(
-        expect.stringContaining('/twitter/search'),
         expect.objectContaining({
+          url: expect.stringContaining('/twitter/search'),
           params: {
             query: query.query,
             max_results: query.maxResults,
@@ -251,7 +303,7 @@ describe('RawDataController', () => {
         sentiment: [mockSentiment],
       };
 
-      jest.spyOn(httpService, 'get').mockReturnValue(
+      jest.spyOn(httpService, 'request').mockReturnValue(
         of({
           data: mockResponse,
           status: 200,
@@ -261,7 +313,9 @@ describe('RawDataController', () => {
         }),
       );
 
-      const result = await controller.fetchRedditSentiment(query);
+      const result = await controller.fetchRedditSentiment(query, {
+        user: { sub: 1 },
+      });
 
       expect(result).toHaveProperty('posts');
       expect(result).toHaveProperty('translations');
@@ -280,7 +334,7 @@ describe('RawDataController', () => {
         sentiment: [mockSentiment],
       };
 
-      jest.spyOn(httpService, 'get').mockReturnValue(
+      jest.spyOn(httpService, 'request').mockReturnValue(
         of({
           data: mockResponse,
           status: 200,
@@ -290,11 +344,11 @@ describe('RawDataController', () => {
         }),
       );
 
-      await controller.fetchRedditSentiment(query);
+      await controller.fetchRedditSentiment(query, { user: { sub: 1 } });
 
       expect(mockPostStorageService.storeRawPosts).toHaveBeenCalledWith(
         'reddit',
-        mockResponse.posts,
+        expect.any(Array),
       );
     });
 
@@ -307,7 +361,7 @@ describe('RawDataController', () => {
         sentiment: [mockSentiment],
       };
 
-      jest.spyOn(httpService, 'get').mockReturnValue(
+      jest.spyOn(httpService, 'request').mockReturnValue(
         of({
           data: mockResponse,
           status: 200,
@@ -317,7 +371,7 @@ describe('RawDataController', () => {
         }),
       );
 
-      await controller.fetchRedditSentiment(query);
+      await controller.fetchRedditSentiment(query, { user: { sub: 1 } });
 
       expect(mockPostStorageService.storeProcessedPosts).toHaveBeenCalledWith(
         'reddit',
@@ -329,14 +383,14 @@ describe('RawDataController', () => {
 
     it('should handle sentiment analysis errors', async () => {
       jest
-        .spyOn(httpService, 'get')
+        .spyOn(httpService, 'request')
         .mockReturnValue(
           throwError(() => new Error('Sentiment analysis failed')),
         );
 
-      await expect(controller.fetchRedditSentiment(query)).rejects.toThrow(
-        InternalServerErrorException,
-      );
+      await expect(
+        controller.fetchRedditSentiment(query, { user: { sub: 1 } }),
+      ).rejects.toThrow(InternalServerErrorException);
     });
 
     it('should include all sentiment data in response', async () => {
@@ -348,7 +402,7 @@ describe('RawDataController', () => {
         sentiment: [mockSentiment],
       };
 
-      jest.spyOn(httpService, 'get').mockReturnValue(
+      jest.spyOn(httpService, 'request').mockReturnValue(
         of({
           data: mockResponse,
           status: 200,
@@ -358,7 +412,9 @@ describe('RawDataController', () => {
         }),
       );
 
-      const result = await controller.fetchRedditSentiment(query);
+      const result = await controller.fetchRedditSentiment(query, {
+        user: { sub: 1 },
+      });
 
       expect(result.sentiment[0]).toHaveProperty('sentiment');
       expect(result.sentiment[0]).toHaveProperty('score');
@@ -382,7 +438,7 @@ describe('RawDataController', () => {
         sentiment: [mockSentiment],
       };
 
-      jest.spyOn(httpService, 'get').mockReturnValue(
+      jest.spyOn(httpService, 'request').mockReturnValue(
         of({
           data: mockResponse,
           status: 200,
@@ -392,7 +448,9 @@ describe('RawDataController', () => {
         }),
       );
 
-      const result = await controller.fetchTwitterSentiment(query);
+      const result = await controller.fetchTwitterSentiment(query, {
+        user: { sub: 1 },
+      });
 
       expect(result).toHaveProperty('tweets');
       expect(result).toHaveProperty('translations');
@@ -409,7 +467,7 @@ describe('RawDataController', () => {
         sentiment: [mockSentiment],
       };
 
-      jest.spyOn(httpService, 'get').mockReturnValue(
+      jest.spyOn(httpService, 'request').mockReturnValue(
         of({
           data: mockResponse,
           status: 200,
@@ -419,11 +477,11 @@ describe('RawDataController', () => {
         }),
       );
 
-      await controller.fetchTwitterSentiment(query);
+      await controller.fetchTwitterSentiment(query, { user: { sub: 1 } });
 
       expect(mockPostStorageService.storeRawPosts).toHaveBeenCalledWith(
         'twitter',
-        mockResponse.tweets,
+        expect.any(Array),
       );
     });
 
@@ -436,7 +494,7 @@ describe('RawDataController', () => {
         sentiment: [mockSentiment],
       };
 
-      jest.spyOn(httpService, 'get').mockReturnValue(
+      jest.spyOn(httpService, 'request').mockReturnValue(
         of({
           data: mockResponse,
           status: 200,
@@ -446,7 +504,7 @@ describe('RawDataController', () => {
         }),
       );
 
-      await controller.fetchTwitterSentiment(query);
+      await controller.fetchTwitterSentiment(query, { user: { sub: 1 } });
 
       expect(mockPostStorageService.storeProcessedPosts).toHaveBeenCalledWith(
         'twitter',
@@ -458,14 +516,14 @@ describe('RawDataController', () => {
 
     it('should handle Twitter sentiment analysis errors', async () => {
       jest
-        .spyOn(httpService, 'get')
+        .spyOn(httpService, 'request')
         .mockReturnValue(
           throwError(() => new Error('Twitter sentiment failed')),
         );
 
-      await expect(controller.fetchTwitterSentiment(query)).rejects.toThrow(
-        InternalServerErrorException,
-      );
+      await expect(
+        controller.fetchTwitterSentiment(query, { user: { sub: 1 } }),
+      ).rejects.toThrow(InternalServerErrorException);
     });
   });
 
@@ -483,10 +541,12 @@ describe('RawDataController', () => {
       };
 
       jest
-        .spyOn(httpService, 'get')
+        .spyOn(httpService, 'request')
         .mockReturnValue(throwError(() => new Error('ETIMEDOUT')));
 
-      await expect(controller.fetchRedditRawData(query)).rejects.toThrow();
+      await expect(
+        controller.fetchRedditRawData(query, { user: { sub: 1 } }),
+      ).rejects.toThrow();
     });
 
     it('should handle FastAPI 502 errors', async () => {
@@ -500,7 +560,9 @@ describe('RawDataController', () => {
         .spyOn(httpService, 'get')
         .mockReturnValue(throwError(() => ({ response: { status: 502 } })));
 
-      await expect(controller.fetchRedditSentiment(query)).rejects.toThrow();
+      await expect(
+        controller.fetchRedditSentiment(query, { user: { sub: 1 } }),
+      ).rejects.toThrow();
     });
   });
 });

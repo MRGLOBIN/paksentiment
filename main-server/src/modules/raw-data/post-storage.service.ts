@@ -2,48 +2,51 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MongoRepository } from 'typeorm';
 
-import { RawPostEntity } from '../../database/entities/mongo/raw-post.entity';
-import { ProcessedPostEntity } from '../../database/entities/mongo/processed-post.entity';
+import { ScrapedDocumentEntity } from '../../database/entities/mongo/scraped-document.entity';
 
 @Injectable()
 /**
- * Service to persist Raw and Processed posts in MongoDB.
- * Handles data mapping, deduplication (via upsert logic mostly handled by repo or unique index if set), and retrieval.
+ * Service to persist scraped data in MongoDB.
+ * Handles unified insertion and updation of documents (raw and analyzed sentiment).
  */
 export class PostStorageService {
   constructor(
-    @InjectRepository(RawPostEntity, 'mongo')
-    private readonly rawPosts: MongoRepository<RawPostEntity>,
-    @InjectRepository(ProcessedPostEntity, 'mongo')
-    private readonly processedPosts: MongoRepository<ProcessedPostEntity>,
+    @InjectRepository(ScrapedDocumentEntity, 'mongo')
+    private readonly documentsRepo: MongoRepository<ScrapedDocumentEntity>,
   ) { }
 
-  /**
-   * Save raw data from social platforms.
-   * 
-   * @param platform Source platform name
-   * @param posts Array of raw post objects
-   */
   async storeRawPosts(platform: string, posts: any[]) {
     if (!posts?.length) {
       return;
     }
 
-    const docs: Omit<RawPostEntity, '_id'>[] = posts.map((post) => {
+    for (const post of posts) {
+      const sourceId = this.extractSourceId(post);
       const content = this.composeContent(post);
       const timestamp = this.extractTimestamp(post);
-      return {
-        platform,
-        sourceId: this.extractSourceId(post),
-        content,
-        author: post.author_name ?? post.author ?? null,
-        timestamp,
-        metadata: post,
-        fetchedAt: new Date(),
-      };
-    });
 
-    await this.rawPosts.save(docs);
+      const doc = {
+        url: post.url || `https://${platform}.com/${sourceId}`,
+        domain: platform, // Extracted or generic
+        sourceEngine: platform, // Reddit, Twitter, Scrapling, etc.
+        contentType: 'social_post', // Defaulting for simple map, updated later
+        title: post.title || null,
+        cleanText: content,
+        createdAt: timestamp,
+        updatedAt: new Date(),
+        metadata: {
+          sourceId: sourceId,
+          author: post.author_name ?? post.author ?? null,
+          ...post
+        }
+      };
+
+      await this.documentsRepo.updateOne(
+        { "metadata.sourceId": sourceId, sourceEngine: platform },
+        { $set: doc },
+        { upsert: true }
+      );
+    }
   }
 
   /**
@@ -71,35 +74,39 @@ export class PostStorageService {
       sentiments.map((item: any) => [item.id, item]),
     );
 
-    const docs: Omit<ProcessedPostEntity, '_id'>[] = [];
-
     for (const post of posts) {
       const sourceId = this.extractSourceId(post);
       const translation = translationsMap.get(sourceId);
       const sentiment = sentimentMap.get(sourceId);
 
-      const cleanText = this.composeContent(post);
-      const translatedText = translation?.translatedText ?? null;
-      const language = translation?.language ?? 'unknown';
+      // Only update if we at least have sentiment or translation
+      if (!sentiment && !translation) continue;
 
-      docs.push({
-        platform,
-        rawPostSourceId: sourceId,
-        cleanText,
-        translatedText,
-        language,
-        sentiment: sentiment?.sentiment ?? null,
-        confidence: sentiment?.confidence ?? null,
-        keywords: [],
-        processedAt: new Date(),
-        metadata: {
-          summary: sentiment?.summary,
-          chunk_results: sentiment?.chunk_results,
-        },
-      });
+      const updatePayload: any = {
+        updatedAt: new Date()
+      };
+
+      if (translation) {
+        updatePayload['metadata.translatedText'] = translation.translatedText;
+        updatePayload['metadata.language'] = translation.language;
+      }
+
+      if (sentiment) {
+        updatePayload.sentiment = {
+          label: sentiment.sentiment,
+          score: sentiment.confidence ?? 0,
+          analyzedAt: new Date(),
+          summary: sentiment.summary,
+          chunkResults: sentiment.chunk_results
+        };
+      }
+
+      await this.documentsRepo.updateOne(
+        { "metadata.sourceId": sourceId, sourceEngine: platform },
+        { $set: updatePayload },
+        { upsert: true }
+      );
     }
-
-    await this.processedPosts.save(docs);
   }
 
   private composeContent(post: any): string {
@@ -154,27 +161,27 @@ export class PostStorageService {
     const where: any = {};
 
     if (query.platform) {
-      where.platform = query.platform;
+      where.sourceEngine = query.platform;
     }
 
     if (query.sentiment) {
-      where.sentiment = query.sentiment;
+      where['sentiment.label'] = query.sentiment;
     }
 
     if (query.startDate || query.endDate) {
-      where.processedAt = {};
-      if (query.startDate) where.processedAt.$gte = new Date(query.startDate);
-      if (query.endDate) where.processedAt.$lte = new Date(query.endDate);
+      where.createdAt = {};
+      if (query.startDate) where.createdAt.$gte = new Date(query.startDate);
+      if (query.endDate) where.createdAt.$lte = new Date(query.endDate);
     }
 
     if (query.search) {
       where.cleanText = { $regex: new RegExp(query.search, 'i') };
     }
 
-    const [posts, count] = await this.processedPosts.findAndCount({
+    const [posts, count] = await this.documentsRepo.findAndCount({
       where,
       take: query.limit || 100,
-      order: { processedAt: 'DESC' },
+      order: { createdAt: 'DESC' },
     });
 
     return { posts, count };
@@ -183,28 +190,16 @@ export class PostStorageService {
   async getProcessedPostsBySourceIds(sourceIds: string[]) {
     if (!sourceIds.length) return { posts: [], count: 0 };
 
-    // We use Mongo 'in' operator
-    const posts = await this.processedPosts.find({
-      where: {
-        rawPostSourceId: { $in: sourceIds }
-      }
+    const cursor = this.documentsRepo.createCursor({
+      "metadata.sourceId": { $in: sourceIds }
     });
+    const posts = await cursor.toArray();
 
-    // Also count?
-    const count = posts.length;
-    return { posts, count };
+    return { posts, count: posts.length };
   }
 
   async getRawPostsBySourceIds(sourceIds: string[]) {
-    if (!sourceIds.length) return { posts: [], count: 0 };
-
-    const posts = await this.rawPosts.find({
-      where: {
-        sourceId: { $in: sourceIds }
-      }
-    });
-
-    return { posts, count: posts.length };
+    return this.getProcessedPostsBySourceIds(sourceIds);
   }
 }
 

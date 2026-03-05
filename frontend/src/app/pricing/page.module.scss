@@ -1,0 +1,438 @@
+/* ── Pricing Page ── */
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-primary);
+}
+
+.main {
+  flex: 1;
+  padding: 100px 24px 80px;
+  max-width: 1120px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ── Header ── */
+.header {
+  text-align: center;
+  margin-bottom: 48px;
+
+  h1 {
+    font-size: var(--font-size-4xl);
+    font-weight: 800;
+    color: var(--text-primary);
+    letter-spacing: -0.03em;
+    margin-bottom: 12px;
+  }
+
+  p {
+    font-size: var(--font-size-lg);
+    color: var(--text-secondary);
+    max-width: 480px;
+    margin: 0 auto;
+  }
+}
+
+.badge {
+  display: inline-block;
+  padding: 6px 16px;
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--primary);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  border-radius: 999px;
+  margin-bottom: 14px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ── Plans Grid ── */
+.plans {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  align-items: stretch;
+  margin-bottom: 72px;
+}
+
+/* ── Plan Card ── */
+.planCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 36px 28px 32px;
+  transition: all var(--transition-base);
+
+  &:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+  }
+
+  &.highlighted {
+    border-color: var(--primary);
+    box-shadow:
+      0 0 0 1px var(--primary),
+      var(--shadow-lg);
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: var(--radius-xl);
+      padding: 2px;
+      background: var(--gradient-primary);
+      mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+      mask-composite: exclude;
+      -webkit-mask-composite: xor;
+      pointer-events: none;
+    }
+  }
+}
+
+.planBadge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 14px;
+  background: var(--gradient-primary);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 999px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.planName {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.planDesc {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+/* Price */
+.priceRow {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: 24px;
+}
+
+.price {
+  font-size: var(--font-size-4xl);
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.period {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+/* ── CTA Buttons ── */
+.ctaBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 13px 16px;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+  margin-bottom: 28px;
+  cursor: pointer;
+
+  &.outline {
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+
+    &:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: rgba(16, 185, 129, 0.05);
+    }
+  }
+
+  &.primary {
+    background: var(--primary);
+    color: #fff;
+    border: 1px solid transparent;
+
+    &:hover {
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
+    }
+  }
+
+  &.gradient {
+    background: var(--gradient-primary);
+    color: #fff;
+    border: 1px solid transparent;
+
+    &:hover {
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
+    }
+  }
+}
+
+/* ── Feature List ── */
+.featureList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: var(--font-size-sm);
+    line-height: 1.4;
+  }
+
+  .included {
+    color: var(--text-primary);
+
+    svg {
+      color: var(--primary);
+      flex-shrink: 0;
+    }
+  }
+
+  .excluded {
+    color: var(--text-muted);
+
+    svg {
+      color: var(--text-muted);
+      opacity: 0.5;
+      flex-shrink: 0;
+    }
+  }
+}
+
+/* ── FAQ ── */
+.faqSection {
+  max-width: 840px;
+  margin: 0 auto;
+}
+
+.faqTitle {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+  margin-bottom: 32px;
+  letter-spacing: -0.02em;
+}
+
+.faqGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.faqCard {
+  background: var(--surface-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+
+  h3 {
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+  }
+
+  p {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .plans {
+    grid-template-columns: 1fr;
+    max-width: 440px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .highlighted {
+    order: -1;
+  }
+}
+
+@media (max-width: 640px) {
+  .header h1 {
+    font-size: var(--font-size-2xl);
+  }
+
+  .faqGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .planCard {
+    padding: 28px 20px 24px;
+  }
+}
+
+/* Modal and Warnings */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modalContent {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  justify-content: center;
+}
+
+.warningModal {
+  position: relative;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  width: 100%;
+  padding: 32px;
+  box-shadow: var(--shadow-xl);
+  text-align: center;
+  animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+  .warningClose {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: all var(--transition-fast);
+
+    &:hover {
+      color: var(--text-primary);
+      transform: scale(1.1);
+    }
+  }
+
+  h2 {
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+  }
+
+  p {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    line-height: 1.5;
+
+    &:last-of-type {
+      margin-bottom: 24px;
+    }
+  }
+
+  strong {
+    color: var(--primary);
+  }
+
+  .actionRow {
+    display: flex;
+    gap: 12px;
+  }
+
+  .dismissBtn {
+    flex: 1;
+    padding: 12px;
+    background: var(--surface-secondary);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+
+    &:hover {
+      background: var(--border);
+    }
+  }
+
+  .dangerBtn {
+    flex: 1;
+    padding: 12px;
+    background: #ef4444;
+    border: none;
+    color: white;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+
+    &:hover {
+      background: #dc2626;
+      transform: translateY(-2px);
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}

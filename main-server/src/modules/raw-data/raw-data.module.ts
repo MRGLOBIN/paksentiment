@@ -7,8 +7,7 @@ import { RawDataController } from './raw-data.controller';
 import { ActivityModule } from '../activity/activity.module';
 import { AuthModule } from '../auth/auth.module';
 
-import { RawPostEntity } from '../../database/entities/mongo/raw-post.entity';
-import { ProcessedPostEntity } from '../../database/entities/mongo/processed-post.entity';
+import { ScrapedDocumentEntity } from '../../database/entities/mongo/scraped-document.entity';
 import { AnalysisSessionEntity } from '../../database/entities/mongo/analysis-session.entity';
 import { PostStorageService } from './post-storage.service';
 
@@ -18,13 +17,14 @@ import { TwitterProvider } from './providers/twitter.provider';
 import { YouTubeProvider } from './providers/youtube.provider';
 import { CommonCrawlProvider } from './providers/commoncrawl.provider';
 import { ScraplingProvider } from './providers/scrapling.provider';
+import { WebProvider } from './providers/web.provider';
 
 @Module({
   imports: [
     HttpModule,
     AuthModule,
     TypeOrmModule.forFeature(
-      [RawPostEntity, ProcessedPostEntity, AnalysisSessionEntity],
+      [ScrapedDocumentEntity, AnalysisSessionEntity],
       'mongo',
     ),
     ActivityModule,
@@ -39,7 +39,8 @@ import { ScraplingProvider } from './providers/scrapling.provider';
     YouTubeProvider,
     CommonCrawlProvider,
     ScraplingProvider,
+    WebProvider,
   ],
   exports: [RawDataService],
 })
-export class RawDataModule { }
+export class RawDataModule {}

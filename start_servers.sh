@@ -31,15 +31,20 @@ echo "🧠 Starting Main Server (NestJS)..."
 echo "🐍 Starting Data Gateway (FastAPI)..."
 (cd "new PakSentiment-data-gateway" && ./.venv/bin/fastapi dev main.py) &
 
-# 4. Start Go Colly Sidecar
+# 4. Start Dedicated Scrapling Server
+echo "🌐 Starting Scrapling Fallback Server..."
+(cd "new PakSentiment-data-gateway" && ./.venv/bin/fastapi run scrapling_server.py --port 8002) &
+
+# 5. Start Go Colly Sidecar (Pointed to Scrapling Server for Fallbacks)
 echo "🔧 Starting Go Colly Sidecar..."
-(cd "colly-sidecar" && go run main.go) &
+(cd "colly-sidecar" && FASTAPI_URL=http://localhost:8002 go run main.go) &
 
 echo "======================================="
 echo "✅ All servers started!"
 echo "   Frontend:       http://localhost:3001"
 echo "   NestJS:         http://localhost:3000"
 echo "   FastAPI:        http://localhost:8000"
+echo "   Scrapling:      http://localhost:8002"
 echo "   Colly Sidecar:  http://localhost:8081"
 echo "Press Ctrl+C to stop everything."
 echo "======================================="

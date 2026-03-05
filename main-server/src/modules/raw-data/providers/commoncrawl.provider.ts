@@ -46,7 +46,7 @@ export class CommonCrawlProvider extends AbstractDataProvider {
             });
         }
 
-        await this.storeRaw('commoncrawl', response.records ?? []);
+        await this.storeRaw('commoncrawl', response.records ?? [], 'article');
         await this.storeProcessed(
             'commoncrawl',
             response.records ?? [],

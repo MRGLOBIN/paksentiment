@@ -5,6 +5,7 @@ export interface User {
     email: string
     fullName: string
     provider: string
+    subscriptionTier?: 'free' | 'premium' | 'super_premium'
 }
 
 export interface AuthResponse {
@@ -27,6 +28,8 @@ export interface SentimentResult {
     sentiment: string
     confidence: number
     summary: string
+    topic?: string
+    engine?: string
     chunk_results?: any[]
 }
 

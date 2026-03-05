@@ -24,7 +24,8 @@ import {
     ListAlt,
     Close as CloseIcon,
     Visibility as VisibilityIcon,
-    Download as DownloadIcon
+    Download as DownloadIcon,
+    TrendingUp
 } from '@mui/icons-material'
 import {
     Dialog,
@@ -280,6 +281,40 @@ export default function AnalysisDashboard({ data }: AnalysisDashboardProps) {
         return Object.entries(buckets).map(([range, count]) => ({ range, count }))
     }, [kpis.sentimentSource])
 
+    // ============ TOPIC ANALYTICS ============
+    const TOPIC_COLOR_MAP: Record<string, string> = {
+        economics: '#F59E0B', politics: '#EF4444', technology: '#8B5CF6',
+        health: '#F97316', education: '#0EA5E9', sports: '#10B981',
+        science: '#6366F1', culture: '#EC4899', environment: '#14B8A6',
+        law: '#A855F7', general: '#6B7280', society: '#8884D8',
+    }
+
+    // Count documents per actual topic (from Ollama)
+    const realTopicCounts = useMemo(() => {
+        const counts: Record<string, number> = {}
+        const sentiments = data.sentiment || []
+        sentiments.forEach((s: any) => {
+            const topic = s.topic || 'General'
+            counts[topic] = (counts[topic] || 0) + 1
+        })
+        return counts
+    }, [data.sentiment])
+
+    const realTopicChartData = useMemo(() =>
+        Object.entries(realTopicCounts)
+            .map(([name, value]) => ({
+                name,
+                value,
+                color: TOPIC_COLOR_MAP[name.toLowerCase()] || COLORS.primary
+            }))
+            .sort((a, b) => b.value - a.value),
+        [realTopicCounts]
+    )
+
+    const uniqueTopicCount = Object.keys(realTopicCounts).length
+
+    // Sentiment breakdown per topic (for stacked bar) — removed per user request
+
     // ============ RENDER ============
     return (
         <div className={styles.dashboard}>
@@ -335,105 +370,27 @@ export default function AnalysisDashboard({ data }: AnalysisDashboardProps) {
                                 <span className={styles.kpiValue} style={{ color: TOPIC_COLORS[kpis.topTopic.toLowerCase()] || COLORS.primary }}>
                                     {kpis.topTopic}
                                 </span>
-                                <span className={styles.kpiTitle}>Top Topic ({kpis.topTopicPercent}%)</span>
+                                <span className={styles.kpiTitle}>Top Sentiment ({kpis.topTopicPercent}%)</span>
                             </div>
                         </div>
 
+                        <div className={styles.kpiCard}>
+                            <span className={styles.kpiIcon}>
+                                <TrendingUp fontSize="inherit" />
+                            </span>
+                            <div className={styles.kpiContent}>
+                                <span className={styles.kpiValue} style={{ color: COLORS.primary }}>
+                                    {uniqueTopicCount}
+                                </span>
+                                <span className={styles.kpiTitle}>Unique Topics</span>
+                            </div>
+                        </div>
 
                     </>
                 )}
             </div>
 
-            {/* Charts Grid */}
-            {hasSentiment && (
-                <div className={styles.chartsGrid}>
-                    {/* Topic Distribution Donut - Full Width */}
-                    <div className={`${styles.chartCard} ${styles.fullWidth}`}>
-                        <h3 className={styles.chartTitle}>Topic Distribution</h3>
-                        <ResponsiveContainer width="100%" height={450}>
-                            <PieChart>
-                                <Pie
-                                    data={topicChartData}
-                                    innerRadius={100}
-                                    outerRadius={160}
-                                    paddingAngle={2}
-                                    dataKey="value"
-                                    label={({ name, percent }) => (percent ?? 0) > 0.03 ? `${name} ${((percent ?? 0) * 100).toFixed(0)}%` : ''}
-                                    labelLine={true}
-                                >
-                                    {topicChartData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={entry.color} />
-                                    ))}
-                                </Pie>
-                                <Tooltip
-                                    contentStyle={{ backgroundColor: COLORS.cardBg, border: `1px solid ${COLORS.border}`, borderRadius: '8px' }}
-                                    itemStyle={{ color: COLORS.text }}
-                                />
-                                <Legend
-                                    verticalAlign="bottom"
-                                    wrapperStyle={{ color: COLORS.textMuted }}
-                                />
-                            </PieChart>
-                        </ResponsiveContainer>
-                    </div>
-
-                    {/* Volume by Topic (Bar) */}
-                    <div className={styles.chartCard}>
-                        <h3 className={styles.chartTitle}>Volume by Topic</h3>
-                        <ResponsiveContainer width="100%" height={380}>
-                            <BarChart data={topicChartData.sort((a, b) => b.value - a.value).slice(0, 10)}>
-                                <CartesianGrid strokeDasharray="3 3" stroke={COLORS.border} />
-                                <XAxis dataKey="name" stroke={COLORS.textMuted} tick={{ fontSize: 12 }} />
-                                <YAxis stroke={COLORS.textMuted} />
-                                <Tooltip
-                                    contentStyle={{ backgroundColor: COLORS.cardBg, border: `1px solid ${COLORS.border}`, borderRadius: '8px' }}
-                                    cursor={{ fill: 'rgba(255,255,255,0.05)' }}
-                                />
-                                <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-                                    {topicChartData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={entry.color} />
-                                    ))}
-                                </Bar>
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
-
-                    {/* Timeline */}
-                    {timelineData.length > 1 && (
-                        <div className={styles.chartCard}>
-                            <h3 className={styles.chartTitle}>Content Over Time</h3>
-                            <ResponsiveContainer width="100%" height={380}>
-                                <AreaChart data={timelineData}>
-                                    <defs>
-                                        <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor={COLORS.primary} stopOpacity={0.8} />
-                                            <stop offset="95%" stopColor={COLORS.primary} stopOpacity={0.1} />
-                                        </linearGradient>
-                                    </defs>
-                                    <CartesianGrid strokeDasharray="3 3" stroke={COLORS.border} />
-                                    <XAxis dataKey="date" stroke={COLORS.textMuted} tick={{ fontSize: 10 }} />
-                                    <YAxis stroke={COLORS.textMuted} />
-                                    <Tooltip
-                                        contentStyle={{ backgroundColor: COLORS.cardBg, border: `1px solid ${COLORS.border}`, borderRadius: '8px' }}
-                                    />
-                                    <Area
-                                        type="monotone"
-                                        dataKey="count"
-                                        stroke={COLORS.primary}
-                                        fill="url(#colorCount)"
-                                    />
-                                </AreaChart>
-                            </ResponsiveContainer>
-                        </div>
-                    )}
-
-
-
-
-                </div>
-            )}
-
-            {/* Data Table */}
+            {/* Data Table — shown first, above charts */}
             <div className={styles.dataGridSection}>
                 <div className={styles.sectionHeader}>
                     <h3>
@@ -447,26 +404,88 @@ export default function AnalysisDashboard({ data }: AnalysisDashboardProps) {
                         const sentiment = data.sentiment?.find(s => s.id === post.id)
                         return {
                             id: post.id || idx,
-                            author: post.author || 'Unknown',
-                            content: post.title || (post.text || post.content || '').substring(0, 120) + '...',
-                            topic: post.sentiment || sentiment?.sentiment || null,
-                            confidence: post.confidence || sentiment?.confidence || null,
-                            fullPost: post // Store full object for retrieval
+                            source: post.author || 'Unknown',
+                            topic: sentiment?.topic || '—',
+                            summary: sentiment?.summary || post.title || (post.text || post.content || '').substring(0, 200) + '...',
+                            sentiment: sentiment?.sentiment || post.sentiment || '—',
+                            confidence: sentiment?.confidence ?? post.confidence ?? null,
+                            fullPost: post
                         }
                     }) || []}
                     columns={[
-                        { field: 'author', headerName: 'SOURCE', flex: 1, minWidth: 150 },
-                        { field: 'content', headerName: 'CONTENT PREVIEW', flex: 2.5, minWidth: 400 },
+                        { field: 'source', headerName: 'SOURCE', flex: 0.8, minWidth: 120 },
+                        {
+                            field: 'topic',
+                            headerName: 'TOPIC',
+                            flex: 0.6,
+                            minWidth: 100,
+                            renderCell: (params) => (
+                                <Chip
+                                    label={params.value}
+                                    size="small"
+                                    sx={{
+                                        backgroundColor: 'rgba(139, 92, 246, 0.15)',
+                                        color: '#a78bfa',
+                                        fontWeight: 600,
+                                        fontSize: '0.7rem',
+                                        letterSpacing: '0.03em',
+                                    }}
+                                />
+                            )
+                        },
+                        { field: 'summary', headerName: 'SUMMARY', flex: 2.5, minWidth: 350 },
+                        {
+                            field: 'sentiment',
+                            headerName: 'SENTIMENT',
+                            flex: 0.7,
+                            minWidth: 110,
+                            renderCell: (params) => {
+                                const val = (params.value || '').toLowerCase()
+                                const color = val.includes('positive') ? '#10b981'
+                                    : val.includes('negative') ? '#ef4444'
+                                        : '#6b7280'
+                                return (
+                                    <Chip
+                                        label={params.value}
+                                        size="small"
+                                        sx={{
+                                            backgroundColor: `${color}22`,
+                                            color: color,
+                                            fontWeight: 700,
+                                            fontSize: '0.7rem',
+                                            letterSpacing: '0.03em',
+                                            border: `1px solid ${color}44`,
+                                        }}
+                                    />
+                                )
+                            }
+                        },
+                        {
+                            field: 'confidence',
+                            headerName: 'CONFIDENCE',
+                            flex: 0.6,
+                            minWidth: 100,
+                            renderCell: (params) => {
+                                if (params.value == null) return '—'
+                                const pct = Math.round(params.value * 100)
+                                const color = pct >= 75 ? '#10b981' : pct >= 50 ? '#f59e0b' : '#ef4444'
+                                return (
+                                    <span style={{ color, fontWeight: 700, fontSize: '0.85rem' }}>
+                                        {pct}%
+                                    </span>
+                                )
+                            }
+                        },
+
                         {
                             field: 'actions',
                             headerName: 'ACTIONS',
-                            width: 150,
+                            width: 120,
                             renderCell: (params) => (
                                 <Button
                                     startIcon={<VisibilityIcon />}
                                     size="small"
                                     onClick={() => {
-                                        // Find original post using ID or index
                                         const original = data.posts?.find((p, i) => (p.id || i) === params.id)
                                         setSelectedPost(original || null)
                                     }}
@@ -519,6 +538,140 @@ export default function AnalysisDashboard({ data }: AnalysisDashboardProps) {
                     disableRowSelectionOnClick
                 />
             </div>
+
+            {/* Charts Grid — below the table */}
+            {hasSentiment && (
+                <div className={styles.chartsGrid}>
+                    {/* Sentiment Distribution Donut - Full Width */}
+                    <div className={`${styles.chartCard} ${styles.fullWidth}`}>
+                        <h3 className={styles.chartTitle}>Sentiment Distribution</h3>
+                        <ResponsiveContainer width="100%" height={450}>
+                            <PieChart>
+                                <Pie
+                                    data={topicChartData}
+                                    innerRadius={100}
+                                    outerRadius={160}
+                                    paddingAngle={2}
+                                    dataKey="value"
+                                    label={({ name, percent }) => (percent ?? 0) > 0.03 ? `${name} ${((percent ?? 0) * 100).toFixed(0)}%` : ''}
+                                    labelLine={true}
+                                >
+                                    {topicChartData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={entry.color} />
+                                    ))}
+                                </Pie>
+                                <Tooltip
+                                    contentStyle={{ backgroundColor: COLORS.cardBg, border: `1px solid ${COLORS.border}`, borderRadius: '8px' }}
+                                    itemStyle={{ color: COLORS.text }}
+                                />
+                                <Legend
+                                    verticalAlign="bottom"
+                                    wrapperStyle={{ color: COLORS.textMuted }}
+                                />
+                            </PieChart>
+                        </ResponsiveContainer>
+                    </div>
+
+                    {/* Volume by Sentiment (Bar) */}
+                    <div className={styles.chartCard}>
+                        <h3 className={styles.chartTitle}>Volume by Sentiment</h3>
+                        <ResponsiveContainer width="100%" height={380}>
+                            <BarChart data={topicChartData.sort((a, b) => b.value - a.value).slice(0, 10)}>
+                                <CartesianGrid strokeDasharray="3 3" stroke={COLORS.border} />
+                                <XAxis dataKey="name" stroke={COLORS.textMuted} tick={{ fontSize: 12 }} />
+                                <YAxis stroke={COLORS.textMuted} />
+                                <Tooltip
+                                    contentStyle={{ backgroundColor: COLORS.cardBg, border: `1px solid ${COLORS.border}`, borderRadius: '8px' }}
+                                    cursor={{ fill: 'rgba(255,255,255,0.05)' }}
+                                />
+                                <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                                    {topicChartData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={entry.color} />
+                                    ))}
+                                </Bar>
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+
+                    {/* Timeline */}
+                    {timelineData.length > 1 && (
+                        <div className={styles.chartCard}>
+                            <h3 className={styles.chartTitle}>Content Over Time</h3>
+                            <ResponsiveContainer width="100%" height={380}>
+                                <AreaChart data={timelineData}>
+                                    <defs>
+                                        <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor={COLORS.primary} stopOpacity={0.8} />
+                                            <stop offset="95%" stopColor={COLORS.primary} stopOpacity={0.1} />
+                                        </linearGradient>
+                                    </defs>
+                                    <CartesianGrid strokeDasharray="3 3" stroke={COLORS.border} />
+                                    <XAxis dataKey="date" stroke={COLORS.textMuted} tick={{ fontSize: 10 }} />
+                                    <YAxis stroke={COLORS.textMuted} />
+                                    <Tooltip
+                                        contentStyle={{ backgroundColor: COLORS.cardBg, border: `1px solid ${COLORS.border}`, borderRadius: '8px' }}
+                                    />
+                                    <Area
+                                        type="monotone"
+                                        dataKey="count"
+                                        stroke={COLORS.primary}
+                                        fill="url(#colorCount)"
+                                    />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        </div>
+                    )}
+
+                    {/* Confidence Distribution */}
+                    <div className={styles.chartCard}>
+                        <h3 className={styles.chartTitle}>Confidence Distribution</h3>
+                        <ResponsiveContainer width="100%" height={380}>
+                            <BarChart data={confidenceData}>
+                                <CartesianGrid strokeDasharray="3 3" stroke={COLORS.border} />
+                                <XAxis dataKey="range" stroke={COLORS.textMuted} tick={{ fontSize: 12 }} />
+                                <YAxis stroke={COLORS.textMuted} />
+                                <Tooltip
+                                    contentStyle={{ backgroundColor: COLORS.cardBg, border: `1px solid ${COLORS.border}`, borderRadius: '8px' }}
+                                />
+                                <Bar dataKey="count" fill={COLORS.primary} radius={[4, 4, 0, 0]} />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+
+                    {/* Topic Distribution Donut */}
+                    {realTopicChartData.length > 0 && (
+                        <div className={`${styles.chartCard} ${styles.fullWidth}`}>
+                            <h3 className={styles.chartTitle}>📚 Topic Distribution</h3>
+                            <ResponsiveContainer width="100%" height={420}>
+                                <PieChart>
+                                    <Pie
+                                        data={realTopicChartData}
+                                        innerRadius={90}
+                                        outerRadius={150}
+                                        paddingAngle={3}
+                                        dataKey="value"
+                                        label={({ name, percent }) => (percent ?? 0) > 0.03 ? `${name} ${((percent ?? 0) * 100).toFixed(0)}%` : ''}
+                                        labelLine={true}
+                                    >
+                                        {realTopicChartData.map((entry, index) => (
+                                            <Cell key={`topic-cell-${index}`} fill={entry.color} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip
+                                        contentStyle={{ backgroundColor: COLORS.cardBg, border: `1px solid ${COLORS.border}`, borderRadius: '8px' }}
+                                        itemStyle={{ color: COLORS.text }}
+                                    />
+                                    <Legend
+                                        verticalAlign="bottom"
+                                        wrapperStyle={{ color: COLORS.textMuted }}
+                                    />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </div>
+                    )}
+
+                </div>
+            )}
 
             {/* Post Detail Dialog */}
             <Dialog

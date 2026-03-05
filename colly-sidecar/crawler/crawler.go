@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/url"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gocolly/colly/v2"
@@ -47,24 +48,49 @@ func (c *Crawler) ScrapePage(ctx context.Context, url string, selectors map[stri
 func (c *Crawler) CrawlSite(ctx context.Context, req models.CrawlRequest) ([]models.PageResult, error) {
 	maxDepth := req.MaxDepth
 	if maxDepth <= 0 {
-		maxDepth = 2
+		maxDepth = 3 // default crawl depth
 	}
+
+	// limit == 0 means "unlimited" (follow all discovered links)
 	limit := req.Limit
-	if limit <= 0 {
-		limit = 20
+	unlimited := limit == 0
+	if limit < 0 {
+		limit = 20 // safety default for negative values
 	}
+
+	// When unlimited, apply a hard safety cap to prevent runaway crawling
+	const safetyMaxPages = 50
+	if unlimited {
+		if maxDepth < 3 {
+			maxDepth = 3
+		}
+	}
+
+	log.Printf("[Crawler] CrawlSite starting — url=%s depth=%d limit=%d unlimited=%v", req.URL, maxDepth, limit, unlimited)
 	delayMs := req.DelayMs
 	if delayMs <= 0 {
 		delayMs = 100
 	}
 
+	// Mutex-protected shared state for Colly async mode
+	var mu sync.Mutex
 	var results []models.PageResult
 	visited := make(map[string]bool)
+
+	// Helper to check if we've hit the page cap
+	hitLimit := func() bool {
+		if unlimited {
+			return len(results) >= safetyMaxPages
+		}
+		return len(results) >= limit
+	}
 
 	collector := colly.NewCollector(
 		colly.MaxDepth(maxDepth),
 		colly.Async(true),
+		colly.UserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"),
 	)
+	collector.SetRequestTimeout(15 * time.Second)
 
 	// Set concurrency and delay
 	collector.Limit(&colly.LimitRule{
@@ -86,10 +112,13 @@ func (c *Crawler) CrawlSite(ctx context.Context, req models.CrawlRequest) ([]mod
 	collector.OnHTML("html", func(e *colly.HTMLElement) {
 		pageURL := e.Request.URL.String()
 
-		if visited[pageURL] || len(results) >= limit {
+		mu.Lock()
+		if visited[pageURL] || hitLimit() {
+			mu.Unlock()
 			return
 		}
 		visited[pageURL] = true
+		mu.Unlock()
 
 		// Check cache first
 		cachedHit := false
@@ -98,14 +127,8 @@ func (c *Crawler) CrawlSite(ctx context.Context, req models.CrawlRequest) ([]mod
 			_ = cached // we already have the page via Colly, just mark it
 		}
 
-		// Extract title
-		title := e.ChildText("title")
-
-		// Extract text content (simplified: body text)
-		body := e.ChildText("body")
-		if len(body) > 5000 {
-			body = body[:5000]
-		}
+		// Use smart content extraction
+		title, cleanText, headlines, method := ExtractContent(e, pageURL)
 
 		// Extract links
 		var links []string
@@ -120,24 +143,45 @@ func (c *Crawler) CrawlSite(ctx context.Context, req models.CrawlRequest) ([]mod
 			URL:       pageURL,
 			Status:    e.Response.StatusCode,
 			Title:     title,
-			Text:      strings.TrimSpace(body),
+			Text:      cleanText,
+			Headlines: headlines,
 			Links:     links,
 			CachedHit: cachedHit,
+			Method:    method,
+			Engine:    "colly",
 			ScrapedAt: time.Now(),
 		}
-		results = append(results, result)
 
-		// Cache the page
-		c.cache.Set(ctx, pageURL, body)
+		mu.Lock()
+		results = append(results, result)
+		currentCount := len(results)
+		mu.Unlock()
+
+		log.Printf("[Crawler] Scraped page %d: %s (%d chars)", currentCount, pageURL, len(cleanText))
+
+		// Cache the cleaned text
+		c.cache.Set(ctx, pageURL, cleanText)
 	})
 
 	collector.OnHTML("a[href]", func(e *colly.HTMLElement) {
-		if len(results) >= limit {
+		mu.Lock()
+		if hitLimit() {
+			mu.Unlock()
 			return
 		}
+		mu.Unlock()
+
 		link := e.Attr("href")
 		if link != "" {
-			e.Request.Visit(e.Request.AbsoluteURL(link))
+			absLink := e.Request.AbsoluteURL(link)
+			if absLink != "" {
+				mu.Lock()
+				alreadyVisited := visited[absLink]
+				mu.Unlock()
+				if !alreadyVisited {
+					e.Request.Visit(absLink)
+				}
+			}
 		}
 	})
 
@@ -155,27 +199,34 @@ func (c *Crawler) CrawlSite(ctx context.Context, req models.CrawlRequest) ([]mod
 	}
 
 	collector.Wait()
+
+	log.Printf("[Crawler] CrawlSite finished — total pages scraped: %d", len(results))
 	return results, nil
 }
 
-// fetchPage uses Colly to fetch a single page.
+// fetchPage uses Colly to fetch a single page with smart content extraction.
 func (c *Crawler) fetchPage(pageURL string, selectors map[string]string) (*models.PageResult, error) {
 	result := &models.PageResult{
 		URL:       pageURL,
+		Engine:    "colly",
 		ScrapedAt: time.Now(),
 	}
 
-	collector := colly.NewCollector()
+	collector := colly.NewCollector(
+		colly.UserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"),
+	)
+	collector.SetRequestTimeout(15 * time.Second)
 
 	collector.OnHTML("html", func(e *colly.HTMLElement) {
 		result.Status = e.Response.StatusCode
-		result.Title = e.ChildText("title")
 
-		body := e.ChildText("body")
-		if len(body) > 5000 {
-			body = body[:5000]
-		}
-		result.Text = strings.TrimSpace(body)
+		// Use smart content extraction
+		title, cleanText, headlines, method := ExtractContent(e, pageURL)
+		
+		result.Title = title
+		result.Text = cleanText
+		result.Headlines = headlines
+		result.Method = method
 
 		// Collect links
 		var links []string
@@ -187,7 +238,7 @@ func (c *Crawler) fetchPage(pageURL string, selectors map[string]string) (*model
 		})
 		result.Links = links
 
-		// Apply selectors
+		// Apply selectors if provided (for backward compatibility)
 		if len(selectors) > 0 {
 			result.Extracted = make(map[string]string)
 			for name, sel := range selectors {
@@ -217,3 +268,50 @@ func parseHTMLResult(pageURL, text string, selectors map[string]string) *models.
 		ScrapedAt: time.Now(),
 	}
 }
+
+// SearchWeb uses Yahoo Search to search the web and return results.
+func (c *Crawler) SearchWeb(ctx context.Context, query string) ([]models.SearchResult, error) {
+	var results []models.SearchResult
+
+	searchURL := "https://search.yahoo.com/search?p=" + url.QueryEscape(query)
+
+	collector := colly.NewCollector(
+		colly.UserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"),
+	)
+	collector.SetRequestTimeout(15 * time.Second)
+
+	collector.OnHTML(".algo-sr", func(e *colly.HTMLElement) {
+		title := strings.TrimSpace(e.ChildText(".title"))
+		link := e.ChildAttr("a", "href")
+		snippet := strings.TrimSpace(e.ChildText(".compText"))
+
+		if title != "" && link != "" {
+			// Extract actual URL from Yahoo redirect
+			ruIndex := strings.Index(link, "/RU=")
+			if ruIndex != -1 {
+				encodedURL := link[ruIndex+4:]
+				rkIndex := strings.Index(encodedURL, "/")
+				if rkIndex != -1 {
+					encodedURL = encodedURL[:rkIndex]
+				}
+				if decoded, err := url.QueryUnescape(encodedURL); err == nil {
+					link = decoded
+				}
+			}
+
+			results = append(results, models.SearchResult{
+				Title:   title,
+				Link:    link,
+				Snippet: snippet,
+			})
+		}
+	})
+
+	err := collector.Visit(searchURL)
+	if err != nil {
+		return nil, fmt.Errorf("web search failed: %w", err)
+	}
+
+	return results, nil
+}
+

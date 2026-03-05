@@ -12,13 +12,15 @@ export default function Home() {
   return (
     <>
       <Navbar />
-      <HeroSection />
-      <StatsSection />
-      <FeaturesSection />
-      <DataSourcesSection />
-      <HowItWorksSection />
-      <PrivacySection />
-      <CTASection />
+      <main>
+        <HeroSection />
+        <StatsSection />
+        <FeaturesSection />
+        <DataSourcesSection />
+        <HowItWorksSection />
+        <PrivacySection />
+        <CTASection />
+      </main>
       <Footer />
     </>
   )
