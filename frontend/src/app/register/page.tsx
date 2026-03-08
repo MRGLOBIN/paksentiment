@@ -16,129 +16,22 @@ import { Visibility, VisibilityOff } from '@mui/icons-material'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import styles from './register.module.scss'
-import { useAuthStore } from '../../store/useAuthStore'
-
-interface FormErrors {
-  firstName?: string
-  lastName?: string
-  email?: string
-  password?: string
-  confirmPassword?: string
-}
+import { useRegister } from './useRegister'
 
 const RegisterPage = () => {
   const theme = useTheme()
-  const router = useRouter()
-  const { login } = useAuthStore()
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [errors, setErrors] = useState<FormErrors>({})
-  const [loading, setLoading] = useState(false)
-  const [apiError, setApiError] = useState('')
-  const [success, setSuccess] = useState(false)
-
-  const validateForm = (): boolean => {
-    const newErrors: FormErrors = {}
-
-    // First name validation
-    if (!firstName) {
-      newErrors.firstName = 'First name is required'
-    } else if (firstName.length < 3) {
-      newErrors.firstName = 'First name must be at least 3 characters'
-    }
-
-    // Last name validation
-    if (!lastName) {
-      newErrors.lastName = 'Last name is required'
-    } else if (lastName.length < 3) {
-      newErrors.lastName = 'Last name must be at least 3 characters'
-    }
-
-    // Email validation
-    if (!email) {
-      newErrors.email = 'Email is required'
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = 'Please enter a valid email'
-    }
-
-    // Password validation
-    if (!password) {
-      newErrors.password = 'Password is required'
-    } else if (password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters'
-    } else if (!/(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$%&*?!#])/.test(password)) {
-      newErrors.password =
-        'Password must contain alphabet, number and special character'
-    }
-
-    // Confirm password validation
-    if (!confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your password'
-    } else if (password !== confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match'
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
-
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setApiError('')
-    setSuccess(false)
-
-    if (!validateForm()) {
-      return
-    }
-
-    setLoading(true)
-
-    try {
-      const response = await fetch('http://localhost:3000/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          firstName,
-          lastName,
-          email,
-          password,
-          confirmPassword,
-        }),
-      })
-
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.message || 'Registration failed')
-      }
-
-      const data = await response.json()
-
-      // Use the auth context to login
-      login(data.accessToken, data.user)
-
-      setSuccess(true)
-
-      // Redirect to home page after 1 second
-      setTimeout(() => {
-        router.push('/')
-      }, 1000)
-    } catch (error) {
-      setApiError(
-        error instanceof Error
-          ? error.message
-          : 'An error occurred during registration'
-      )
-    } finally {
-      setLoading(false)
-    }
-  }
+  const {
+    firstName, setFirstName,
+    lastName, setLastName,
+    email, setEmail,
+    password, setPassword,
+    confirmPassword, setConfirmPassword,
+    showPassword, setShowPassword,
+    showConfirmPassword, setShowConfirmPassword,
+    errors, setErrors,
+    loading, apiError, success,
+    handleSubmit
+  } = useRegister()
 
   return (
     <div className={styles.container}>

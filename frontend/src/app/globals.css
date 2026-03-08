@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   PakSentiment — Global Design System
+   DataInsight — Global Design System
    Modern, elegant, startup-grade UI foundation
    ═══════════════════════════════════════════════════════════ */
 
@@ -95,17 +95,13 @@
 
   /* ── Gradients ── */
   --gradient-primary: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  --gradient-hero: linear-gradient(
-    135deg,
-    #0f172a 0%,
-    #1e293b 50%,
-    #0f172a 100%
-  );
-  --gradient-card: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(16, 185, 129, 0.02) 100%
-  );
+  --gradient-hero: linear-gradient(135deg,
+      #0f172a 0%,
+      #1e293b 50%,
+      #0f172a 100%);
+  --gradient-card: linear-gradient(180deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(16, 185, 129, 0.02) 100%);
   --gradient-accent: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
 
   --disabled-bg: #cbd5e1;
@@ -143,17 +139,13 @@
   --box-shadow: rgba(0, 0, 0, 0.3);
   --box-shadow-hover: rgba(16, 185, 129, 0.4);
 
-  --gradient-hero: linear-gradient(
-    135deg,
-    #0c0f17 0%,
-    #131825 50%,
-    #0c0f17 100%
-  );
-  --gradient-card: linear-gradient(
-    180deg,
-    rgba(22, 27, 46, 0) 0%,
-    rgba(16, 185, 129, 0.03) 100%
-  );
+  --gradient-hero: linear-gradient(135deg,
+      #0c0f17 0%,
+      #131825 50%,
+      #0c0f17 100%);
+  --gradient-card: linear-gradient(180deg,
+      rgba(22, 27, 46, 0) 0%,
+      rgba(16, 185, 129, 0.03) 100%);
 
   --disabled-bg: #334155;
 }
@@ -190,17 +182,13 @@
     --box-shadow: rgba(0, 0, 0, 0.3);
     --box-shadow-hover: rgba(16, 185, 129, 0.4);
 
-    --gradient-hero: linear-gradient(
-      135deg,
-      #0c0f17 0%,
-      #131825 50%,
-      #0c0f17 100%
-    );
-    --gradient-card: linear-gradient(
-      180deg,
-      rgba(22, 27, 46, 0) 0%,
-      rgba(16, 185, 129, 0.03) 100%
-    );
+    --gradient-hero: linear-gradient(135deg,
+        #0c0f17 0%,
+        #131825 50%,
+        #0c0f17 100%);
+    --gradient-card: linear-gradient(180deg,
+        rgba(22, 27, 46, 0) 0%,
+        rgba(16, 185, 129, 0.03) 100%);
 
     --disabled-bg: #334155;
   }
@@ -266,13 +254,16 @@ button {
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
   background: var(--text-muted);
   border-radius: var(--radius-full);
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-secondary);
 }

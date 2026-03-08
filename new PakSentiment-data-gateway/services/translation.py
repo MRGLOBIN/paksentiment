@@ -8,7 +8,7 @@ from groq import Groq
 from langdetect import DetectorFactory, LangDetectException, detect
 
 from config import settings
-from sentiment_classifier import Document
+from .sentiment_classifier import Document
 
 DetectorFactory.seed = 0
 

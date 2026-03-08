@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 
 export interface ChatMessage {
@@ -14,6 +14,7 @@ export interface ChatMessage {
 export class AiService {
     private readonly groqApiUrl = 'https://api.groq.com/openai/v1/chat/completions';
     private readonly model = 'llama-3.3-70b-versatile'; // Llama 3.3 Stable
+    private readonly logger = new Logger(AiService.name);
 
     constructor(private readonly httpService: HttpService) { }
 
@@ -79,7 +80,7 @@ You should:
                 max_tokens: 1024,
             };
 
-            console.log('[AiService.chat] Initial Payload sent');
+            this.logger.log('[chat] Initial Payload sent');
             let response: any = await firstValueFrom(
                 this.httpService.post(this.groqApiUrl, payload, {
                     headers: { Authorization: `Bearer ${apiKey}` },
@@ -90,7 +91,7 @@ You should:
 
             // Handle tool calls if the model decides to use a tool
             if (responseMessage.tool_calls) {
-                console.log('[AiService.chat] Model triggered tool calls:', responseMessage.tool_calls.length);
+                this.logger.log(`[chat] Model triggered tool calls: ${responseMessage.tool_calls.length}`);
 
                 // Append the assistant's tool call message to history
                 currentMessages.push(responseMessage);
@@ -98,7 +99,7 @@ You should:
                 for (const toolCall of responseMessage.tool_calls) {
                     if (toolCall.function.name === 'search_and_crawl_web') {
                         const args = JSON.parse(toolCall.function.arguments);
-                        console.log(`[AiService.chat] Executing search for: "${args.query}"`);
+                        this.logger.log(`[chat] Executing search for: "${args.query}"`);
 
                         let toolResult = "";
                         try {
@@ -111,7 +112,7 @@ You should:
                             if (searchData.success && searchData.results && searchData.results.length > 0) {
                                 // Take top 3 links
                                 const topResults = searchData.results.slice(0, 3);
-                                console.log(`[AiService.chat] Found ${searchData.results.length} results, scraping top ${topResults.length}...`);
+                                this.logger.log(`[chat] Found ${searchData.results.length} results, scraping top ${topResults.length}...`);
 
                                 // 2. Scrape the links
                                 const scrapePromises = topResults.map(async (res: any) => {
@@ -123,7 +124,7 @@ You should:
                                         const text = scrapeReq.data.result?.text || res.snippet;
                                         return `Source: ${res.title} (${res.link})\nContent: ${text.substring(0, 1500)}...\n`;
                                     } catch (err) {
-                                        console.error(`[AiService.chat] Failed to scrape ${res.link}:`, err?.message);
+                                        this.logger.error(`[chat] Failed to scrape ${res.link}: ${err?.message}`);
                                         return `Source: ${res.title} (${res.link})\nContent: ${res.snippet}\n(Failed to fetch full text)\n`;
                                     }
                                 });
@@ -134,7 +135,7 @@ You should:
                                 toolResult = "No search results found.";
                             }
                         } catch (err) {
-                            console.error('[AiService.chat] Tool execution error:', err?.message);
+                            this.logger.error(`[chat] Tool execution error: ${err?.message}`);
                             toolResult = "Error performing web search. Please answer based on your existing knowledge.";
                         }
 
@@ -149,7 +150,7 @@ You should:
                 }
 
                 // Second call to model with tool results
-                console.log('[AiService.chat] Sending tool results back to model...');
+                this.logger.log('[chat] Sending tool results back to model...');
 
                 // Create a new payload without tools to force final answer
                 const finalPayload = {
@@ -171,7 +172,7 @@ You should:
 
             return responseMessage.content;
         } catch (error: any) {
-            console.error('[AiService.chat] Error:', error?.response?.data || error.message);
+            this.logger.error(`[chat] Error: ${JSON.stringify(error?.response?.data || error.message)}`);
             throw new InternalServerErrorException('Failed to get chat response');
         }
     }

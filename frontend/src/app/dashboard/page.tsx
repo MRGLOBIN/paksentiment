@@ -21,8 +21,7 @@ export default function DashboardPage() {
         // Simple hydration delay or check
         setIsChecking(false)
         if (!isAuthenticated && !token) {
-            // Optional: Redirect
-            // router.push('/login')
+            // Unauthenticated state handled by conditional rendering below
         }
     }, [isAuthenticated, token, router])
 
@@ -47,7 +46,7 @@ export default function DashboardPage() {
                     <>
                         <div className={styles.header}>
                             <h1>Welcome back, {user?.fullName}</h1>
-                            <p>Here is a summary of your recent activities on PakSentiment.</p>
+                            <p>Here is a summary of your recent activities on DataInsight.</p>
                         </div>
 
                         <div className={styles.activityCard}>
@@ -79,13 +78,13 @@ export default function DashboardPage() {
                                                             )
                                                         })}
                                                         {/* Add View Results Button for Analysis Activities */}
-                                                        {((activity.action.includes('ANALYZE') || activity.action.includes('SEARCH') || activity.action.includes('PLAN')) && (activity.details.sessionId || activity.details.query)) && (
+                                                        {((activity.action.includes('ANALYZE') || activity.action.includes('SEARCH') || activity.action.includes('PLAN')) && Boolean(activity.details.sessionId || activity.details.query)) && (
                                                             <div style={{ marginTop: '10px' }}>
                                                                 <Link
                                                                     href={
                                                                         activity.details.sessionId
-                                                                            ? `/analytics?sessionId=${activity.details.sessionId}`
-                                                                            : `/analytics?mode=manual&source=database&query=${encodeURIComponent(activity.details.query as string)}`
+                                                                            ? `/analytics?sessionId=${String(activity.details.sessionId)}`
+                                                                            : `/analytics?mode=manual&source=database&query=${encodeURIComponent(String(activity.details.query))}`
                                                                     }
                                                                     className={styles.viewResultsBtn}
                                                                     style={{

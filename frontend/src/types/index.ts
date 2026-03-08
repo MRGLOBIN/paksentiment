@@ -18,7 +18,7 @@ export interface Activity {
     id: number
     userId: number
     action: string
-    details: any
+    details: Record<string, unknown>
     createdAt: string
 }
 
@@ -30,22 +30,24 @@ export interface SentimentResult {
     summary: string
     topic?: string
     engine?: string
-    chunk_results?: any[]
+    chunk_results?: Record<string, unknown>[]
 }
 
 export interface Post {
     id: string
-    title?: string
-    text?: string
+    title: string
+    text: string
     content?: string
-    author?: string
-    url?: string
+    author: string
+    url: string
     timestamp?: string
-    created_utc?: number
+    created_utc: number
     date?: string | number
     sentiment?: string
     confidence?: number
-    metadata?: any
+    subreddit: string
+    score: number
+    metadata?: Record<string, unknown>
 }
 
 export interface AnalysisResult {
@@ -54,10 +56,73 @@ export interface AnalysisResult {
     posts: Post[]
     sentiment: SentimentResult[]
     sessionId?: string
-    plan?: any[]
+    plan?: Record<string, unknown>[]
 }
 
 export interface AnalysisSource {
     id: string
     name: string
+}
+
+export interface TranslationData {
+    id: string
+    language: string
+    translated: boolean
+    translatedText: string | null
+    text_for_sentiment: string
+}
+
+export interface AnalysisResponse {
+    source: string
+    count: number
+    posts: Post[]
+    translations: TranslationData[]
+    sentiment: SentimentResult[]
+}
+
+// UI & Component Types
+export interface PlanFeature {
+    text: string
+    included: boolean
+}
+
+export interface Plan {
+    name: string
+    price: string
+    period: string
+    description: string
+    badge?: string
+    highlighted?: boolean
+    features: PlanFeature[]
+    cta: string
+    ctaVariant: 'outline' | 'primary' | 'gradient'
+}
+
+export interface PaymentModalProps {
+    planName: string
+    price: string
+    onClose: () => void
+    onSuccess: () => void
+}
+
+export interface StripeCheckoutFormProps {
+    price: string
+    onSuccess: () => void
+    setIsProcessing: (val: boolean) => void
+    isProcessing: boolean
+}
+
+// Chat Types
+export interface Message {
+    role: 'user' | 'assistant'
+    content: string
+}
+
+// Form Types
+export interface FormErrors {
+    firstName?: string
+    lastName?: string
+    email?: string
+    password?: string
+    confirmPassword?: string
 }

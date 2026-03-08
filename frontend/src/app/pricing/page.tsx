@@ -9,23 +9,7 @@ import styles from './page.module.scss'
 import { Check, Close, Star } from '@mui/icons-material'
 import { useAuthStore } from '../../store/useAuthStore'
 import { useRouter } from 'next/navigation'
-
-interface PlanFeature {
-  text: string
-  included: boolean
-}
-
-interface Plan {
-  name: string
-  price: string
-  period: string
-  description: string
-  badge?: string
-  highlighted?: boolean
-  features: PlanFeature[]
-  cta: string
-  ctaVariant: 'outline' | 'primary' | 'gradient'
-}
+import { Plan, PlanFeature } from '../../types'
 
 const PLANS: Plan[] = [
   {

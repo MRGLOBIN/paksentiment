@@ -35,9 +35,7 @@ export class PaymentsService {
                 currency: 'usd',
                 metadata: {
                     planName: planName
-                },
-                // In a real app, you might also pass a customer ID if you are attaching it to a specific user
-                // customer: user.stripeCustomerId 
+                }
             });
 
             return {

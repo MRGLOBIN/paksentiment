@@ -2,7 +2,7 @@ import logging
 from typing import Any, Dict, List, Tuple
 from fastapi import HTTPException
 from paksentiment_scraper import RedditScraperClient
-from sentiment_classifier import Document, AnalysisModelSentimentClassifier
+from .sentiment_classifier import Document, AnalysisModelSentimentClassifier
 
 logger = logging.getLogger(__name__)
 

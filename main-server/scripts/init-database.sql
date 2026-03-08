@@ -9,7 +9,9 @@ WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'paksentiment')\gexec
 -- Note: TypeORM will automatically create all tables when synchronize: true is enabled
 -- Tables that will be created:
 -- - users
+-- - identities
 -- - user_preferences
+-- - user_activities
 -- - api_keys
 -- - system_configs
 

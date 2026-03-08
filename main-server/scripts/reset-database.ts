@@ -27,6 +27,7 @@ async function resetDatabase() {
       'user_activities',
       'api_keys',
       'user_preferences',
+      'identities',
       'users',
       'system_configs',
     ];

@@ -3,7 +3,7 @@ import msgspec
 from typing import Any, Dict, List, Optional
 from fastapi import HTTPException
 from paksentiment_scraper import CommonCrawlScraperClient
-from sentiment_classifier import Document, AnalysisModelSentimentClassifier
+from .sentiment_classifier import Document, AnalysisModelSentimentClassifier
 
 logger = logging.getLogger(__name__)
 

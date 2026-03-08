@@ -75,9 +75,8 @@ class GroqSentimentClassifier:
                     
             except RateLimitError as e:
                 print(f"⚠️ Groq Rate Limit detected on batch {i // batch_size + 1}: {e}")
-            except RateLimitError as e:
-                print(f"⚠️ Groq Rate Limit detected on batch {i // batch_size + 1}: {e}")
-                continue
+                # print(f"⚠️ Groq Rate Limit detected on batch {i // batch_size + 1}: {e}")
+                # continue
 
             except Exception as exc:
                 print(f"Error processing batch {i // batch_size + 1}: {exc}")

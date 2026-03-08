@@ -9,8 +9,16 @@ import {
     Logger,
     HttpCode,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '../auth/auth.guard';
+import {
+    ScrapeDocs,
+    CrawlDocs,
+    ScrapeHeadlessDocs,
+    GetResultsDocs,
+    CacheStatsDocs,
+    SidecarHealthDocs
+} from './crawler.docs';
 import { CrawlerService } from './crawler.service';
 
 @ApiTags('Crawler')
@@ -26,25 +34,7 @@ export class CrawlerController {
      * Scrape a single page via Go Colly sidecar (fast, static HTML).
      */
     @Post('scrape')
-    @ApiOperation({
-        summary: 'Scrape Single Page (Colly)',
-        description: 'Fetches a single page using the high-performance Go Colly sidecar. Best for static HTML pages.',
-    })
-    @ApiBody({
-        schema: {
-            type: 'object',
-            properties: {
-                url: { type: 'string', example: 'https://example.com' },
-                selectors: {
-                    type: 'object',
-                    example: { title: 'h1', content: 'article' },
-                    description: 'Optional CSS selectors to extract specific elements',
-                },
-            },
-            required: ['url'],
-        },
-    })
-    @ApiResponse({ status: 201, description: 'Scrape completed successfully' })
+    @ScrapeDocs()
     async scrape(
         @Body('url') url: string,
         @Body('selectors') selectors?: Record<string, string>,
@@ -58,28 +48,7 @@ export class CrawlerController {
      */
     @Post('crawl')
     @HttpCode(202)
-    @ApiOperation({
-        summary: 'Deep Crawl (Colly)',
-        description: 'Performs a multi-page deep crawl using Go Colly with configurable depth, limits, and domain restrictions.',
-    })
-    @ApiBody({
-        schema: {
-            type: 'object',
-            properties: {
-                url: { type: 'string', example: 'https://example.com' },
-                max_depth: { type: 'number', example: 2 },
-                limit: { type: 'number', example: 20 },
-                allowed_domains: {
-                    type: 'array',
-                    items: { type: 'string' },
-                    example: ['example.com'],
-                },
-                delay_ms: { type: 'number', example: 100 },
-            },
-            required: ['url'],
-        },
-    })
-    @ApiResponse({ status: 202, description: 'Crawl job started securely in the background. Polling session UUID returned.' })
+    @CrawlDocs()
     async crawl(
         @Body('url') url: string,
         @Body('max_depth') maxDepth?: number,
@@ -95,22 +64,7 @@ export class CrawlerController {
      * Scrape via Python headless browser for JS-heavy sites.
      */
     @Post('scrape-headless')
-    @ApiOperation({
-        summary: 'Scrape with Headless Browser (Python)',
-        description: 'Uses the Python FastAPI/Scrapling backend for sites that require JavaScript rendering.',
-    })
-    @ApiBody({
-        schema: {
-            type: 'object',
-            properties: {
-                url: { type: 'string', example: 'https://spa-example.com' },
-                follow_links: { type: 'boolean', example: false },
-                limit: { type: 'number', example: 3 },
-            },
-            required: ['url'],
-        },
-    })
-    @ApiResponse({ status: 201, description: 'Headless scrape completed' })
+    @ScrapeHeadlessDocs()
     async scrapeHeadless(
         @Body('url') url: string,
         @Body('follow_links') followLinks?: boolean,
@@ -124,11 +78,7 @@ export class CrawlerController {
      * Retrieve crawl job results from MongoDB.
      */
     @Get('results/:sessionId')
-    @ApiOperation({
-        summary: 'Get Crawl Results',
-        description: 'Retrieve stored crawl job results by session ID.',
-    })
-    @ApiResponse({ status: 200, description: 'Crawl job data' })
+    @GetResultsDocs()
     async getResults(@Param('sessionId') sessionId: string) {
         const job = await this.crawlerService.getJobBySession(sessionId);
         if (!job) {
@@ -141,10 +91,7 @@ export class CrawlerController {
      * Get Go sidecar cache statistics.
      */
     @Get('cache/stats')
-    @ApiOperation({
-        summary: 'Cache Statistics',
-        description: 'Returns Redis cache hit/miss statistics from the Go sidecar.',
-    })
+    @CacheStatsDocs()
     async cacheStats() {
         return this.crawlerService.getCacheStats();
     }
@@ -153,10 +100,7 @@ export class CrawlerController {
      * Health check for the Go sidecar.
      */
     @Get('health')
-    @ApiOperation({
-        summary: 'Sidecar Health',
-        description: 'Checks if the Go Colly sidecar is running and healthy.',
-    })
+    @SidecarHealthDocs()
     async sidecarHealth() {
         return this.crawlerService.getSidecarHealth();
     }

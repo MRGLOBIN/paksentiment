@@ -1,5 +1,6 @@
 import { Body, Controller, Post, UseGuards, Request } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { ChatDocs, TranslateDocs } from './ai.docs';
 import { AiService, ChatMessage } from './ai.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { ActivityService } from '../activity/activity.service';
@@ -46,11 +47,7 @@ export class AiController {
     ) { }
 
     @Post('chat')
-    @ApiOperation({
-        summary: 'Chat with Pakistani AI Assistant',
-        description: 'Send messages to get responses in Pakistani style. Supports Urdu, Pashto, Punjabi, Saraiki, and English.',
-    })
-    @ApiBody({ type: ChatDto })
+    @ChatDocs()
     async chat(@Body() dto: ChatDto, @Request() req) {
         await this.activityService.logActivity(req.user.sub, 'AI_CHAT', {
             messageCount: dto.messages.length,
@@ -61,11 +58,7 @@ export class AiController {
     }
 
     @Post('translate')
-    @ApiOperation({
-        summary: 'Translate Pakistani languages to English',
-        description: 'Translate text from Urdu, Pashto, Punjabi, Saraiki, Sindhi, or Balochi to English.',
-    })
-    @ApiBody({ type: TranslateDto })
+    @TranslateDocs()
     async translate(@Body() dto: TranslateDto, @Request() req) {
         await this.activityService.logActivity(req.user.sub, 'AI_TRANSLATE', {
             textLength: dto.text.length,

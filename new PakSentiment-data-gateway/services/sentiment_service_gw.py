@@ -1,7 +1,7 @@
 import logging
 from typing import Any, Dict, List, Optional
 from fastapi import HTTPException
-from sentiment_classifier import Document, AnalysisModelSentimentClassifier
+from .sentiment_classifier import Document, AnalysisModelSentimentClassifier
 
 logger = logging.getLogger(__name__)
 

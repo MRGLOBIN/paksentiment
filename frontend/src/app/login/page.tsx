@@ -16,85 +16,18 @@ import { Visibility, VisibilityOff } from '@mui/icons-material'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import styles from './login.module.scss'
-import { useAuthStore } from '../../store/useAuthStore'
-
-interface FormErrors {
-  email?: string
-  password?: string
-}
+import { useLogin } from './useLogin'
 
 const LoginPage = () => {
   const theme = useTheme()
-  const router = useRouter()
-  const { login } = useAuthStore()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [errors, setErrors] = useState<FormErrors>({})
-  const [loading, setLoading] = useState(false)
-  const [apiError, setApiError] = useState('')
-
-  const validateForm = (): boolean => {
-    const newErrors: FormErrors = {}
-
-    // Email validation
-    if (!email) {
-      newErrors.email = 'Email is required'
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = 'Please enter a valid email'
-    }
-
-    // Password validation
-    if (!password) {
-      newErrors.password = 'Password is required'
-    } else if (password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters'
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
-
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setApiError('')
-
-    if (!validateForm()) {
-      return
-    }
-
-    setLoading(true)
-
-    try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
-      const response = await fetch(`${apiUrl}/auth/login-with-email-password`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      })
-
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.message || 'Login failed')
-      }
-
-      const data = await response.json()
-
-      // Use the auth context to login
-      login(data.accessToken, data.user)
-      router.push('/dashboard')
-    } catch (error) {
-      setApiError(
-        error instanceof Error
-          ? error.message
-          : 'An error occurred during login',
-      )
-    } finally {
-      setLoading(false)
-    }
-  }
+  const {
+    email, setEmail,
+    password, setPassword,
+    showPassword, setShowPassword,
+    errors, setErrors,
+    loading, apiError,
+    handleSubmit
+  } = useLogin()
 
   return (
     <div className={styles.container}>

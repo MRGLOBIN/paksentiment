@@ -97,8 +97,8 @@ export function useAnalytics({ token, apiUrl }: UseAnalyticsProps) {
               mergedResult.posts.push(...(result.posts || []))
               mergedResult.sentiment.push(...(result.sentiment || []))
               mergedResult.count += result.count || 0
-            } catch (urlErr: any) {
-              console.warn(`Failed to process ${urls[i]}: ${urlErr.message}`)
+            } catch (urlErr: unknown) {
+              console.warn(`Failed to process ${urls[i]}: ${urlErr instanceof Error ? urlErr.message : String(urlErr)}`)
             }
           }
 
@@ -122,10 +122,10 @@ export function useAnalytics({ token, apiUrl }: UseAnalyticsProps) {
           const smartData = await smartRes.json()
 
           // Normalize posts to ensure consistent author and text fields
-          const normalizedPosts = (smartData.posts || []).map((p: any) => ({
+          const normalizedPosts = (smartData.posts || []).map((p: Record<string, unknown>) => ({
             ...p,
             author: p.author || (() => {
-              try { return p.url ? new URL(p.url).hostname : 'Unknown System' } catch { return 'Unknown System' }
+              try { return p.url ? new URL(String(p.url)).hostname : 'Unknown System' } catch { return 'Unknown System' }
             })(),
             text: p.text || p.content || '',
           }))
@@ -153,8 +153,8 @@ export function useAnalytics({ token, apiUrl }: UseAnalyticsProps) {
           setSearchData(result)
           if (result.sessionId) setSessionId(result.sessionId)
         }
-      } catch (err: any) {
-        setError(err.message)
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : String(err))
       } finally {
         setLoading(false)
         setStatusMsg('')
@@ -214,9 +214,9 @@ async function fetchSource(
   overrideSessionId?: string,
 ): Promise<AnalysisResult> {
   let endpoint = ''
-  let body: any = {}
+  let body: Record<string, unknown> = {}
 
-  const addTags = (b: any) => {
+  const addTags = (b: Record<string, unknown>) => {
     if (customTags) b.customTags = customTags
     if (overrideSessionId) b.overrideSessionId = overrideSessionId
     return b
@@ -280,7 +280,7 @@ async function fetchSource(
   if (src === 'reddit_sentiment') {
     normalizedData.count = json.count || (json.posts ? json.posts.length : 0)
     normalizedData.posts =
-      json.posts?.map((p: any) => ({
+      json.posts?.map((p: Record<string, unknown>) => ({
         ...p,
         author: p.author || 'Reddit User',
       })) || []
@@ -288,17 +288,17 @@ async function fetchSource(
   } else if (src === 'twitter_sentiment') {
     normalizedData.count = json.count || (json.tweets ? json.tweets.length : 0)
     normalizedData.posts =
-      (json.tweets || json.posts)?.map((t: any) => ({
+      (json.tweets || json.posts)?.map((t: Record<string, unknown>) => ({
         ...t,
         author: t.author_id
-          ? `User ${t.author_id.substring(0, 8)}`
+          ? `User ${String(t.author_id).substring(0, 8)}`
           : 'Twitter User',
       })) || []
     normalizedData.sentiment = json.sentiment || []
   } else if (src === 'web') {
     normalizedData.count = json.count || (json.posts ? json.posts.length : 0)
     normalizedData.posts =
-      json.posts?.map((p: any) => ({
+      json.posts?.map((p: Record<string, unknown>) => ({
         ...p,
         text: p.content || p.text,
       })) || []
@@ -307,14 +307,14 @@ async function fetchSource(
     normalizedData.count =
       json.count || (json.records ? json.records.length : 0)
     normalizedData.posts =
-      json.records?.map((r: any) => ({
+      json.records?.map((r: Record<string, unknown>) => ({
         ...r,
         text: r.text || r.content,
         author:
           r.author ||
           (() => {
             try {
-              return new URL(r.url).hostname
+              return new URL(String(r.url)).hostname
             } catch {
               return 'Web Source'
             }

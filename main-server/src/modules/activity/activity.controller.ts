@@ -1,5 +1,6 @@
 import { Controller, Get, Query, Request, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
+import { GetMyActivitiesDocs } from './activity.docs';
 import { AuthGuard } from '../auth/auth.guard';
 import { ActivityService } from './activity.service';
 
@@ -13,8 +14,7 @@ export class ActivityController {
 
     @Get('me')
     @UseGuards(AuthGuard)
-    @ApiBearerAuth()
-    @ApiOperation({ summary: 'Get current user activity history' })
+    @GetMyActivitiesDocs()
     async getMyActivities(
         @Request() req,
         @Query('limit') limit?: number,

@@ -5,21 +5,15 @@ import { Elements, CardNumberElement, CardExpiryElement, CardCvcElement, useStri
 import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js'
 import { useTheme } from '../providers/ThemeProvider'
 import styles from './PaymentModal.module.scss'
+import { PaymentModalProps, StripeCheckoutFormProps } from '../../types'
 
 // Initialize Stripe outside of component to avoid recreating the object
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_sample')
 
-interface PaymentModalProps {
-    planName: string
-    price: string
-    onClose: () => void
-    onSuccess: () => void
-}
-
 /**
  * Stripe Checkout Form Component
  */
-const StripeCheckOutForm = ({ price, onSuccess, setIsProcessing, isProcessing }: any) => {
+const StripeCheckOutForm = ({ price, onSuccess, setIsProcessing, isProcessing }: StripeCheckoutFormProps) => {
     const stripe = useStripe()
     const elements = useElements()
     const [error, setError] = useState<string | null>(null)
@@ -204,7 +198,7 @@ export default function PaymentModal({
                                             }
                                         }}
                                         onCancel={() => {
-                                            console.log("PayPal Checkout Canceled")
+                                            // Handle cancellation
                                         }}
                                         onError={(err) => {
                                             console.error("PayPal Error:", err)

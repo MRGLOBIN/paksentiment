@@ -16,7 +16,7 @@ from paksentiment_scraper import (
     CommonCrawlScraperClient,
     ScraplingClient,
 )
-from sentiment_classifier import get_analysis_model
+from services.sentiment_classifier import get_analysis_model
 from models.schemas import HealthCheckResponse
 from routes import (
     reddit,
