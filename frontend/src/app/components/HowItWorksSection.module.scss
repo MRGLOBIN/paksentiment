@@ -38,7 +38,7 @@ $border: var(--border-color);
     gap: 2rem;
     position: relative;
 
-    @media (max-width: 800px) {
+    @media (max-width: 1024px) {
         grid-template-columns: 1fr;
         gap: 3rem;
     }
@@ -97,7 +97,7 @@ $border: var(--border-color);
     transform: translateY(-50%);
     z-index: 10;
 
-    @media (max-width: 800px) {
+    @media (max-width: 1024px) {
         display: none;
     }
 }

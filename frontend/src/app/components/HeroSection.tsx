@@ -9,7 +9,7 @@ export default function HeroSection() {
       <div className={styles.heroContent}>
         <div className={styles.textContent}>
           <h1 className={styles.title}>
-            AI-Powered Sentiment Analysis for Pakistan&apos;s Digital Landscape
+            AI-Powered Sentiment Analysis for the Global Digital Landscape
           </h1>
           <p className={styles.subtitle}>
             Monitor public sentiment, detect security risks, and gain real-time
@@ -23,7 +23,7 @@ export default function HeroSection() {
           <div className={styles.dashboardFrame}>
             <div className={styles.dashboardHeader}>
               <div className={styles.headerLeft}>
-                <span className={styles.logo}>PakSentiment</span>
+                <span className={styles.logo}>DataInsight</span>
               </div>
               <div className={styles.headerRight}>
                 <span className={styles.menuItem}>Dashboard</span>

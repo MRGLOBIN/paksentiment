@@ -1,0 +1,11 @@
+[project]
+name = "paksentiment-workspace"
+version = "0.1.0"
+description = "A unified workspace for the Data Gateway and Scraper"
+requires-python = ">=3.12"
+
+[workspace]
+members = [
+    "PakSentiment-scraper",
+    "new PakSentiment-data-gateway"
+]

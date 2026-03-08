@@ -28,10 +28,10 @@ export default function Footer() {
                   />
                 </svg>
               </div>
-              <h3 className={styles.brandName}>PakSentiment</h3>
+              <h3 className={styles.brandName}>DataInsight</h3>
             </div>
             <p className={styles.brandDescription}>
-              AI-powered governance monitoring for Pakistan&apos;s digital
+              AI-powered trend monitoring for the global digital
               landscape.
             </p>
           </div>
@@ -59,7 +59,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Languages Section */}
           <div className={styles.footerSection}>
             <h4 className={styles.sectionTitle}>Languages</h4>
             <ul className={styles.linkList}>
@@ -67,38 +66,36 @@ export default function Footer() {
                 <Link href='/languages/english'>English</Link>
               </li>
               <li>
-                <Link href='/languages/urdu'>Urdu (اردو)</Link>
+                <Link href='/languages/spanish'>Spanish</Link>
               </li>
               <li>
-                <Link href='/languages/punjabi'>Punjabi</Link>
+                <Link href='/languages/french'>French</Link>
               </li>
               <li>
-                <Link href='/languages/pashto'>Pashto (پښتو)</Link>
+                <Link href='/languages/mandarin'>Mandarin</Link>
               </li>
             </ul>
           </div>
 
-          {/* Contact Section */}
           <div className={styles.footerSection}>
             <h4 className={styles.sectionTitle}>Contact</h4>
             <ul className={styles.contactList}>
               <li>
-                <a href='mailto:support@paksentiment.gov.pk'>
-                  support@paksentiment.gov.pk
+                <a href='mailto:hello@datainsight.io'>
+                  hello@datainsight.io
                 </a>
               </li>
               <li>
-                <a href='tel:+92511234567'>+92 51 1234567</a>
+                <a href='tel:+18001234567'>+1 800 123 4567</a>
               </li>
-              <li>Islamabad, Pakistan</li>
+              <li>San Francisco, CA</li>
             </ul>
           </div>
         </div>
 
-        {/* Footer Bottom */}
         <div className={styles.footerBottom}>
           <p className={styles.copyright}>
-            © 2025 PakSentiment Governance Monitor. All rights reserved.
+            © 2026 DataInsight Analytics. All rights reserved.
           </p>
         </div>
       </div>

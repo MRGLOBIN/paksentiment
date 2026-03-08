@@ -21,18 +21,19 @@ class CommonCrawlService:
         self.client = client
         self.classifier = classifier
 
-    async def fetch_records(self, limit: int, domain: str | None = None, crawl_id: str | None = None) -> List[Dict[str, Any]]:
+    async def fetch_records(self, limit: int, domain: str | None = None, crawl_id: str | None = None, keyword: str | None = None) -> List[Dict[str, Any]]:
         """
         Fetch records from CommonCrawl.
 
         :param limit: Max records.
         :param domain: Filter by domain.
         :param crawl_id: Optional specific crawl ID.
+        :param keyword: Optional keyword to filter slugs by.
         :return: List of record dictionaries.
         """
         try:
             if domain:
-                records = await self.client.fetch_wet_records_by_domain(domain, limit, crawl_id)
+                records = await self.client.fetch_wet_records_by_domain(domain, limit, crawl_id, keyword)
             else:
                 records = await self.client.fetch_wet_records(limit, crawl_id)
             
@@ -41,18 +42,19 @@ class CommonCrawlService:
             logger.exception(f"CommonCrawl fetch error: {exc}")
             raise HTTPException(status_code=500, detail=str(exc)) from exc
 
-    async def fetch_with_sentiment(self, domain: str, limit: int, crawl_id: str | None = None) -> Dict[str, Any]:
+    async def fetch_with_sentiment(self, domain: str, limit: int, crawl_id: str | None = None, keyword: str | None = None) -> Dict[str, Any]:
         """
         Fetch records and perform sentiment analysis.
 
         :param domain: Target domain.
         :param limit: Max records.
         :param crawl_id: Optional crawl ID.
+        :param keyword: Optional keyword to filter slugs by.
         :return: Dictionary with records and sentiment analysis.
         """
         try:
             # 1. Fetch Records
-            records = await self.fetch_records(limit, domain, crawl_id)
+            records = await self.fetch_records(limit, domain, crawl_id, keyword)
             
             # 2. Process Sentiment
             docs = [

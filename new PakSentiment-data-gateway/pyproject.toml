@@ -6,7 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi[standard]>=0.119.0",
-    "paksentiment-scraper @ file:///Users/mrgoblin/workspace/uni/fyp/new%20current/PakSentiment-scraper",
+    "paksentiment-scraper",
     "google-generativeai>=0.8.3",
     "dynaconf>=3.2.5",
     "langdetect>=1.0.9",

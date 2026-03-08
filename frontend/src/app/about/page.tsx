@@ -20,10 +20,10 @@ export default function AboutPage() {
             <main className={styles.mainContent}>
                 {/* Hero Section */}
                 <section className={styles.hero}>
-                    <h1>About PakSentiment</h1>
+                    <h1>About DataInsight</h1>
                     <p>
-                        An advanced AI-powered platform designed to analyze the digital
-                        pulse of Pakistan. utilizing state-of-the-art machine learning to
+                        An advanced AI-powered platform designed to analyze the global
+                        pulse. Utilizing state-of-the-art machine learning to
                         decode public sentiment across social media and the web.
                     </p>
                 </section>
@@ -38,8 +38,8 @@ export default function AboutPage() {
                             </div>
                             <h3>Advanced AI Analysis</h3>
                             <p>
-                                Leveraging local Large Language Models (LLMs) like the Analysis Model (Flan-T5)
-                                to accurately interpret context, sarcasm, and local languages including Urdu.
+                                Leveraging Large Language Models (LLMs) like the Analysis Model (Flan-T5)
+                                to accurately interpret context, sarcasm, and global languages.
                             </p>
                         </div>
 
@@ -94,8 +94,8 @@ export default function AboutPage() {
                         <School fontSize="large" style={{ color: '#059669', marginBottom: '1rem' }} />
                         <h2>Final Year Project</h2>
                         <p>
-                            PakSentiment is developed as a Final Year Project (FYP) for university,
-                            aiming to bridge the gap in localized social listening tools for the Pakistani market.
+                            DataInsight is developed as a Final Year Project (FYP) for university,
+                            aiming to bridge the gap in advanced global social listening tools.
                             It represents a culmination of research in Natural Language Processing,
                             Distributed Systems, and Full-Stack Development.
                         </p>

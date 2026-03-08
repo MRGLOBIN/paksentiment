@@ -263,15 +263,17 @@ export class RawDataController {
     @Body('customTags') customTags: string,
     @Request() req,
   ) {
-    await this.activityService.logActivity(req.user.sub, 'SMART_SEARCH', {
-      query,
-      customTags,
-    });
-    return await this.rawDataService.executeSmartSearch(
+    const result = await this.rawDataService.executeSmartSearch(
       query,
       req.user.sub,
       customTags,
     );
+    await this.activityService.logActivity(req.user.sub, 'SMART_SEARCH', {
+      query,
+      customTags,
+      sessionId: result.sessionId,
+    });
+    return result;
   }
 
   @Post('ai-links')

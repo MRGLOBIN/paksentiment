@@ -82,6 +82,55 @@ const TOPIC_COLORS: Record<string, string> = {
 }
 
 // ============ COMPONENT ============
+const getSafeString = (val: any, defaultStr = '—'): string => {
+    if (!val) return defaultStr;
+    if (typeof val === 'string') return val;
+    if (typeof val === 'number') return val.toString();
+    if (typeof val === 'object') {
+        if (typeof val.label === 'string') return val.label;
+        if (typeof val.sentiment === 'string') return val.sentiment;
+        if (typeof val.topic === 'string') return val.topic;
+        if (typeof val.value === 'string') return val.value;
+        if (typeof val.summary === 'string') return val.summary;
+        return defaultStr;
+    }
+    return String(val)
+}
+
+const getSentimentString = (val: any): string => {
+    let s = getSafeString(val, 'Neutral').trim();
+    if (s === '—') return 'Neutral';
+    const lower = s.toLowerCase();
+    if (lower.includes('positive')) return 'Positive';
+    if (lower.includes('negative')) return 'Negative';
+    if (lower.includes('neutral')) return 'Neutral';
+
+    // If it's a huge hallucinated sentence, fallback to Neutral
+    if (s.length > 20 || s.includes(' ')) {
+        return 'Neutral';
+    }
+    return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+}
+
+const getConfidenceValue = (val: any, defaultConf = 0.8): number => {
+    if (typeof val === 'number') return val;
+    if (val && typeof val === 'object' && typeof val.score === 'number') return val.score;
+    if (val && typeof val === 'object' && typeof val.confidence === 'number') return val.confidence;
+    return defaultConf;
+}
+
+const sanitizeTopic = (raw: any): string => {
+    let t = getSafeString(raw, 'General').trim();
+    if (t === '—') return t;
+    // If it's a URL, contains markdown, or is very long, extract the first real word
+    if (t.length > 25 || t.includes(' ') || t.includes('http') || t.includes('[')) {
+        const match = t.match(/[a-zA-Z]{3,}/);
+        t = match ? match[0] : 'General';
+    }
+    t = t.substring(0, 15);
+    return t.charAt(0).toUpperCase() + t.slice(1).toLowerCase();
+}
+
 export default function AnalysisDashboard({ data }: AnalysisDashboardProps) {
     const [selectedPost, setSelectedPost] = useState<Post | null>(null)
     const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null)
@@ -89,15 +138,17 @@ export default function AnalysisDashboard({ data }: AnalysisDashboardProps) {
     // ============ EXPORT HANDLERS ============
     const getExportData = () => {
         return data.posts?.map((post, idx) => {
-            const sentiment = data.sentiment?.find(s => s.id === post.id)
+            const sentimentObj = data.sentiment?.find(s => s.id === post.id)
+            const rawSentiment = post.sentiment || sentimentObj?.sentiment
+
             return {
                 Date: post.timestamp ? new Date(post.timestamp).toLocaleString() : (post.created_utc ? new Date(post.created_utc * 1000).toLocaleString() : 'N/A'),
                 'User Name': post.author || 'Unknown',
                 Source: post.url?.includes('reddit') ? 'Reddit' : (post.url?.includes('youtube') ? 'YouTube' : (post.url?.includes('twitter') ? 'Twitter' : 'Web')),
                 Content: (post.text || post.content || post.title || '').replace(/[\n\r]+/g, ' ').substring(0, 500),
-                Sentiment: post.sentiment || sentiment?.sentiment || 'N/A',
-                'Context/Topic': sentiment?.summary || 'N/A',
-                Confidence: ((post.confidence || sentiment?.confidence || 0) * 100).toFixed(1) + '%',
+                Sentiment: getSentimentString(rawSentiment),
+                'Context/Topic': sentimentObj?.summary || 'N/A',
+                Confidence: ((post.confidence || sentimentObj?.confidence || getConfidenceValue(rawSentiment, 0)) * 100).toFixed(1) + '%',
                 URL: post.url || 'N/A'
             }
         }) || []
@@ -180,12 +231,17 @@ export default function AnalysisDashboard({ data }: AnalysisDashboardProps) {
         const uniqueAuthors = new Set(data.posts?.map(p => p.author).filter(Boolean)).size
 
         // Sentiment/Topic counts
-        const sentimentSource = data.sentiment || data.posts?.filter(p => p.sentiment).map(p => ({
-            id: p.id,
-            sentiment: p.sentiment!,
-            confidence: p.confidence || 0.8,
+        const sentimentSource = (data.sentiment || data.posts?.filter(p => p.sentiment).map(p => ({
+            id: p.id || '',
+            sentiment: p.sentiment,
+            confidence: p.confidence,
             summary: ''
-        })) || []
+        })) || []).map(s => ({
+            id: s.id,
+            sentiment: getSentimentString(s.sentiment),
+            confidence: s.confidence ?? getConfidenceValue(s.sentiment),
+            summary: s.summary
+        }))
 
         const topicCounts = sentimentSource.reduce((acc, curr) => {
             acc[curr.sentiment] = (acc[curr.sentiment] || 0) + 1
@@ -294,22 +350,29 @@ export default function AnalysisDashboard({ data }: AnalysisDashboardProps) {
         const counts: Record<string, number> = {}
         const sentiments = data.sentiment || []
         sentiments.forEach((s: any) => {
-            const topic = s.topic || 'General'
+            const topic = sanitizeTopic(s.topic)
             counts[topic] = (counts[topic] || 0) + 1
         })
         return counts
     }, [data.sentiment])
 
-    const realTopicChartData = useMemo(() =>
-        Object.entries(realTopicCounts)
+    const realTopicChartData = useMemo(() => {
+        const sorted = Object.entries(realTopicCounts)
             .map(([name, value]) => ({
                 name,
                 value,
                 color: TOPIC_COLOR_MAP[name.toLowerCase()] || COLORS.primary
             }))
-            .sort((a, b) => b.value - a.value),
-        [realTopicCounts]
-    )
+            .sort((a, b) => b.value - a.value);
+
+        if (sorted.length > 6) {
+            const top5 = sorted.slice(0, 5);
+            const others = sorted.slice(5).reduce((sum, item) => sum + item.value, 0);
+            top5.push({ name: 'Other', value: others, color: '#9CA3AF' });
+            return top5;
+        }
+        return sorted;
+    }, [realTopicCounts])
 
     const uniqueTopicCount = Object.keys(realTopicCounts).length
 
@@ -401,14 +464,24 @@ export default function AnalysisDashboard({ data }: AnalysisDashboardProps) {
                 </div>
                 <DataGrid
                     rows={data.posts?.map((post, idx) => {
-                        const sentiment = data.sentiment?.find(s => s.id === post.id)
+                        const sentimentObj = data.sentiment?.find(s => s.id === post.id)
+                        const rawSentimentValue = sentimentObj?.sentiment || post.sentiment;
+
+                        let safeSummary = getSafeString(sentimentObj?.summary, '');
+                        if (!safeSummary) {
+                            safeSummary = getSafeString(post.title, '');
+                            if (!safeSummary) {
+                                safeSummary = getSafeString(post.text || post.content, '').substring(0, 200) + '...';
+                            }
+                        }
+
                         return {
                             id: post.id || idx,
-                            source: post.author || 'Unknown',
-                            topic: sentiment?.topic || '—',
-                            summary: sentiment?.summary || post.title || (post.text || post.content || '').substring(0, 200) + '...',
-                            sentiment: sentiment?.sentiment || post.sentiment || '—',
-                            confidence: sentiment?.confidence ?? post.confidence ?? null,
+                            source: getSafeString(post.author, 'Unknown'),
+                            topic: sanitizeTopic(sentimentObj?.topic),
+                            summary: safeSummary,
+                            sentiment: getSafeString(rawSentimentValue, '—'),
+                            confidence: sentimentObj?.confidence ?? post.confidence ?? getConfidenceValue(rawSentimentValue, 0),
                             fullPost: post
                         }
                     }) || []}
@@ -440,7 +513,7 @@ export default function AnalysisDashboard({ data }: AnalysisDashboardProps) {
                             flex: 0.7,
                             minWidth: 110,
                             renderCell: (params) => {
-                                const val = (params.value || '').toLowerCase()
+                                const val = String(params.value || '').toLowerCase()
                                 const color = val.includes('positive') ? '#10b981'
                                     : val.includes('negative') ? '#ef4444'
                                         : '#6b7280'
@@ -704,9 +777,9 @@ export default function AnalysisDashboard({ data }: AnalysisDashboardProps) {
                                     <Chip label={`Author: ${selectedPost.author || 'Unknown'}`} variant="outlined" />
                                     {selectedPost.sentiment && (
                                         <Chip
-                                            label={`Sentiment: ${selectedPost.sentiment}`}
+                                            label={`Sentiment: ${getSentimentString(selectedPost.sentiment)}`}
                                             sx={{
-                                                backgroundColor: TOPIC_COLORS[selectedPost.sentiment.toLowerCase()] || COLORS.neutral,
+                                                backgroundColor: TOPIC_COLORS[getSentimentString(selectedPost.sentiment).toLowerCase()] || COLORS.neutral,
                                                 color: '#fff'
                                             }}
                                         />

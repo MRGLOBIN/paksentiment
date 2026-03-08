@@ -109,17 +109,17 @@ export default function ChatPage() {
                 ) : (
                     <>
                         <div className={styles.header}>
-                            <h1>🇵🇰 Pakistani AI Assistant</h1>
-                            <p>Chat in Urdu, Pashto, Punjabi, Saraiki, or English!</p>
+                            <h1>🌐 Global AI Assistant</h1>
+                            <p>Chat in Spanish, French, Mandarin, Arabic, or English!</p>
                         </div>
 
                         <div className={styles.chatContainer}>
                             <div className={styles.messages}>
                                 {messages.length === 0 && (
                                     <div className={`${styles.message} ${styles.assistant}`}>
-                                        Assalam o Alaikum! 👋 Main aap ki kya madad kar sakta/sakti hoon?
+                                        Hello! 👋 How can I help you today?
                                         <br /><br />
-                                        Feel free to chat in Urdu, Pashto, Punjabi, Saraiki, or English!
+                                        Feel free to chat in Spanish, French, Mandarin, Arabic, or English!
                                     </div>
                                 )}
                                 {messages.map((msg, idx) => (
@@ -141,7 +141,7 @@ export default function ChatPage() {
                             <div className={styles.inputArea}>
                                 <input
                                     type="text"
-                                    placeholder="Type your message... (Urdu, Pashto, Punjabi, English)"
+                                    placeholder="Type your message... (English, Spanish, French, etc.)"
                                     value={input}
                                     onChange={e => setInput(e.target.value)}
                                     onKeyPress={handleKeyPress}
@@ -158,10 +158,10 @@ export default function ChatPage() {
                         </div>
 
                         <div className={styles.languageHint}>
-                            <span>اردو</span>
-                            <span>پشتو</span>
-                            <span>پنجابی</span>
-                            <span>سرائیکی</span>
+                            <span>Español</span>
+                            <span>Français</span>
+                            <span>中文</span>
+                            <span>العربية</span>
                             <span>English</span>
                         </div>
                     </>
