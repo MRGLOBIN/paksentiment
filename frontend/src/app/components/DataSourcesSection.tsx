@@ -18,7 +18,7 @@ export default function DataSourcesSection() {
                 <div className={styles.header}>
                     <h2 className={styles.title}>Data Sources</h2>
                     <p className={styles.subtitle}>
-                        Comprehensive coverage across Pakistan&apos;s digital landscape
+                        Comprehensive coverage across the global digital landscape
                     </p>
                 </div>
 

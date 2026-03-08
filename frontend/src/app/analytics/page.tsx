@@ -27,7 +27,7 @@ const SOURCES = [
     description: 'Analyze sentiment from Reddit communities and discussions',
     icon: <Reddit />,
     color: '#FF4500',
-    placeholder: 'Enter subreddit or topic (e.g. r/pakistan economy)',
+    placeholder: 'Enter subreddit or topic (e.g. r/technology ai)',
     inputLabel: 'Subreddit / Topic',
   },
   {
@@ -36,7 +36,7 @@ const SOURCES = [
     description: 'Track sentiment across Twitter/X conversations in real-time',
     icon: <TravelExplore />,
     color: '#1DA1F2',
-    placeholder: 'Enter search query (e.g. Pakistan elections)',
+    placeholder: 'Enter search query (e.g. Global Market Trends)',
     inputLabel: 'Search Query',
   },
   {
@@ -46,7 +46,7 @@ const SOURCES = [
       'Live scraping via Colly with automatic Scrapling fallback for JS-heavy sites',
     icon: <Language />,
     color: '#10b981',
-    placeholder: 'Enter URL to scrape (e.g. https://dawn.com/news/...)',
+    placeholder: 'Enter URL to scrape (e.g. https://techcrunch.com/news/...)',
     inputLabel: 'Website URL',
   },
   {
@@ -55,7 +55,7 @@ const SOURCES = [
     description: 'Search historical web data from Common Crawl archives',
     icon: <History />,
     color: '#8B5CF6',
-    placeholder: 'Enter domain (e.g. dawn.com)',
+    placeholder: 'Enter domain (e.g. medium.com)',
     inputLabel: 'Domain',
   },
   {
@@ -64,7 +64,7 @@ const SOURCES = [
     description: 'Ask AI a question to automatically select and scrape the best URLs',
     icon: <AutoAwesome />,
     color: '#EAB308', // Amber/Gold color
-    placeholder: 'What are you looking for? (e.g. Find news about Pakistan economy)',
+    placeholder: 'What are you looking for? (e.g. Find news about artificial intelligence)',
     inputLabel: 'AI Prompt / Question',
   },
 ]

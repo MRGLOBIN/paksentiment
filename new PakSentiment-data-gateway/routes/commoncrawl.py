@@ -19,9 +19,10 @@ async def commoncrawl_records(
     limit: int = Query(10, ge=1, le=100, description="Max records"),
     domain: str | None = Query(None, description="Filter by domain"),
     crawl_id: str | None = Query(None, description="Specific crawl ID"),
+    keyword: str | None = Query(None, description="Keyword to filter by URL slug"),
     service: CommonCrawlService = Depends(get_commoncrawl_service)
 ) -> Dict[str, Any]:
-    records = await service.fetch_records(limit, domain, crawl_id)
+    records = await service.fetch_records(limit, domain, crawl_id, keyword)
     return {
         "source": "commoncrawl",
         "count": len(records),
@@ -41,6 +42,7 @@ async def commoncrawl_sentiment(
     limit: int = Query(10, ge=1, le=100, description="Max records"),
     domain: str = Query(..., description="Filter by domain"),
     crawl_id: str | None = Query(None, description="Specific crawl ID"),
+    keyword: str | None = Query(None, description="Keyword to filter by URL slug"),
     service: CommonCrawlService = Depends(get_commoncrawl_service)
 ) -> Dict[str, Any]:
-    return await service.fetch_with_sentiment(domain, limit, crawl_id)
+    return await service.fetch_with_sentiment(domain, limit, crawl_id, keyword)

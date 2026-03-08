@@ -163,3 +163,32 @@
         text-decoration: underline;
     }
 }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .main {
+        padding: 80px 1rem 1rem;
+    }
+
+    .header h1 {
+        font-size: 2rem;
+    }
+
+    .messages {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .header h1 {
+        font-size: 1.5rem;
+    }
+
+    .inputArea {
+        flex-direction: column;
+    }
+
+    .sendBtn {
+        width: 100%;
+    }
+}

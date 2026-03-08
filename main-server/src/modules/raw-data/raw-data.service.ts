@@ -287,6 +287,59 @@ export class RawDataService {
             p.params,
             undefined,
           );
+        } else if (p.source === 'web_search') {
+          if (!p.params?.query) return null;
+          const limit = p.params?.limit || 3;
+
+          this.logger.log(`[SmartSearch] Triggering web_search for query: ${p.params.query}`);
+          const collyUrl = process.env.COLLY_SIDECAR_URL || 'http://localhost:8081';
+
+          const searchRes = await firstValueFrom(
+            this.httpService.post(`${collyUrl}/search`, { query: p.params.query })
+          );
+
+          const searchData = searchRes.data;
+          if (searchData.success && searchData.results && searchData.results.length > 0) {
+            const topResults = searchData.results.slice(0, limit);
+
+            // Trigger sentiment web-scrape for each link
+            const scrapePromises = topResults.map(async (res: any) => {
+              try {
+                return await this.webProvider.fetchSentiment({
+                  url: res.link,
+                  followLinks: false,
+                  fetchLimit: 1,
+                  customTags: customTags
+                }, undefined); // Using undefined userId to let the provider handle it or skip session attachment initially
+              } catch (e) {
+                this.logger.error(`[SmartSearch] web_search failed to scrape ${res.link}:`, e.message);
+                return null;
+              }
+            });
+
+            const scrapeResults = await Promise.all(scrapePromises);
+
+            // Consolidate the returned structures into a single format
+            let combinedPosts: any[] = [];
+            let combinedSentiment: any[] = [];
+            let combinedCount = 0;
+
+            for (const s of scrapeResults) {
+              if (s) {
+                combinedPosts = [...combinedPosts, ...(s.posts || [])];
+                combinedSentiment = [...combinedSentiment, ...(s.sentiment || [])];
+                combinedCount += (s.count || s.posts?.length || 0);
+              }
+            }
+
+            return {
+              source: 'web_search',
+              count: combinedCount,
+              posts: combinedPosts,
+              sentiment: combinedSentiment
+            };
+          }
+          return null;
         }
         return null;
       } catch (e) {
@@ -297,13 +350,6 @@ export class RawDataService {
         return null;
       }
     });
-
-    // Also fetch historical data
-    promises.push(
-      this.getStoredData({ limit: 100 })
-        .then((res) => ({ ...res, source: 'database' }))
-        .catch(() => null),
-    );
 
     const results = await Promise.all(promises);
 
@@ -405,32 +451,38 @@ export class RawDataService {
       messages: [
         {
           role: 'system',
-          content: `You are a data retrieval assistant for the PakSentiment platform.
-Your goal is to analyze the user's natural language request and generate a plan to fetch data from available sources.
+          content: `You are a data retrieval assistant for an advanced Data Analytics Platform.
+Your goal is to analyze the user's natural language request and generate a plan to fetch data from ALL available sources simultaneously based on any topic worldwide.
 
 AVAILABLE SOURCES:
 1. "reddit_sentiment"
- - Params: { subreddit: string (default 'pakistan'), query: string, limit: number (default 10) }
- - Use for: Public opinion, discussions, news reactions.
+ - Params: { subreddit: string, query: string, limit: number (default 10) }
+ - Use for: Public opinion, discussions, community reactions. Pick the most relevant subreddit for the topic (e.g. 'technology', 'worldnews', 'movies', 'politics', 'programming').
 2. "scrapling"
  - Params: { url: string, fetchLimit: number (1-3) }
- - Use for: Analyzing specific URL provided by user or highly relevant known news URL.
+ - Use for: Analyzing a specific URL provided by the user. ONLY include this if the user provides a URL.
 3. "commoncrawl"
- - Params: { domain: string, limit: number (default 10) }
- - Use for: Finding articles from specific domains (e.g., dawn.com, geo.tv) if specified.
+ - Params: { domain: string, keyword: string, limit: number (default 10) }
+ - Use for: Finding articles or pages from specific domains. Pick the most relevant high-authority domain for the query (e.g. 'medium.com', 'cnn.com', 'techcrunch.com', 'github.com', 'wikipedia.org'). The 'keyword' must be a SINGLE ENGLISH WORD that would likely appear in the article's URL slug (e.g. "software", "election", "market").
+4. "web_search"
+ - Params: { query: string, limit: number (default 3) }
+ - Use for: Live real-time web results. The system will search the web, fetch the top links, and scrape them to get content.
 
-INSTRUCTIONS:
-- Analyze the User Query.
-- Select the most relevant sources (can be multiple).
-- Generate specific search queries for each source.
-- Return ONLY a JSON object with a "plan" array.
+CRITICAL RULES:
+- You MUST ALWAYS include ALL THREE of these sources in every plan: "reddit_sentiment", "commoncrawl", and "web_search".
+- Only include "scrapling" if the user explicitly provides a URL.
+- Generate a tailored, specific search query string for EACH source based on the user's request.
+- For "commoncrawl", pick the single most globally relevant domain AND provide a single broad keyword to find articles.
+- For "web_search", craft a concise but descriptive generic search engine query.
+- For "reddit_sentiment", craft a good Reddit search query and pick the best matching subreddit.
+- Return ONLY a JSON object with a "plan" array. No extra text.
 
 RESPONSE FORMAT:
 {
 "plan": [
-  { "source": "reddit_sentiment", "params": { "subreddit": "pakistan", "query": "election rigging", "limit": 10 } },
-  { "source": "scrapling", "params": { "url": "https://www.dawn.com/news/1802342", "fetchLimit": 1 } },
-  { "source": "commoncrawl", "params": { "domain": "dawn.com", "limit": 50 } }
+  { "source": "reddit_sentiment", "params": { "subreddit": "technology", "query": "artificial intelligence breakthroughs 2026", "limit": 10 } },
+  { "source": "commoncrawl", "params": { "domain": "techcrunch.com", "keyword": "ai", "limit": 10 } },
+  { "source": "web_search", "params": { "query": "latest artificial intelligence news and breakthroughs 2026", "limit": 10 } }
 ]
 }
 `,

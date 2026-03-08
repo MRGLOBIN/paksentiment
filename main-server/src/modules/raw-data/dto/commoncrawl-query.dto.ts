@@ -14,4 +14,8 @@ export class CommonCrawlQueryDto {
     @IsOptional()
     @IsString()
     crawl_id?: string;
+
+    @IsOptional()
+    @IsString()
+    keyword?: string;
 }

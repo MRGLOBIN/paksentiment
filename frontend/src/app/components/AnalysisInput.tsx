@@ -40,7 +40,7 @@ interface AnalysisResponse {
 
 export default function AnalysisInput() {
   const [inputText, setInputText] = useState('')
-  const [subreddit, setSubreddit] = useState('pakistan')
+  const [subreddit, setSubreddit] = useState('technology')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [results, setResults] = useState<AnalysisResponse | null>(null)
@@ -115,7 +115,7 @@ export default function AnalysisInput() {
                 id='subreddit'
                 type='text'
                 className={styles.input}
-                placeholder='e.g., pakistan, chutyapa, etc.'
+                placeholder='e.g., technology, sports, etc.'
                 value={subreddit}
                 onChange={e => setSubreddit(e.target.value)}
               />
@@ -128,7 +128,7 @@ export default function AnalysisInput() {
               <textarea
                 id='analysisText'
                 className={styles.textarea}
-                placeholder="Enter topic to search in the subreddit (e.g., 'elections', 'economy', 'politics')..."
+                placeholder="Enter topic to search in the subreddit (e.g., 'artificial intelligence', 'stock market')..."
                 value={inputText}
                 onChange={e => setInputText(e.target.value)}
                 onKeyPress={handleKeyPress}

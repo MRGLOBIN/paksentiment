@@ -105,55 +105,41 @@ export function useAnalytics({ token, apiUrl }: UseAnalyticsProps) {
           setSearchData(mergedResult)
           setSessionId(masterSessionId)
         } else if (source === 'ai' && query.trim()) {
-          setStatusMsg('Asking AI to select optimal sources...')
-          const aiRes = await fetch(`${apiUrl}/raw-data/ai-links`, {
+          setStatusMsg('AI is planning multi-source search (Reddit, Web Search, Common Crawl)...')
+          const smartRes = await fetch(`${apiUrl}/raw-data/smart`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
               ...(token ? { Authorization: `Bearer ${token}` } : {}),
             },
-            body: JSON.stringify({ query: query.trim() }),
+            body: JSON.stringify({ query: query.trim(), customTags: customTags || '' }),
           })
 
-          if (!aiRes.ok) throw new Error('AI could not select sources based on the query.')
-          const aiData = await aiRes.json()
-          const aiUrls: string[] = aiData.urls || []
+          if (!smartRes.ok) {
+            const errorData = await smartRes.json().catch(() => ({}))
+            throw new Error(errorData.message || 'AI Smart Search failed.')
+          }
+          const smartData = await smartRes.json()
 
-          if (aiUrls.length === 0) throw new Error('AI returned no valid URLs.')
+          // Normalize posts to ensure consistent author and text fields
+          const normalizedPosts = (smartData.posts || []).map((p: any) => ({
+            ...p,
+            author: p.author || (() => {
+              try { return p.url ? new URL(p.url).hostname : 'Unknown System' } catch { return 'Unknown System' }
+            })(),
+            text: p.text || p.content || '',
+          }))
 
           const mergedResult: AnalysisResult = {
-            source: 'AI Selected Sources',
-            count: 0,
-            posts: [],
-            sentiment: [],
-          }
-
-          const masterSessionId = crypto.randomUUID()
-          mergedResult.sessionId = masterSessionId
-
-          for (let i = 0; i < aiUrls.length; i++) {
-            setStatusMsg(`AI Selected ${aiUrls.length} links. Processing ${i + 1}/${aiUrls.length}: ${aiUrls[i].substring(0, 50)}...`)
-            try {
-              const result = await fetchSource(
-                apiUrl,
-                'web',
-                aiUrls[i],
-                followLinks,
-                includeAllLinks ? 0 : crawlLimit,
-                customTags,
-                token,
-                masterSessionId,
-              )
-              mergedResult.posts.push(...(result.posts || []))
-              mergedResult.sentiment.push(...(result.sentiment || []))
-              mergedResult.count += result.count || 0
-            } catch (urlErr: any) {
-              console.warn(`Failed to process AI selected ${aiUrls[i]}: ${urlErr.message}`)
-            }
+            source: 'AI Smart Search',
+            count: smartData.count || 0,
+            posts: normalizedPosts,
+            sentiment: smartData.sentiment || [],
+            sessionId: smartData.sessionId,
           }
 
           setSearchData(mergedResult)
-          setSessionId(masterSessionId)
+          if (smartData.sessionId) setSessionId(smartData.sessionId)
         } else {
           const result = await fetchSource(
             apiUrl,
@@ -257,17 +243,22 @@ async function fetchSource(
       endpoint = '/raw-data/commoncrawl'
       body = addTags({ domain: q, limit: 10 })
       break
+    case 'database':
+      // Fetching from database uses the history endpoint, handled earlier or differently.
+      // If we reach here, we shouldn't throw, but just mock a safe empty lookup or use the correct log endpoint
+      endpoint = `/raw-data/session/${q}` // q is the sessionId here
+      break
     default:
       throw new Error(`Unknown source: ${src}`)
   }
 
   const res = await fetch(`${apiUrl}${endpoint}`, {
-    method: 'POST',
+    method: src === 'database' ? 'GET' : 'POST',
     headers: {
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
-    body: JSON.stringify(body),
+    body: src === 'database' ? undefined : JSON.stringify(body),
   })
 
   if (!res.ok) {
@@ -330,6 +321,10 @@ async function fetchSource(
           })(),
       })) || []
     normalizedData.sentiment = json.sentiment || []
+  } else if (src === 'database') {
+    normalizedData.count = json.count || (json.posts ? json.posts.length : 0);
+    normalizedData.posts = json.posts || [];
+    normalizedData.sentiment = json.sentiment || [];
   }
 
   return normalizedData

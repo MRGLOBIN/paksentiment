@@ -8,12 +8,12 @@ import styles from './page.module.scss'
 import { useAuthStore } from '../../store/useAuthStore'
 
 const LANGUAGES = [
-    { code: 'urdu', native: 'اردو', english: 'Urdu' },
-    { code: 'pashto', native: 'پشتو', english: 'Pashto' },
-    { code: 'punjabi', native: 'پنجابی', english: 'Punjabi' },
-    { code: 'saraiki', native: 'سرائیکی', english: 'Saraiki' },
-    { code: 'sindhi', native: 'سنڌي', english: 'Sindhi' },
-    { code: 'balochi', native: 'بلوچی', english: 'Balochi' },
+    { code: 'spanish', native: 'Español', english: 'Spanish' },
+    { code: 'french', native: 'Français', english: 'French' },
+    { code: 'german', native: 'Deutsch', english: 'German' },
+    { code: 'mandarin', native: '中文', english: 'Mandarin' },
+    { code: 'arabic', native: 'العربية', english: 'Arabic' },
+    { code: 'hindi', native: 'हिन्दी', english: 'Hindi' },
     { code: 'roman_urdu', native: 'Roman Urdu', english: 'Roman Urdu' },
     { code: 'auto', native: 'Auto', english: 'Auto Detect' },
 ]
@@ -86,8 +86,8 @@ export default function TranslatePage() {
                 ) : (
                     <>
                         <div className={styles.header}>
-                            <h1>🌐 Pakistani Language Translator</h1>
-                            <p>Translate Urdu, Pashto, Punjabi, Saraiki & more to English</p>
+                            <h1>🌐 Global Language Translator</h1>
+                            <p>Translate Spanish, French, Mandarin, Arabic, Hindi & more to English</p>
                         </div>
 
                         <div className={styles.translatorCard}>
@@ -108,7 +108,7 @@ export default function TranslatePage() {
                                     </div>
                                     <textarea
                                         className={styles.textArea}
-                                        placeholder="Enter text in Urdu, Pashto, Punjabi, Saraiki, or Roman Urdu..."
+                                        placeholder="Enter text in Spanish, French, Mandarin, Arabic, Hindi, or German..."
                                         value={sourceText}
                                         onChange={e => setSourceText(e.target.value)}
                                         disabled={loading}
@@ -152,6 +152,6 @@ export default function TranslatePage() {
             </main>
 
             <Footer />
-        </div>
+        </div >
     )
 }
