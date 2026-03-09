@@ -1,7 +1,6 @@
 'use client'
 
 import styles from './HeroSection.module.scss'
-import Image from 'next/image'
 
 export default function HeroSection() {
   return (

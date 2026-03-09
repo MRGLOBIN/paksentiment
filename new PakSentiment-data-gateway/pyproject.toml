@@ -28,3 +28,6 @@ dev = [
     "pytest-cov>=4.1.0",
     "httpx>=0.27.0",
 ]
+
+[tool.uv.sources]
+paksentiment-scraper = { path = "../PakSentiment-scraper", editable = true }

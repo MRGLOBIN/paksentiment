@@ -27,7 +27,7 @@ func NewOllamaAnalyzer(url, model string) *OllamaAnalyzer {
 		url:   url,
 		model: model,
 		client: &http.Client{
-			Timeout: 60 * time.Second,
+			Timeout: 30 * time.Second,
 		},
 	}
 }
@@ -57,16 +57,10 @@ type sentimentJSON struct {
 func (o *OllamaAnalyzer) IsAvailable() bool {
 	pingClient := &http.Client{Timeout: 15 * time.Second}
 
-	body, _ := json.Marshal(ollamaRequest{
-		Model:  o.model,
-		Prompt: "Reply with only the word OK",
-		Stream: false,
-	})
-
-	endpoint := o.url + "/api/generate"
+	endpoint := o.url + "/api/tags"
 	log.Printf("[Sentiment] Pinging Ollama at %s (model: %s)", endpoint, o.model)
 
-	resp, err := pingClient.Post(endpoint, "application/json", bytes.NewReader(body))
+	resp, err := pingClient.Get(endpoint)
 	if err != nil {
 		log.Printf("[Sentiment] Ollama health check failed: %v", err)
 		return false
@@ -78,14 +72,8 @@ func (o *OllamaAnalyzer) IsAvailable() bool {
 		return false
 	}
 
-	var result ollamaResponse
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		log.Printf("[Sentiment] Ollama health check decode failed: %v", err)
-		return false
-	}
-
 	log.Printf("[Sentiment] Ollama health check OK — model %s is ready", o.model)
-	return result.Done
+	return true
 }
 
 // AnalyzePages runs sentiment analysis on each PageResult using the Ollama model.
@@ -97,9 +85,16 @@ func (o *OllamaAnalyzer) AnalyzePages(results []models.PageResult) bool {
 	}
 
 	anySuccess := false
+	processed := 0
+
 	for i := range results {
+		// Hard limit to 3 items evaluated by the LLM per batch to avoid Cloudflare 100s execution timeouts
+		if processed >= 3 {
+			log.Printf("[Sentiment] Skipping Ollama sentiment for %s (batch limit of 3 reached)", results[i].URL)
+			continue
+		}
+
 		if len(results[i].Text) < 50 {
-			// Skip pages with too little text
 			continue
 		}
 
@@ -115,6 +110,7 @@ func (o *OllamaAnalyzer) AnalyzePages(results []models.PageResult) bool {
 		results[i].Summary = summary
 		results[i].SentimentEngine = "ollama:" + o.model
 		anySuccess = true
+		processed++
 
 		log.Printf("[Sentiment] %s → %s (%.2f) [%s] via %s", results[i].URL, sentiment, confidence, topic, o.model)
 	}
@@ -124,7 +120,7 @@ func (o *OllamaAnalyzer) AnalyzePages(results []models.PageResult) bool {
 
 // analyzeSingle sends a single text to Ollama and parses the sentiment response.
 func (o *OllamaAnalyzer) analyzeSingle(text string) (string, float64, string, string, error) {
-	// Truncate text to avoid overwhelming the LLM
+	// Truncate text to avoid overwhelming the LLM with full pages, but keep enough context for a good summary
 	if len(text) > 1500 {
 		text = text[:1500]
 	}

@@ -1,8 +1,6 @@
 'use client'
 
-import { useState, FormEvent } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import {
   TextField,
   Button,
@@ -110,7 +108,7 @@ const LoginPage = () => {
 
         <div className={styles.footer}>
           <p>
-            Don't have an account? <Link href='/register'>Sign up</Link>
+            Don&apos;t have an account? <Link href='/register'>Sign up</Link>
           </p>
         </div>
       </div>

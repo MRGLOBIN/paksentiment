@@ -58,7 +58,7 @@ export const getSafeString = (val: any, defaultStr = '—'): string => {
 }
 
 export const getSentimentString = (val: any): string => {
-    let s = getSafeString(val, 'Neutral').trim();
+    const s = getSafeString(val, 'Neutral').trim();
     if (s === '—') return 'Neutral';
     const lower = s.toLowerCase();
     if (lower.includes('positive')) return 'Positive';

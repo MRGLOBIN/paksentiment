@@ -71,7 +71,7 @@ export class WebProvider extends AbstractDataProvider {
     const primaryText = pages[0]?.text ?? '';
     const isMultiPageCrawl = followLinks && pages.length > 1;
 
-    if (!isMultiPageCrawl && primaryText.length < WebProvider.MIN_CONTENT_LENGTH) {
+    if (!isMultiPageCrawl && primaryText.length < 50) {
       this.logger.log(
         `[Web] Content too thin (${primaryText.length} chars), falling back to Scrapling headless browser`,
       );

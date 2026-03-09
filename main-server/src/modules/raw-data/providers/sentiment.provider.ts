@@ -19,22 +19,14 @@ export class SentimentProvider {
      * Run sentiment analysis — tries Ollama phi3:mini first, falls back to FastAPI.
      */
     async analyzeSentiment(posts: any[], customTags?: string): Promise<any[]> {
-        const CHUNK_SIZE = 2000;
+        const MAX_TEXT_LENGTH = 1500;
         const allDocs: { id: string; text: string; originalId: string }[] = [];
 
         posts.forEach((p) => {
             const text = p.content || '';
-            if (text.length > CHUNK_SIZE) {
-                const chunks = this.chunkString(text, CHUNK_SIZE);
-                chunks.forEach((chunk, idx) => {
-                    allDocs.push({
-                        id: `${p.id}_chunk_${idx}`,
-                        originalId: p.id,
-                        text: chunk,
-                    });
-                });
-            } else if (text.length > 0) {
-                allDocs.push({ id: p.id, originalId: p.id, text });
+            if (text.length > 0) {
+                // Truncate length to reduce model latency while keeping it enough for summary
+                allDocs.push({ id: p.id, originalId: p.id, text: text.substring(0, MAX_TEXT_LENGTH) });
             }
         });
 
@@ -75,42 +67,15 @@ export class SentimentProvider {
             }
         }
 
-        // ── Aggregate chunks back to original documents ──
-        const sentimentMap = new Map<string, any[]>();
-        (rawSentiments ?? []).forEach((s: any) => {
-            const match = allDocs.find((d) => d.id === s.id);
-            if (match) {
-                const oid = match.originalId;
-                if (!sentimentMap.has(oid)) sentimentMap.set(oid, []);
-                sentimentMap.get(oid)!.push(s);
-            }
-        });
-
-        const aggregated = Array.from(sentimentMap.entries()).map(([id, resultList]) => {
-            if (resultList.length === 1) return { ...resultList[0], id };
-
-            const counts: Record<string, number> = {};
-            let totalConfidence = 0;
-            const summaries: string[] = [];
-
-            resultList.forEach((r: any) => {
-                counts[r.sentiment] = (counts[r.sentiment] || 0) + (r.confidence || 0);
-                totalConfidence += r.confidence || 0;
-                if (r.summary) summaries.push(r.summary);
-            });
-
-            const winner = Object.keys(counts).reduce((a, b) =>
-                counts[a] > counts[b] ? a : b,
-            );
-
+        // ── Map back to original documents ──
+        const aggregated = (rawSentiments ?? []).map((s: any) => {
             return {
-                id,
-                sentiment: winner,
-                confidence: totalConfidence / resultList.length,
-                topic: resultList[0]?.topic || 'General',
-                summary: summaries.join('\n---\n'),
-                engine: resultList[0]?.engine || 'unknown',
-                chunk_results: resultList,
+                id: s.id,
+                sentiment: s.sentiment || 'Neutral',
+                confidence: s.confidence || 0.5,
+                topic: s.topic || 'General',
+                summary: s.summary || '',
+                engine: s.engine || 'unknown',
             };
         });
 
@@ -129,7 +94,7 @@ export class SentimentProvider {
                                     prompt: `Classify the main topic of this text as a single word (e.g. Economics, Politics, Technology, Health, Education, Sports, Science, Culture, Environment, Law, Society, Entertainment). Reply with ONLY the single word.\n\nText: "${snippet}"\n\nTopic:`,
                                     stream: false,
                                 },
-                                { timeout: 15000 },
+                                { timeout: 60000 },
                             ),
                         );
                         const topicRaw = (topicRes.data?.response || '').trim();
@@ -156,15 +121,11 @@ export class SentimentProvider {
      */
     async isOllamaAvailable(): Promise<boolean> {
         try {
-            this.logger.log(`[Sentiment] Pinging Ollama at ${this.ollamaUrl}/api/generate (model: ${this.ollamaModel})`);
+            this.logger.log(`[Sentiment] Pinging Ollama at ${this.ollamaUrl}/api/tags (model: ${this.ollamaModel})`);
             const res = await firstValueFrom(
-                this.httpService.post(
-                    `${this.ollamaUrl}/api/generate`,
-                    { model: this.ollamaModel, prompt: 'Reply OK', stream: false },
-                    { timeout: 15000 },
-                ),
+                this.httpService.get(`${this.ollamaUrl}/api/tags`, { timeout: 15000 }),
             );
-            const available = res.data?.done === true;
+            const available = res.data?.models?.some((m: any) => m.name === this.ollamaModel || m.name.includes(this.ollamaModel.split(':')[0]));
             this.logger.log(`[Sentiment] Ollama health check result: ${available}`);
             return available;
         } catch (err) {
@@ -190,7 +151,7 @@ export class SentimentProvider {
                         prompt,
                         stream: false,
                     },
-                    { timeout: 60000 },
+                    { timeout: 30000 },
                 ),
             );
 
@@ -255,17 +216,8 @@ Respond in this exact JSON format:
 {"sentiment": "<category>", "confidence": <0.0 to 1.0>, "topic": "<single word topic>", "summary": "<3-4 sentence summary>"}
 
 Text to analyze:
-"""${text.substring(0, 1500)}"""
+"""${text}"""
 
 JSON response:`;
-    }
-
-    private chunkString(str: string, size: number): string[] {
-        const numChunks = Math.ceil(str.length / size);
-        const chunks = new Array(numChunks);
-        for (let i = 0, o = 0; i < numChunks; ++i, o += size) {
-            chunks[i] = str.substring(o, Math.min(o + size, str.length));
-        }
-        return chunks;
     }
 }

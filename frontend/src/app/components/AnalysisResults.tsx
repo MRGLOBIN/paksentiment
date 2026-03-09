@@ -62,12 +62,6 @@ interface AnalysisResultsProps {
 }
 
 export default function AnalysisResults({ data }: AnalysisResultsProps) {
-  // Generate color palette for sentiments
-  const generateColor = (index: number, total: number) => {
-    const hue = (index * 360) / total
-    return `hsl(${hue}, 65%, 55%)`
-  }
-
   const getSentimentColor = (sentiment: string) => {
     const normalizedSentiment = sentiment.toLowerCase()
 

@@ -13,10 +13,9 @@ import {
     Legend,
     ResponsiveContainer,
     AreaChart,
-    Area,
-    Treemap
+    Area
 } from 'recharts'
-import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid'
+import { DataGrid } from '@mui/x-data-grid'
 import {
     BarChart as BarChartIcon,
     Label,
@@ -40,15 +39,12 @@ import {
     MenuItem
 } from '@mui/material'
 import styles from './AnalysisDashboard.module.scss'
-import { AnalysisResult, Post } from '../../../types'
+import { AnalysisResult } from '../../../types'
 import {
     COLORS,
     TOPIC_COLORS,
     useAnalysisDashboard,
-    getSentimentString,
-    getSafeString,
-    getConfidenceValue,
-    sanitizeTopic,
+    getSentimentString
 } from './useAnalysisDashboard'
 
 interface AnalysisDashboardProps {
@@ -61,7 +57,7 @@ export default function AnalysisDashboard({ data }: AnalysisDashboardProps) {
         exportAnchorEl, setExportAnchorEl,
         handleExportCSV, handleExportPDF,
         hasSentiment, kpis, topicChartData,
-        sourceData, timelineData, confidenceData,
+        timelineData, confidenceData,
         realTopicChartData, uniqueTopicCount,
         tableRows
     } = useAnalysisDashboard(data)
@@ -432,7 +428,7 @@ export default function AnalysisDashboard({ data }: AnalysisDashboardProps) {
                             <IconButton
                                 aria-label="close"
                                 onClick={() => setSelectedPost(null)}
-                                sx={{ color: (theme) => theme.palette.grey[500] }}
+                                sx={{ color: 'text.secondary' }}
                             >
                                 <CloseIcon />
                             </IconButton>

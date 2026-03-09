@@ -1,9 +1,7 @@
 'use client'
 
-import { useState } from 'react'
 import styles from './AnalysisInput.module.scss'
 import AnalysisResults from './AnalysisResults'
-import { AnalysisResponse } from '../../types'
 import { useAnalysisInput } from './useAnalysisInput'
 
 export default function AnalysisInput() {

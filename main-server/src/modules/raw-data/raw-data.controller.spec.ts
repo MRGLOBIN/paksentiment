@@ -22,6 +22,8 @@ import { YouTubeProvider } from './providers/youtube.provider';
 import { CommonCrawlProvider } from './providers/commoncrawl.provider';
 import { ScraplingProvider } from './providers/scrapling.provider';
 import { WebProvider } from './providers/web.provider';
+import { SentimentProvider } from './providers/sentiment.provider';
+import { SmartSearchService } from './smart-search.service';
 import { ActivityService } from '../activity/activity.service';
 
 import { AuthGuard } from '../auth/auth.guard';
@@ -102,6 +104,10 @@ describe('RawDataController', () => {
       providers: [
         RawDataService,
         {
+          provide: SmartSearchService,
+          useValue: { smartSearch: jest.fn() },
+        },
+        {
           provide: PostStorageService,
           useValue: mockPostStorageService,
         },
@@ -116,6 +122,10 @@ describe('RawDataController', () => {
         CommonCrawlProvider,
         ScraplingProvider,
         WebProvider,
+        {
+          provide: SentimentProvider,
+          useValue: { analyzeSentiment: jest.fn().mockResolvedValue([]) },
+        },
       ],
     })
       .overrideGuard(AuthGuard)
@@ -557,7 +567,7 @@ describe('RawDataController', () => {
       };
 
       jest
-        .spyOn(httpService, 'get')
+        .spyOn(httpService, 'request')
         .mockReturnValue(throwError(() => ({ response: { status: 502 } })));
 
       await expect(

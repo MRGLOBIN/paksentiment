@@ -655,7 +655,9 @@ dependencies = [
     { name = "fastapi", extra = ["standard"] },
     { name = "google-generativeai" },
     { name = "groq" },
+    { name = "justext" },
     { name = "langdetect" },
+    { name = "lxml" },
     { name = "msgspec" },
     { name = "numpy" },
     { name = "paksentiment-scraper" },
@@ -680,10 +682,12 @@ requires-dist = [
     { name = "google-generativeai", specifier = ">=0.8.3" },
     { name = "groq", specifier = ">=0.8.0" },
     { name = "httpx", marker = "extra == 'dev'", specifier = ">=0.27.0" },
+    { name = "justext", specifier = ">=3.0.0" },
     { name = "langdetect", specifier = ">=1.0.9" },
+    { name = "lxml", specifier = ">=5.0.0" },
     { name = "msgspec", specifier = ">=0.20.0" },
     { name = "numpy", specifier = "<2" },
-    { name = "paksentiment-scraper", directory = "../PakSentiment-scraper" },
+    { name = "paksentiment-scraper", editable = "../PakSentiment-scraper" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0.0" },
     { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = ">=0.23.0" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.1.0" },
@@ -1931,7 +1935,7 @@ wheels = [
 [[package]]
 name = "paksentiment-scraper"
 version = "1.0.0"
-source = { directory = "../PakSentiment-scraper" }
+source = { editable = "../PakSentiment-scraper" }
 dependencies = [
     { name = "aiohttp" },
     { name = "asyncpraw" },

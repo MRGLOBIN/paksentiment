@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
+
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import PaymentModal from '../components/PaymentModal'
@@ -9,7 +9,7 @@ import styles from './page.module.scss'
 import { Check, Close, Star } from '@mui/icons-material'
 import { useAuthStore } from '../../store/useAuthStore'
 import { useRouter } from 'next/navigation'
-import { Plan, PlanFeature } from '../../types'
+import { Plan } from '../../types'
 
 const PLANS: Plan[] = [
   {

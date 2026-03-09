@@ -22,19 +22,19 @@ async def analyze_sentiment(
     sentiment = await service.analyze_batch(body.documents, body.sentiments, body.custom_sentiments)
     return {"sentiment": sentiment}
 
-# @router.post(
-#     "/analyze/local",
-#     response_model=GenericSentimentResponse,
-#     summary="Local Sentiment Analysis",
-#     description="Analyze sentiment using local Analysis Model (Alias for /analyze).",
-#     responses={
-#         502: {"model": ErrorResponse, "description": "Analysis Error"}
-#     }
-# )
-# async def analyze_sentiment_local(
-#     body: GenericSentimentRequest,
-#     service: SentimentService = Depends(get_sentiment_service)
-# ) -> Dict[str, Any]:
-#     # Exact same logic as above
-#     sentiment = await service.analyze_batch(body.documents, body.sentiments, body.custom_sentiments)
-#     return {"sentiment": sentiment}
+@router.post(
+    "/analyze/local",
+    response_model=GenericSentimentResponse,
+    summary="Local Sentiment Analysis",
+    description="Analyze sentiment using local Analysis Model (Alias for /analyze).",
+    responses={
+        502: {"model": ErrorResponse, "description": "Analysis Error"}
+    }
+)
+async def analyze_sentiment_local(
+    body: GenericSentimentRequest,
+    service: SentimentService = Depends(get_sentiment_service)
+) -> Dict[str, Any]:
+    # Exact same logic as above
+    sentiment = await service.analyze_batch(body.documents, body.sentiments, body.custom_sentiments)
+    return {"sentiment": sentiment}

@@ -51,7 +51,7 @@ export class CrawlerService {
         maxDepth = 2,
         limit = 20,
         allowedDomains?: string[],
-        delayMs = 100,
+        delayMs = 150,
     ): Promise<any> {
         try {
             this.logger.log(`[Crawl] ${url} depth=${maxDepth} limit=${limit} via Colly`);
