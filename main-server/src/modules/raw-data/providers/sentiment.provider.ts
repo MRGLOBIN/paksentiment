@@ -54,7 +54,7 @@ export class SentimentProvider {
                     this.httpService.post(
                         `${this.fastApiBaseUrl}/sentiment/analyze/local`,
                         {
-                            documents: allDocs.map((d) => ({ id: d.id, text: d.text })),
+                            documents: allDocs.slice(0, 3).map((d) => ({ id: d.id, text: d.text.substring(0, 500) })),
                             ...(customTags ? { custom_sentiments: customTags } : {}),
                         },
                         { timeout: 60000 }

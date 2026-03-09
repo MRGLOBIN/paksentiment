@@ -67,6 +67,7 @@ export const useRegister = () => {
                     lastName,
                     email,
                     password,
+                    confirmPassword,
                 }),
             })
 

@@ -1,0 +1,149 @@
+version: "3.9"
+
+services:
+  # ═══════════════════════════════════════
+  #  Databases (Isolated — separate from host DBs)
+  # ═══════════════════════════════════════
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    env_file: .env.docker
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-paksentiment}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-paksentiment}
+      POSTGRES_DB: ${POSTGRES_DB:-paksentiment}
+    ports:
+      - "5005:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U paksentiment"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    ports:
+      - "5006:27017"
+    volumes:
+      - mongodata:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "5007:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # ═══════════════════════════════════════
+  #  Application Services
+  # ═══════════════════════════════════════
+
+  data-gateway:
+    build:
+      context: .
+      dockerfile: new PakSentiment-data-gateway/Dockerfile
+    restart: unless-stopped
+    env_file: .env.docker
+    ports:
+      - "5003:8000"
+    environment:
+      TOKENIZERS_PARALLELISM: "false"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  colly-sidecar:
+    build:
+      context: ./colly-sidecar
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "5004:8081"
+    environment:
+      PORT: "8081"
+      REDIS_URL: "redis:6379"
+      MONGO_URI: "mongodb://mongo:27017/paksentiment"
+      FASTAPI_URL: "http://data-gateway:8000"
+      OLLAMA_URL: "https://llm.h4mxa.com"
+      OLLAMA_MODEL: "phi3:mini"
+    depends_on:
+      redis:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+      data-gateway:
+        condition: service_started
+
+  main-server:
+    build:
+      context: ./main-server
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file: .env.docker
+    ports:
+      - "5002:3000"
+    environment:
+      PORT: "3000"
+      NODE_ENV: "production"
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: ${POSTGRES_USER:-paksentiment}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-paksentiment}
+      POSTGRES_DB: ${POSTGRES_DB:-paksentiment}
+      MONGO_URI: "mongodb://mongo:27017"
+      MONGO_DB: "paksentiment"
+      REDIS_URL: "redis://redis:6379"
+      FAST_API_BASE_URL: "http://data-gateway:8000"
+      COLLY_SIDECAR_URL: "http://colly-sidecar:8081"
+      OLLAMA_URL: "https://llm.h4mxa.com"
+      OLLAMA_MODEL: "phi3:mini"
+      JWT_SECRET: "${JWT_SECRET:-please-change-me-in-production}"
+      JWT_EXPIRES_IN: "${JWT_EXPIRES_IN:-1h}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      data-gateway:
+        condition: service_started
+      colly-sidecar:
+        condition: service_started
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: "http://localhost:5002"
+    restart: unless-stopped
+    env_file: .env.docker
+    ports:
+      - "5001:3001"
+    depends_on:
+      - main-server
+
+volumes:
+  pgdata:
+  mongodata:
+  redisdata:

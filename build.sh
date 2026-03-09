@@ -9,6 +9,7 @@ ROOT_DIR=$(pwd)
 
 echo "[1/4] Building Main Server (NestJS)..."
 cd "$ROOT_DIR/main-server"
+export TMPDIR=/tmp
 npm install
 npm run build
 

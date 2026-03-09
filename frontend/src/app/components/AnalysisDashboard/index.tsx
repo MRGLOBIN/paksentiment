@@ -312,7 +312,7 @@ export default function AnalysisDashboard({ data }: AnalysisDashboardProps) {
                     <div className={styles.chartCard}>
                         <h3 className={styles.chartTitle}>Volume by Sentiment</h3>
                         <ResponsiveContainer width="100%" height={380}>
-                            <BarChart data={topicChartData.sort((a, b) => b.value - a.value).slice(0, 10)}>
+                            <BarChart data={[...topicChartData].sort((a, b) => b.value - a.value).slice(0, 10)}>
                                 <CartesianGrid strokeDasharray="3 3" stroke={COLORS.border} />
                                 <XAxis dataKey="name" stroke={COLORS.textMuted} tick={{ fontSize: 12 }} />
                                 <YAxis stroke={COLORS.textMuted} />
