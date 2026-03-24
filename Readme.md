@@ -572,20 +572,15 @@ The Nest.js application is initialized in `main.ts`, which serves as the entry p
 
 The following diagram illustrates the sequence of operations during the application startup:
 
+```mermaid
 graph TD
-    A[Start Application] --> B[Initialize AppModule & Dependencies]
-    B --> C["NestFactory.create(AppModule)"]
-    C --> D{App Instance Created?}
-    
-    D -- Yes --> E[app.enableCors]
-    E --> F[app.useGlobalPipes - ValidationPipe]
-    F --> G[Setup Swagger Documentation]
-    G --> H["app.listen(process.env.PORT || 3000)"]
-    H --> I[Trigger Lifecycle Hooks - OnModuleInit]
-    I --> J[Application Ready & Listening]
-    
-    D -- No --> K[Catch Error & process.exit]
-    K --> L[Application Shutdown]
+    A[Start Application] --> B{"NestFactory.create(AppModule)"}
+    B --> C[Enable CORS]
+    C --> D[Use Global ValidationPipes]
+    D --> E[Setup Swagger Documentation]
+    E --> F["Listen on Port (3000 or env.PORT)"]
+    F --> G[Application Ready]
+```
 Sources: [main-server/src/main.ts:7-24](main-server/src/main.ts#L7-L24)
 
 ### Key Configurations
