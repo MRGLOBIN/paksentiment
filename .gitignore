@@ -1,0 +1,9 @@
+.env.docker
+.env
+.env.example
+.env.local
+.env.prod
+.env.docker
+.secrets.toml
+.env.docker
+.secrets.toml
